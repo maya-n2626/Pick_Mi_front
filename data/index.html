@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>PickMi - Anonymous Note Throwing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+
+  <!-- ====== LOGIN ====== -->
+  <div class="container" id="login-screen">
+    <h1>התחברות</h1>
+    <form id="login-form">
+      <div class="input-group">
+        <label for="login-email">אימייל</label>
+        <input type="email" id="login-email" required>
+      </div>
+      <div class="input-group">
+        <label for="login-password">סיסמה</label>
+        <input type="password" id="login-password" required>
+      </div>
+      <div id="login-error" class="error-msg hidden"></div>
+      <button type="submit">התחבר</button>
+    </form>
+    <button class="btn-link" id="to-forgot">שכחתי סיסמה</button>
+  </div>
+
+  <!-- ====== WRONG PASSWORD ====== -->
+  <div class="container hidden" id="wrong-password-screen">
+    <h1>סיסמה שגויה</h1>
+    <div class="error-msg" style="margin-bottom:20px;">הסיסמה או האימייל שהזנת שגויים.</div>
+    <button id="wrong-back">חזור להתחברות</button>
+    <button class="btn-link" id="wrong-forgot">שכחתי סיסמה</button>
+  </div>
+
+  <!-- ====== FORGOT PASSWORD ====== -->
+  <div class="container hidden" id="forgot-password-screen">
+    <h1>איפוס סיסמה</h1>
+    <form id="forgot-form">
+      <div class="input-group">
+        <label for="forgot-email">הזן כתובת אימייל</label>
+        <input type="email" id="forgot-email" required>
+      </div>
+      <div id="forgot-error" class="error-msg hidden"></div>
+      <button type="submit">שלח קישור איפוס</button>
+    </form>
+    <button class="btn-link" id="forgot-back">חזור להתחברות</button>
+  </div>
+
+  <!-- ====== RESET SENT CONFIRM ====== -->
+  <div class="container hidden" id="reset-sent-screen">
+    <h1>קישור נשלח</h1>
+    <div class="success-msg" style="margin-bottom:16px;">
+      אם יש חשבון עבור כתובת האימייל הזאת, קישור לאיפוס סיסמה נשלח אליך.
+    </div>
+    <button id="sent-back">חזור להתחברות</button>
+  </div>
+
+  <!-- ====== HOME (MAP) ====== -->
+  <div id="home-bg" class="hidden">
+  </div>
+  <div id="home-content" class="container hidden">
+    <div class="user-icon" title="פרטי משתמש">👤</div>
+    <h1>ברוך הבא לפיקמי!</h1>
+    <div id="notes-list"></div>
+    <button id="logout-btn" class="btn-link" style="margin-top:20px;">התנתק</button>
+    <button id="to-map-btn" class="btn-link" style="margin-top:20px;">מעבר למפה</button>
+
+  </div>
+  <!-- ====== MAP SCREEN ====== -->
+<div id="map-screen" class="container hidden">
+  <h2>המפה בסביבה שלך</h2>
+  <div id="big-map" style="width:100%;height:400px"></div>
+  <button id="back-to-home" class="btn-link" style="margin-top:20px;">חזור לדף הבית</button>
+</div>
+
+
+ <script src="../js/js.script"></script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY">
+</script>
+</body>
+</html>
+
+
+
+
+
+

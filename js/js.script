@@ -1,0 +1,118 @@
+document.addEventListener("DOMContentLoaded", function() {
+  const API_BASE = "/api";
+
+  // Utility: Show only the chosen screen
+  function show(screenId) {
+    document.querySelectorAll(".container, #home-bg, #home-content, #map-screen").forEach(
+      el => el.classList.add("hidden")
+    );
+    document.getElementById(screenId).classList.remove("hidden");
+    if (screenId === "home-content") {
+      document.getElementById("home-bg").classList.remove("hidden");
+    }
+  }
+
+  // Set dynamic background by location
+  function setHomeBackgroundByLocation(position) {
+    const { latitude, longitude } = position.coords;
+    let imageUrl = "../images/default.jpg"; // Default image
+    // Set the ranges as you want for different locations
+    if (latitude > 32.08 && latitude < 32.10 && longitude > 34.78 && longitude < 34.82) {
+      imageUrl = "../images/park.jpg"; // Park image
+    } else if (latitude > 32.05 && latitude < 32.07 && longitude > 34.75 && longitude < 34.78) {
+      imageUrl = "../images/sea.jpg"; // Sea image
+    }
+    const bgDiv = document.getElementById("home-bg");
+    bgDiv.style.backgroundImage = `url('${imageUrl}')`;
+    bgDiv.style.backgroundSize = "cover";
+    bgDiv.style.backgroundPosition = "center";
+  }
+
+  // Navigation functions
+  function gotoLogin() {
+    document.getElementById("login-error").classList.add("hidden");
+    show("login-screen");
+  }
+
+  async function gotoHome() {
+    show("home-content");
+    // Set background image according to location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(setHomeBackgroundByLocation, () => {
+        document.getElementById("home-bg").style.backgroundImage =
+          "url('../images/default.jpg')";
+      });
+    } else {
+      document.getElementById("home-bg").style.backgroundImage =
+        "url('../images/default.jpg')";
+    }
+    loadNearbyNotes();
+  }
+
+  // Map screen (Google Maps)
+  function loadBigMap() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+        const map = new google.maps.Map(document.getElementById("big-map"), {
+          center: { lat: latitude, lng: longitude },
+          zoom: 14,
+        });
+        // In the future: add notes markers
+      });
+    }
+  }
+
+  // Fetch nearby notes (dummy)
+  async function loadNearbyNotes() {
+    const token = localStorage.getItem("jwt");
+    let lat = 32.0853, lon = 34.7818;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        lat = pos.coords.latitude;
+        lon = pos.coords.longitude;
+        fetchNotes(lat, lon, token);
+      }, () => fetchNotes(lat, lon, token));
+    } else {
+      fetchNotes(lat, lon, token);
+    }
+  }
+
+  async function fetchNotes(lat, lon, token) {
+    // Dummy API for now - update when real backend
+    const notesList = document.getElementById("notes-list");
+    notesList.innerHTML = `
+      <div class="note-card">
+        📄 פתק קרוב<br>
+        <small>(${lat.toFixed(5)}, ${lon.toFixed(5)})</small>
+      </div>
+    `;
+  }
+
+  // ----- EVENT LISTENERS -----
+  document.getElementById("to-forgot").onclick = () => show("forgot-password-screen");
+  document.getElementById("login-form").onsubmit = function(e) {
+    e.preventDefault();
+    gotoHome();
+  };
+  document.getElementById("forgot-form").onsubmit = function(e) {
+    e.preventDefault();
+    show("reset-sent-screen");
+  };
+  document.getElementById("forgot-back").onclick = gotoLogin;
+  document.getElementById("sent-back").onclick = gotoLogin;
+  document.getElementById("to-map-btn").onclick = function() {
+    show("map-screen");
+    loadBigMap();
+  };
+  document.getElementById("back-to-home").onclick = function() {
+    gotoHome();
+  };
+  document.getElementById("logout-btn").onclick = function() {
+    localStorage.removeItem("jwt");
+    gotoLogin();
+  };
+
+  // Start on login
+  gotoLogin();
+});

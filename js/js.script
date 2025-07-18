@@ -1,139 +1,184 @@
 document.addEventListener("DOMContentLoaded", function() {
+  // === Constants & Tokens ===
+  const API_BASE = "http://localhost:3000/api";
+  const jwt = () => localStorage.getItem("jwt") || "";
+
+  // === API Wrapper ===
+  async function apiFetch(path, options = {}) {
+    const headers = options.headers || {};
+    if (!headers["Authorization"] && jwt()) {
+      headers["Authorization"] = "Bearer " + jwt();
+    }
+    if (options.body && !headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
+    const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw err.error?.message || res.statusText;
+    }
+    return res.status !== 204 ? res.json() : {};
+  }
+
+  // Auth
+  async function signin(email, password) {
+    const data = await apiFetch("/auth/signin", {
+      method: "POST",
+      body: JSON.stringify({ email, password })
+    });
+    localStorage.setItem("jwt", data.token);
+    return true;
+  }
+
+  // Notes
+  async function getNearbyNotes(lat, lon, radius = 500) {
+    return apiFetch(`/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`);
+  }
+
+  // === UI Navigation & Screens ===
   function show(screenId) {
-    document.querySelectorAll(".container, #home-bg, #home-content, #map-screen").forEach(
-      el => el.classList.add("hidden")
-    );
+    document.querySelectorAll(".container, #home-bg, #home-content, #map-screen")
+      .forEach(el => el.classList.add("hidden"));
     document.getElementById(screenId).classList.remove("hidden");
     if (screenId === "home-content") {
       document.getElementById("home-bg").classList.remove("hidden");
     }
   }
- function loadBigMap() {
-  const mapDiv = document.getElementById("big-map");
-  
-  // מגדירים מפה עם מרכז ברירת מחדל
-  const map = new google.maps.Map(mapDiv, {
-    center: { lat: 32.1, lng: 34.8 }, // ברירת מחדל (אפשר לשנות)
-    zoom: 14
-  });
 
-  // מנסים לקבל מיקום גאוגרפי מהדפדפן
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const userLocation = {
+  // === Signin Form ===
+  document.getElementById("login-form").onsubmit = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value;
+    try {
+      await signin(email, password);
+      gotoHome();
+    } catch (err) {
+      document.getElementById("login-error").textContent = err;
+      document.getElementById("login-error").classList.remove("hidden");
+    }
+  };
+
+  document.getElementById("to-forgot").onclick = () => show("forgot-password-screen");
+
+  // === Load Nearby Notes ===
+  async function loadNearbyNotes() {
+    const notesList = document.getElementById("notes-list");
+    notesList.innerHTML = "טוען...";
+    if (!navigator.geolocation) {
+      notesList.innerHTML = "Geolocation לא נתמך בדפדפן.";
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(async position => {
+      try {
+        const data = await getNearbyNotes(
+          position.coords.latitude,
+          position.coords.longitude,
+          500
+        );
+        notesList.innerHTML = "";
+        if (data.length === 0) {
+          notesList.textContent = "אין פיקודים באזור הקרוב.";
+          return;
+        }
+        data.forEach(note => {
+          const div = document.createElement("div");
+          div.textContent = `פתק ID: ${note.id} – (${note.location.lat.toFixed(4)}, ${note.location.lon.toFixed(4)})`;
+          notesList.appendChild(div);
+        });
+      } catch (err) {
+        notesList.innerHTML = "שגיאה בטעינת הפיקודים.";
+        console.error(err);
+      }
+    }, () => {
+      notesList.innerHTML = "לא ניתן לקבל את המיקום שלך.";
+    });
+  }
+
+  // === Google Map Screen ===
+  function loadBigMap() {
+    const mapDiv = document.getElementById("big-map");
+    const map = new google.maps.Map(mapDiv, {
+      center: { lat: 32.1, lng: 34.8 },
+      zoom: 14
+    });
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const userLoc = {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
-        // ממקדים את המפה במיקום המשתמש
-        map.setCenter(userLocation);
-
-        // אופציונלי: סימון מיקום המשתמש עם Marker
-        new google.maps.Marker({
-          position: userLocation,
-          map: map,
-          title: "המיקום שלך"
-        });
-      },
-      () => {
-        console.warn("המשתמש לא אישר גישה למיקום, או שיש שגיאה");
-      }
-    );
-  } else {
-    console.warn("Geolocation לא נתמך בדפדפן זה");
-  }
-}
-
-
-  // רקע דינמי לפי מיקום: פארק -> ים -> רחוב
-  function setHomeBackgroundByLocation(position) {
-    const { latitude, longitude } = position.coords;
-      console.log("Current position:", latitude, longitude);
-
-    let imageUrl = "../images/default.jpg"; // ברירת מחדל
-
-    if (window.google && google.maps && google.maps.places) {
-      const service = new google.maps.places.PlacesService(document.createElement('div'));
-
-      // 1. בדוק פארק
-      service.nearbySearch({
-        location: new google.maps.LatLng(latitude, longitude),
-        radius: 200,
-        type: ['park']
-      }, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-          setHomeBackgroundImage("../images/Park_BG.png");
-        } else {
-          // 2. בדוק ים/חוף
-          service.nearbySearch({
-            location: new google.maps.LatLng(latitude, longitude),
-            radius: 700,
-            type: ['beach'],
-            keyword: 'sea'
-          }, (results, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-              setHomeBackgroundImage("../images/sea.png");
-            } else {
-              // 3. ברירת מחדל - רחוב
-              setHomeBackgroundImage("../images/street.png");
-            }
-          });
-        }
-      });
-    } else {
-      setHomeBackgroundImage(imageUrl);
+        map.setCenter(userLoc);
+        new google.maps.Marker({ position: userLoc, map, title: "המיקום שלך" });
+      }, () => console.warn("נכשל בקבלת המיקום"));
     }
   }
 
-  function setHomeBackgroundImage(imageUrl) {
-    const bgDiv = document.getElementById("home-bg");
-    bgDiv.style.backgroundImage = `url('${imageUrl}')`;
-    bgDiv.style.backgroundSize = "cover";
-    bgDiv.style.backgroundPosition = "center";
+  document.getElementById("to-map-btn").onclick = () => {
+    show("map-screen");
+    loadBigMap();
+  };
+  document.getElementById("back-to-home").onclick = gotoHome;
+
+  // === Dynamic Home Background ===
+  function setHomeBackgroundImage(url) {
+    const bg = document.getElementById("home-bg");
+    bg.style.backgroundImage = `url('${url}')`;
+    bg.style.backgroundSize = "cover";
+    bg.style.backgroundPosition = "center";
   }
 
+  function setHomeBackgroundByLocation(position) {
+    const { latitude, longitude } = position.coords;
+    const service = new google.maps.places.PlacesService(
+      document.createElement("div")
+    );
+    service.nearbySearch({
+      location: new google.maps.LatLng(latitude, longitude),
+      radius: 200,
+      type: ["park"]
+    }, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results.length) {
+        setHomeBackgroundImage("../images/Park_BG.png");
+      } else {
+        service.nearbySearch({
+          location: new google.maps.LatLng(latitude, longitude),
+          radius: 700,
+          type: ["beach"],
+          keyword: "sea"
+        }, (res2, st2) => {
+          if (st2 === google.maps.places.PlacesServiceStatus.OK && res2.length) {
+            setHomeBackgroundImage("../images/sea.png");
+          } else {
+            setHomeBackgroundImage("../images/street.png");
+          }
+        });
+      }
+    });
+  }
+
+  // === Home & Logout ===
+  function gotoHome() {
+    show("home-content");
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        setHomeBackgroundByLocation,
+        () => setHomeBackgroundImage("../images/default.jpg")
+      );
+    } else {
+      setHomeBackgroundImage("../images/default.jpg");
+    }
+    loadNearbyNotes();
+  }
+  document.getElementById("logout-btn").onclick = () => {
+    localStorage.removeItem("jwt");
+    show("login-screen");
+  };
+
+  // === Initial Screen ===
+  gotoLogin();
   function gotoLogin() {
     document.getElementById("login-error").classList.add("hidden");
     show("login-screen");
   }
-
-  document.getElementById("to-forgot").onclick = () => show("forgot-password-screen");
-  document.getElementById("login-form").onsubmit = function(e) {
-    e.preventDefault();
-    gotoHome();
-  };
-  document.getElementById("forgot-form").onsubmit = function(e) {
-    e.preventDefault();
-    show("reset-sent-screen");
-  };
-  document.getElementById("forgot-back").onclick = gotoLogin;
-  document.getElementById("sent-back").onclick = gotoLogin;
-
-  document.getElementById("to-map-btn").onclick = function() {
-    show("map-screen");
-    loadBigMap && loadBigMap();
-  };
-  document.getElementById("back-to-home").onclick = function() {
-    gotoHome();
-  };
-
-  // מסך בית עם רקע דינמי
-  function gotoHome() {
-    show("home-content");
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(setHomeBackgroundByLocation, () => {
-        setHomeBackgroundImage("../images/default.jpg");
-      });
-    } else {
-      setHomeBackgroundImage("../images/default.jpg");
-    }
-    if (typeof loadNearbyNotes === "function") loadNearbyNotes();
-  }
-
-  document.getElementById("logout-btn").onclick = function() {
-    localStorage.removeItem("jwt");
-    gotoLogin();
-  }
-
-  gotoLogin();
 });

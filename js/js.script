@@ -21,13 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // === Auth Endpoints ===
-  async function signup(email, password) {
-    return apiFetch("/api/auth/signup", {
-      method: "POST",
-      body: JSON.stringify({ email, password })
-    });
-  }
-
   async function signin(email, password) {
     const { token } = await apiFetch("/api/auth/signin", {
       method: "POST",
@@ -44,68 +37,13 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  async function resetPassword(token, newPassword) {
-    return apiFetch("/api/auth/reset-password", {
-      method: "POST",
-      body: JSON.stringify({ token, newPassword })
-    });
-  }
-
-  async function deleteAccount(password) {
-    return apiFetch("/api/auth/me", {
-      method: "DELETE",
-      body: JSON.stringify({ password })
-    });
-  }
-
   // === Notes Endpoints ===
-  async function throwNote(text, drawingData, lat, lon, placeId) {
-    return apiFetch("/api/notes", {
-      method: "POST",
-      body: JSON.stringify({
-        content: { text, drawingData },
-        location: { latitude: lat, longitude: lon, placeId }
-      })
-    });
-  }
-
   async function getNearbyNotes(lat, lon, radius = 500) {
     return apiFetch(`/api/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`);
   }
 
-  async function getNoteContent(id, lat, lon) {
-    return apiFetch(`/api/notes/${id}?lat=${lat}&lon=${lon}`);
-  }
-
-  async function deleteNote(id, lat, lon) {
-    return apiFetch(`/api/notes/${id}`, {
-      method: "DELETE",
-      body: JSON.stringify({ latitude: lat, longitude: lon })
-    });
-  }
-
   // === Admin Endpoints ===
-  async function getAllUsers() {
-    return apiFetch("/api/admin/users");
-  }
-  async function getAllNotesAdmin() {
-    return apiFetch("/api/admin/notes");
-  }
-  async function getUserById(userId) {
-    return apiFetch(`/api/admin/users/${userId}`);
-  }
-  async function getNoteById(noteId) {
-    return apiFetch(`/api/admin/notes/${noteId}`);
-  }
-  async function getUserNotes(userId) {
-    return apiFetch(`/api/admin/users/${userId}/notes`);
-  }
-  async function deleteUser(userId) {
-    return apiFetch(`/api/admin/users/${userId}`, { method: "DELETE" });
-  }
-  async function deleteNoteAdmin(noteId) {
-    return apiFetch(`/api/admin/notes/${noteId}`, { method: "DELETE" });
-  }
+  // … (לא מוצגות כאן כדי להתמקד ב‑flow)
 
   // === UI Navigation & Screens ===
   function show(screenId) {
@@ -137,37 +75,38 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // === Event Listeners ===
 
- 
-
   // Sign In
   document.getElementById("login-form").onsubmit = async e => {
     e.preventDefault();
-    const email = document.getElementById("login-email").value.trim();
-    const pwd   = document.getElementById("login-password").value;
     try {
+      const email = document.getElementById("login-email").value.trim();
+      const pwd   = document.getElementById("login-password").value;
       await signin(email, pwd);
       gotoHome();
-    } catch (err) {
-      document.getElementById("login-error").textContent = err;
-      document.getElementById("login-error").classList.remove("hidden");
+    } catch (_) {
+      show("wrong-password-screen");
     }
   };
 
   // Forgot Password
   document.getElementById("to-forgot").onclick = () =>
     show("forgot-password-screen");
+
   document.getElementById("forgot-form").onsubmit = async e => {
     e.preventDefault();
     const email = document.getElementById("forgot-email").value.trim();
+    const errEl = document.getElementById("forgot-error");
+    errEl.classList.add("hidden");
+
     try {
       await forgotPassword(email);
       show("reset-sent-screen");
     } catch (err) {
-      const el = document.getElementById("forgot-error");
-      el.textContent = err;
-      el.classList.remove("hidden");
+      errEl.textContent = err;
+      errEl.classList.remove("hidden");
     }
   };
+
   document.getElementById("forgot-back").onclick = gotoLogin;
   document.getElementById("sent-back").onclick   = gotoLogin;
 
@@ -194,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const notesList = document.getElementById("notes-list");
     notesList.textContent = "טוען...";
     if (!navigator.geolocation) {
-      notesList.textContent = "Geolocation לא נתמך בדפדפן.";
+      notesList.textContent = "Geolocation לא נתמך.";
       return;
     }
     navigator.geolocation.getCurrentPosition(

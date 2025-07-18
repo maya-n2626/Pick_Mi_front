@@ -1,18 +1,18 @@
 document.addEventListener("DOMContentLoaded", function() {
   // === Constants & Tokens ===
-  const API_BASE = "http://localhost:3000/api";
-  const jwt = () => localStorage.getItem("jwt") || "";
+  const API_BASE = "http://localhost:3000";
+  const jwt       = () => localStorage.getItem("jwt") || "";
 
   // === API Wrapper ===
   async function apiFetch(path, options = {}) {
     const headers = options.headers || {};
-    if (!headers["Authorization"] && jwt()) {
-      headers["Authorization"] = "Bearer " + jwt();
+    if (!headers.Authorization && jwt()) {
+      headers.Authorization = "Bearer " + jwt();
     }
     if (options.body && !headers["Content-Type"]) {
       headers["Content-Type"] = "application/json";
     }
-    const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+    const res = await fetch(API_BASE + path, { ...options, headers });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw err.error?.message || res.statusText;
@@ -20,19 +20,91 @@ document.addEventListener("DOMContentLoaded", function() {
     return res.status !== 204 ? res.json() : {};
   }
 
-  // Auth
-  async function signin(email, password) {
-    const data = await apiFetch("/auth/signin", {
+  // === Auth Endpoints ===
+  async function signup(email, password) {
+    return apiFetch("/api/auth/signup", {
       method: "POST",
       body: JSON.stringify({ email, password })
     });
-    localStorage.setItem("jwt", data.token);
-    return true;
   }
 
-  // Notes
+  async function signin(email, password) {
+    const { token } = await apiFetch("/api/auth/signin", {
+      method: "POST",
+      body: JSON.stringify({ email, password })
+    });
+    localStorage.setItem("jwt", token);
+    return token;
+  }
+
+  async function forgotPassword(email) {
+    return apiFetch("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email })
+    });
+  }
+
+  async function resetPassword(token, newPassword) {
+    return apiFetch("/api/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, newPassword })
+    });
+  }
+
+  async function deleteAccount(password) {
+    return apiFetch("/api/auth/me", {
+      method: "DELETE",
+      body: JSON.stringify({ password })
+    });
+  }
+
+  // === Notes Endpoints ===
+  async function throwNote(text, drawingData, lat, lon, placeId) {
+    return apiFetch("/api/notes", {
+      method: "POST",
+      body: JSON.stringify({
+        content: { text, drawingData },
+        location: { latitude: lat, longitude: lon, placeId }
+      })
+    });
+  }
+
   async function getNearbyNotes(lat, lon, radius = 500) {
-    return apiFetch(`/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`);
+    return apiFetch(`/api/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`);
+  }
+
+  async function getNoteContent(id, lat, lon) {
+    return apiFetch(`/api/notes/${id}?lat=${lat}&lon=${lon}`);
+  }
+
+  async function deleteNote(id, lat, lon) {
+    return apiFetch(`/api/notes/${id}`, {
+      method: "DELETE",
+      body: JSON.stringify({ latitude: lat, longitude: lon })
+    });
+  }
+
+  // === Admin Endpoints ===
+  async function getAllUsers() {
+    return apiFetch("/api/admin/users");
+  }
+  async function getAllNotesAdmin() {
+    return apiFetch("/api/admin/notes");
+  }
+  async function getUserById(userId) {
+    return apiFetch(`/api/admin/users/${userId}`);
+  }
+  async function getNoteById(noteId) {
+    return apiFetch(`/api/admin/notes/${noteId}`);
+  }
+  async function getUserNotes(userId) {
+    return apiFetch(`/api/admin/users/${userId}/notes`);
+  }
+  async function deleteUser(userId) {
+    return apiFetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+  }
+  async function deleteNoteAdmin(noteId) {
+    return apiFetch(`/api/admin/notes/${noteId}`, { method: "DELETE" });
   }
 
   // === UI Navigation & Screens ===
@@ -45,119 +117,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // === Signin Form ===
-  document.getElementById("login-form").onsubmit = async function(e) {
-    e.preventDefault();
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value;
-    try {
-      await signin(email, password);
-      gotoHome();
-    } catch (err) {
-      document.getElementById("login-error").textContent = err;
-      document.getElementById("login-error").classList.remove("hidden");
-    }
-  };
-
-  document.getElementById("to-forgot").onclick = () => show("forgot-password-screen");
-
-  // === Load Nearby Notes ===
-  async function loadNearbyNotes() {
-    const notesList = document.getElementById("notes-list");
-    notesList.innerHTML = "טוען...";
-    if (!navigator.geolocation) {
-      notesList.innerHTML = "Geolocation לא נתמך בדפדפן.";
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(async position => {
-      try {
-        const data = await getNearbyNotes(
-          position.coords.latitude,
-          position.coords.longitude,
-          500
-        );
-        notesList.innerHTML = "";
-        if (data.length === 0) {
-          notesList.textContent = "אין פיקודים באזור הקרוב.";
-          return;
-        }
-        data.forEach(note => {
-          const div = document.createElement("div");
-          div.textContent = `פתק ID: ${note.id} – (${note.location.lat.toFixed(4)}, ${note.location.lon.toFixed(4)})`;
-          notesList.appendChild(div);
-        });
-      } catch (err) {
-        notesList.innerHTML = "שגיאה בטעינת הפיקודים.";
-        console.error(err);
-      }
-    }, () => {
-      notesList.innerHTML = "לא ניתן לקבל את המיקום שלך.";
-    });
+  function gotoLogin() {
+    document.getElementById("login-error").classList.add("hidden");
+    show("login-screen");
   }
 
-  // === Google Map Screen ===
-  function loadBigMap() {
-    const mapDiv = document.getElementById("big-map");
-    const map = new google.maps.Map(mapDiv, {
-      center: { lat: 32.1, lng: 34.8 },
-      zoom: 14
-    });
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(position => {
-        const userLoc = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        map.setCenter(userLoc);
-        new google.maps.Marker({ position: userLoc, map, title: "המיקום שלך" });
-      }, () => console.warn("נכשל בקבלת המיקום"));
-    }
-  }
-
-  document.getElementById("to-map-btn").onclick = () => {
-    show("map-screen");
-    loadBigMap();
-  };
-  document.getElementById("back-to-home").onclick = gotoHome;
-
-  // === Dynamic Home Background ===
-  function setHomeBackgroundImage(url) {
-    const bg = document.getElementById("home-bg");
-    bg.style.backgroundImage = `url('${url}')`;
-    bg.style.backgroundSize = "cover";
-    bg.style.backgroundPosition = "center";
-  }
-
-  function setHomeBackgroundByLocation(position) {
-    const { latitude, longitude } = position.coords;
-    const service = new google.maps.places.PlacesService(
-      document.createElement("div")
-    );
-    service.nearbySearch({
-      location: new google.maps.LatLng(latitude, longitude),
-      radius: 200,
-      type: ["park"]
-    }, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && results.length) {
-        setHomeBackgroundImage("../images/Park_BG.png");
-      } else {
-        service.nearbySearch({
-          location: new google.maps.LatLng(latitude, longitude),
-          radius: 700,
-          type: ["beach"],
-          keyword: "sea"
-        }, (res2, st2) => {
-          if (st2 === google.maps.places.PlacesServiceStatus.OK && res2.length) {
-            setHomeBackgroundImage("../images/sea.png");
-          } else {
-            setHomeBackgroundImage("../images/street.png");
-          }
-        });
-      }
-    });
-  }
-
-  // === Home & Logout ===
   function gotoHome() {
     show("home-content");
     if (navigator.geolocation) {
@@ -170,15 +134,152 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     loadNearbyNotes();
   }
+
+  // === Event Listeners ===
+
+ 
+
+  // Sign In
+  document.getElementById("login-form").onsubmit = async e => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value.trim();
+    const pwd   = document.getElementById("login-password").value;
+    try {
+      await signin(email, pwd);
+      gotoHome();
+    } catch (err) {
+      document.getElementById("login-error").textContent = err;
+      document.getElementById("login-error").classList.remove("hidden");
+    }
+  };
+
+  // Forgot Password
+  document.getElementById("to-forgot").onclick = () =>
+    show("forgot-password-screen");
+  document.getElementById("forgot-form").onsubmit = async e => {
+    e.preventDefault();
+    const email = document.getElementById("forgot-email").value.trim();
+    try {
+      await forgotPassword(email);
+      show("reset-sent-screen");
+    } catch (err) {
+      const el = document.getElementById("forgot-error");
+      el.textContent = err;
+      el.classList.remove("hidden");
+    }
+  };
+  document.getElementById("forgot-back").onclick = gotoLogin;
+  document.getElementById("sent-back").onclick   = gotoLogin;
+
+  // Wrong Password Screen
+  document.getElementById("wrong-back").onclick   = gotoLogin;
+  document.getElementById("wrong-forgot").onclick = () =>
+    show("forgot-password-screen");
+
+  // Logout
   document.getElementById("logout-btn").onclick = () => {
     localStorage.removeItem("jwt");
-    show("login-screen");
+    gotoLogin();
   };
+
+  // Map Navigation
+  document.getElementById("to-map-btn").onclick = () => {
+    show("map-screen");
+    loadBigMap();
+  };
+  document.getElementById("back-to-home").onclick = gotoHome;
+
+  // === Load Nearby Notes ===
+  async function loadNearbyNotes() {
+    const notesList = document.getElementById("notes-list");
+    notesList.textContent = "טוען...";
+    if (!navigator.geolocation) {
+      notesList.textContent = "Geolocation לא נתמך בדפדפן.";
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        try {
+          const data = await getNearbyNotes(pos.coords.latitude, pos.coords.longitude);
+          notesList.innerHTML = "";
+          if (!data.length) {
+            notesList.textContent = "אין פיקודים באזור הקרוב.";
+            return;
+          }
+          data.forEach(n => {
+            const div = document.createElement("div");
+            div.textContent = `פתק ID: ${n.id} – (${n.location.lat.toFixed(4)}, ${n.location.lon.toFixed(4)})`;
+            notesList.appendChild(div);
+          });
+        } catch {
+          notesList.textContent = "שגיאה בטעינת הפיקודים.";
+        }
+      },
+      () => {
+        notesList.textContent = "לא ניתן לקבל את המיקום שלך.";
+      }
+    );
+  }
+
+  // === Google Map ===
+  function loadBigMap() {
+    const map = new google.maps.Map(document.getElementById("big-map"), {
+      center: { lat: 32.1, lng: 34.8 },
+      zoom: 14
+    });
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          map.setCenter(loc);
+          new google.maps.Marker({ position: loc, map, title: "המיקום שלך" });
+        },
+        () => console.warn("נכשל בקבלת המיקום")
+      );
+    }
+  }
+
+  // === Dynamic Background ===
+  function setHomeBackgroundImage(url) {
+    const bg = document.getElementById("home-bg");
+    bg.style.backgroundImage = `url('${url}')`;
+    bg.style.backgroundSize = "cover";
+    bg.style.backgroundPosition = "center";
+  }
+  function setHomeBackgroundByLocation(pos) {
+    const svc = new google.maps.places.PlacesService(
+      document.createElement("div")
+    );
+    svc.nearbySearch(
+      {
+        location: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
+        radius: 200,
+        type: ["park"]
+      },
+      (res, st) => {
+        if (st === google.maps.places.PlacesServiceStatus.OK && res.length) {
+          setHomeBackgroundImage("../images/Park_BG.png");
+        } else {
+          svc.nearbySearch(
+            {
+              location: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
+              radius: 700,
+              type: ["beach"],
+              keyword: "sea"
+            },
+            (r2, s2) => {
+              if (s2 === google.maps.places.PlacesServiceStatus.OK && r2.length) {
+                setHomeBackgroundImage("../images/sea.png");
+              } else {
+                setHomeBackgroundImage("../images/street.png");
+              }
+            }
+          );
+        }
+      }
+    );
+  }
 
   // === Initial Screen ===
   gotoLogin();
-  function gotoLogin() {
-    document.getElementById("login-error").classList.add("hidden");
-    show("login-screen");
-  }
 });

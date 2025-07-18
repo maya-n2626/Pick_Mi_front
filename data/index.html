@@ -35,18 +35,29 @@
   </div>
 
   <!-- ====== FORGOT PASSWORD ====== -->
-  <div class="container hidden" id="forgot-password-screen">
-    <h1>איפוס סיסמה</h1>
-    <form id="forgot-form">
-      <div class="input-group">
-        <label for="forgot-email">הזן כתובת אימייל</label>
-        <input type="email" id="forgot-email" required>
-      </div>
-      <div id="forgot-error" class="error-msg hidden"></div>
-      <button type="submit">שלח קישור איפוס</button>
-    </form>
-    <button class="btn-link" id="forgot-back">חזור להתחברות</button>
-  </div>
+<div class="container hidden" id="forgot-password-screen">
+  <h1>איפוס סיסמה</h1>
+  <form id="forgot-form">
+    <div class="input-group">
+      <label for="forgot-email">Email</label>
+      <input
+        type="email"
+        id="forgot-email"
+        placeholder="myEmail@gmail.com"
+        required
+      />
+    </div>
+    <div id="forgot-error" class="error-msg hidden"></div>
+    <div class="button-group">
+      <button type="button" id="forgot-cancel" class="btn">
+        Cancel
+      </button>
+      <button type="submit" id="forgot-submit" class="btn-primary">
+        Reset Password
+      </button>
+    </div>
+  </form>
+</div>
 
   <!-- ====== RESET SENT CONFIRM ====== -->
   <div class="container hidden" id="reset-sent-screen">

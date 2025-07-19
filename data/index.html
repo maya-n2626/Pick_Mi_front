@@ -8,6 +8,7 @@
 </head>
 <body>
 
+ 
   <!-- ====== LOGIN ====== -->
   <div class="container" id="login-screen">
     <h1>התחברות</h1>
@@ -23,7 +24,28 @@
       <div id="login-error" class="error-msg hidden"></div>
       <button type="submit">התחבר</button>
     </form>
-    <button class="btn-link" id="to-forgot">שכחתי סיסמה</button>
+    <div class="button-group">
+      <button class="btn-link" id="to-forgot">שכחתי סיסמה</button>
+      <button class="btn-link" id="to-signup">הרשמה</button>
+    </div>
+  </div>
+
+  <!-- ====== SIGNUP ====== -->
+  <div class="container hidden" id="signup-screen">
+    <h1>הרשמה</h1>
+    <form id="signup-form">
+      <div class="input-group">
+        <label for="signup-email">אימייל</label>
+        <input type="email" id="signup-email" required>
+      </div>
+      <div class="input-group">
+        <label for="signup-password">סיסמה</label>
+        <input type="password" id="signup-password" required>
+      </div>
+      <div id="signup-error" class="error-msg hidden"></div>
+      <button type="submit">שמור</button>
+    </form>
+    <button class="btn-link" id="signup-back">חזור להתחברות</button>
   </div>
 
   <!-- ====== WRONG PASSWORD ====== -->
@@ -87,7 +109,7 @@
 </div>
 
 
- <script src="../js/js.script"></script>
+ <script src="../js/script.js"></script>
 <script async defer
 
 

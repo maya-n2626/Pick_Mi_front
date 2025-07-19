@@ -23,15 +23,32 @@ document.addEventListener("DOMContentLoaded", function() {
       body: JSON.stringify({ email, password })
     });
   }
-
-  async function signin(email, password) {
-    const { token } = await apiFetch("/api/auth/signin", {
+async function signin(email, password) {
+  try {
+    // שולחים את ה‑POST ל־/api/auth/signin
+    const response = await apiFetch(`/api/auth/signin`, {
       method: "POST",
       body: JSON.stringify({ email, password })
     });
+
+    // מדפיסים את כל ה‑response מהשרת
+    console.log("signin response:", response);
+
+    // שולפים את הטוקן והמשתמש
+    const { token, user } = response;
+
+    // שומרים את הטוקן ב־localStorage
     localStorage.setItem("jwt", token);
-    return token;
+
+    // מחזירים גם את ה‑user וגם את ה‑token, למקרה שצריך אותם
+    return { user, token };
+  } catch (err) {
+    console.error("signin failed:", err);
+    throw err; // זורקים הלאה כדי שתוכלי לטפל ב‑.catch במקום הקריאה
   }
+}
+
+
 
   async function forgotPassword(email) {
     return apiFetch("/api/auth/forgot-password", {
@@ -139,12 +156,16 @@ document.addEventListener("DOMContentLoaded", function() {
     try {
       const email = document.getElementById("login-email").value.trim();
       const pwd = document.getElementById("login-password").value;
+      console.log(email,pwd);
       await signin(email, pwd);
+      
       gotoHome();
     } catch (_) {
       show("wrong-password-screen");
     }
   };
+
+
 
   // 2. Wrong Password Screen
   document.getElementById("wrong-back").onclick = gotoLogin;

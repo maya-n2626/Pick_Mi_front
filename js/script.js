@@ -95,13 +95,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // === UI Navigation & Screens ===
   function show(screenId) {
-    document.querySelectorAll(".container, #home-bg, #home-content, #map-screen")
-      .forEach(el => el.classList.add("hidden"));
-    document.getElementById(screenId).classList.remove("hidden");
-    if (screenId === "home-content") {
-      document.getElementById("home-bg").classList.remove("hidden");
-    }
+  document.querySelectorAll(
+    ".container, #home-bg, #home-content, #map-screen, #settings-screen"
+  ).forEach(el => el.classList.add("hidden"));
+  document.getElementById(screenId).classList.remove("hidden");
+  if (screenId === "home-content") {
+    document.getElementById("home-bg").classList.remove("hidden");
   }
+}
+
 
   function gotoLogin() {
     document.getElementById("login-error").classList.add("hidden");
@@ -183,28 +185,105 @@ document.addEventListener("DOMContentLoaded", function() {
       errEl.classList.remove("hidden");
     }
   };
-  document.getElementById("forgot-back").onclick = gotoLogin;
+  document.getElementById("forgot-cancel").onclick = gotoLogin;
   document.getElementById("sent-back").onclick = gotoLogin;
 
-  // 6. Logout
-  document.getElementById("logout-btn").onclick = () => {
+// 6. Logout
+const logoutBtn = document.getElementById("logout-btn");
+console.log("logoutBtn is", logoutBtn);
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    console.log("Logout button clicked");
     localStorage.removeItem("jwt");
     gotoLogin();
-  };
+  });
+}
+//7.Delete account
+document.getElementById("settings-btn").addEventListener("click", () => {
+  show("settings-screen");
+});
+document.getElementById("settings-back-btn").addEventListener("click", () => {
+  gotoHome();
+});
+document.getElementById("delete-account-btn").addEventListener("click", async () => {
+  const ok = confirm("אתה בטוח שברצונך למחוק את החשבון שלך? פעולה זו אינה ניתנת לביטול.");
+  if (!ok) return;
 
-  // 7. Map Navigation
-  document.getElementById("to-map-btn").onclick = () => {
-    show("map-screen");
-    loadBigMap();
-  };
-  document.getElementById("back-to-home").onclick = gotoHome;
+  try {
+    const pwd = prompt("הכנס את הסיסמה הנוכחית כדי לאשר מחיקה:");
+    if (!pwd) return alert("מחיקה בוטלה – לא הוזנה סיסמה.");
+    await deleteAccount(pwd);    
+    alert("החשבון נמחק בהצלחה.");
+    localStorage.removeItem("jwt");
+    gotoLogin();
+  } catch (err) {
+    console.error("Error deleting account:", err);
+    alert("אירעה שגיאה במחיקת החשבון: " + err);
+  }
+});
+
+
+
+// 8. Back from Map
+const backHomeBtn = document.getElementById("back-to-home");
+console.log("backHomeBtn is", backHomeBtn);
+if (backHomeBtn) {
+  backHomeBtn.addEventListener("click", () => {
+    console.log("Back to home clicked");
+    gotoHome();
+  });
+}
+
 
   // 8. Admin Flow (renderUsers / renderNotes)…
-  // … כאן ממשיכי עם שאר הקוד הקיים שלך …
+  
 
   // === Helpers for Home & Map ===
+// 7. Map Navigation + Geolocation
+document.getElementById("to-map-btn").addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    return alert("הדפדפן שלך לא תומך בגיאולוקיישן.");
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      // 1. עוברים למסך המפה
+      show("map-screen");
+
+      // 2. בונים מפה במיקום המשתמש
+      const userLoc = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      const map = new google.maps.Map(
+        document.getElementById("big-map"),
+        {
+          center: userLoc,
+          zoom: 14
+        }
+      );
+
+      // 3. מוסיפים Marker
+      new google.maps.Marker({
+        position: userLoc,
+        map,
+        title: "המיקום שלך"
+      });
+    },
+    error => {
+      if (error.code === error.PERMISSION_DENIED) {
+        alert("לא אישרת את השימוש במיקום, לא ניתן להציג מפה.");
+      } else {
+        console.warn("שגיאה בקבלת מיקום:", error);
+        alert("לא הצלחנו לקבל את המיקום שלך.");
+      }
+    }
+  );
+});
+
+
+
   async function loadNearbyNotes() { /* … */ }
-  function loadBigMap() { /* … */ }
   function setHomeBackgroundImage(url) { /* … */ }
   function setHomeBackgroundByLocation(pos) { /* … */ }
 

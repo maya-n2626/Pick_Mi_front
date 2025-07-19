@@ -90,15 +90,20 @@
     <button id="sent-back">חזור להתחברות</button>
   </div>
 
-  <!-- ====== HOME (MAP) ====== -->
+  <!-- ====== HOME ====== -->
   <div id="home-bg" class="hidden">
-  </div>
+  
   <div id="home-content" class="container hidden">
     <div class="user-icon" title="פרטי משתמש">👤</div>
     <h1>ברוך הבא לפיקמי!</h1>
     <div id="notes-list"></div>
     <button id="logout-btn" class="btn-link" style="margin-top:20px;">התנתק</button>
+
     <button id="to-map-btn" class="btn-link" style="margin-top:20px;">מעבר למפה</button>
+
+
+    <button id="settings-btn" title="הגדרות">⚙️</button>
+  </div>
 
   </div>
   <!-- ====== MAP SCREEN ====== -->
@@ -107,16 +112,26 @@
   <div id="big-map" style="width:100%;height:400px"></div>
   <button id="back-to-home" class="btn-link" style="margin-top:20px;">חזור לדף הבית</button>
 </div>
+<!-- ====== SETTINGS ====== -->
+<div id="settings-screen" class="container hidden">
+  <h1>הגדרות</h1>
+  <button id="delete-account-btn" class="btn-danger" style="margin-top:20px;">
+    מחק חשבון
+  </button>
+  <button id="settings-back-btn" class="btn-link" style="margin-top:20px;">
+    חזור
+  </button>
+</div>
 
 
- <script src="../js/script.js"></script>
-<script async defer
-
-
-
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY&libraries=places">
+<script  defer
+  
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY&libraries=places">
 
 </script>
+
+ <script defer src="../js/script.js"></script>
+
  
 </body>
 </html>

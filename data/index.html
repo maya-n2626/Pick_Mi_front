@@ -135,7 +135,10 @@
   <div class="note-large note-write">
     <img src="../images/WritePen (1).png" alt="פתק לכתיבה בעט" />
     <textarea id="note-text" placeholder="כתוב כאן..."></textarea>
+
     <button id="to-brush-btn" class="btn-link">עבור לצביעה</button>
+    <button id="save-text-note-btn" class="btn-primary">שמור פתק</button>
+
   </div>
 </div>
 
@@ -147,7 +150,16 @@
   <div class="note-large note-brush">
     <img src="../images/WriteBrush.png" alt="פתק לצביעה" />
     <canvas id="note-canvas" width="400" height="300"></canvas>
-    <button id="save-note-btn" class="btn-link">שמור פתק</button>
+    <!-- אפשרויות מברשת -->
+ <div class="brush-controls">
+  <label for="brush-color">צבע:</label>
+  <input type="color" id="brush-color" value="#000000">
+
+  <label for="brush-size">עובי:</label>
+  <input type="range" id="brush-size" min="1" max="30" value="5">
+</div>
+
+<button id="save-drawing-note-btn" class="btn-primary">שמור פתק</button>
   </div>
 </div>
 

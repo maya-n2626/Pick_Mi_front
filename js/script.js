@@ -178,6 +178,7 @@ async function forgotPassword(email) {
       method: "DELETE",
       body: JSON.stringify({ latitude: lat, longitude: lon })
     });
+
   }
 // 1. כשלוחצים על הכפתור החדש בדף הבית
 const newNoteBtn = document.getElementById("new-note-btn");
@@ -216,9 +217,9 @@ if (brushBackBtn) {
 
 
 // 5. כשלוחצים שמור פתק בצביעה
-document.getElementById("save-note-btn").addEventListener("click", async () => {
+document.getElementById("save-drawing-note-btn").addEventListener("click", async () => {
   // למשל: תאסוף את הטקסט מ־textarea והציור מ־canvas
-const saveBtn = document.getElementById("save-note-btn");
+const saveBtn = document.getElementById("save-drawing-note-btn");
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     const textInput = document.getElementById("note-text");
@@ -237,11 +238,24 @@ if (saveBtn) {
   });
 }
 
-  const drawingData = document.getElementById("note-canvas").toDataURL();
-  // תשלח ב־POST את הפתק (throwNote)
-  await throwNote(text, drawingData, currentLat, currentLon, currentPlaceId);
-  // ואז תחזור לדף הבית
-  gotoHome();
+const saveTextBtn = document.getElementById("save-text-note-btn");
+if (saveTextBtn) {
+  saveTextBtn.addEventListener("click", async () => {
+    const textInput = document.getElementById("note-text");
+
+    if (!textInput) {
+      console.warn("❗ אלמנט note-text לא נמצא");
+      return;
+    }
+
+    const text = textInput.value;
+    const drawingData = ""; 
+
+    await throwNote(text, drawingData, currentLat, currentLon, currentPlaceId);
+    gotoHome();
+  });
+}
+
 });
 
   // === Admin Endpoints ===
@@ -511,6 +525,54 @@ if (toMapBtn) {
 }
 
 
+const canvas = document.getElementById("note-canvas");
+const ctx = canvas.getContext("2d");
+const colorPicker = document.getElementById("brush-color");
+const sizePicker = document.getElementById("brush-size");
+
+let painting = false;
+let brushColor = "#000000";
+let brushSize = 5;
+
+colorPicker.addEventListener("input", (e) => {
+  brushColor = e.target.value;
+});
+
+sizePicker.addEventListener("input", (e) => {
+  brushSize = e.target.value;
+});
+
+canvas.addEventListener("mousedown", startPaint);
+canvas.addEventListener("mouseup", stopPaint);
+canvas.addEventListener("mouseout", stopPaint);
+canvas.addEventListener("mousemove", draw);
+
+function startPaint(e) {
+  painting = true;
+  draw(e);
+}
+
+function stopPaint() {
+  painting = false;
+  ctx.beginPath();
+}
+
+function draw(e) {
+  if (!painting) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  ctx.lineWidth = brushSize;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = brushColor;
+
+  ctx.lineTo(x, y);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+}
 
 
   // === Initial Screen ===

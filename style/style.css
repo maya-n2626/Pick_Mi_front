@@ -213,3 +213,64 @@ button:hover, .btn-link:hover {
   height: auto;
   display: block;
 }
+
+/* === פתק כתיבה בעט === */
+.note-write {
+  position: relative;
+}
+.note-write img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+#note-text {
+  position: absolute;
+  top: 26%;
+  left: 13%;
+  width: 74%;
+  height: 55%;
+  font-size: 1.1rem;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-family: 'Segoe UI', sans-serif;
+  color: #000;
+  outline: none;
+}
+
+/* === פתק צביעה === */
+.note-brush {
+  position: relative;
+}
+.note-brush img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+#note-canvas {
+  position: absolute;
+  top: 26%;
+  left: 13%;
+  width: 74%;
+  height: 55%;
+  background: transparent;
+  touch-action: none;
+}
+
+.brush-controls {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.brush-controls label {
+  margin-right: 5px;
+}
+
+.brush-controls input[type="color"],
+.brush-controls input[type="range"] {
+  cursor: pointer;
+}

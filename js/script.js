@@ -1,7 +1,14 @@
+
+
+
 document.addEventListener("DOMContentLoaded", function() {
-  // === Constants & Tokens ===
+
+  // === Auth Endpoints ===
+
+// === Constants & Tokens ===
   const API_BASE = "http://localhost:3000";
   const jwt = () => localStorage.getItem("jwt") || "";
+
 
   // === API Wrapper ===
   async function apiFetch(path, options = {}) {
@@ -16,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return res.status !== 204 ? res.json() : {};
   }
 
-  // === Auth Endpoints ===
+
   async function signup(email, password) {
     return apiFetch("/api/auth/signup", {
       method: "POST",
@@ -33,6 +40,8 @@ document.addEventListener("DOMContentLoaded", function() {
       console.log("signin response:", response);
       const { token, user } = response;
       localStorage.setItem("jwt", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
       return { user, token };
     } catch (err) {
       console.error("signin failed:", err);
@@ -40,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  async function forgotPassword(email) {
+async function forgotPassword(email) {
     return apiFetch("/api/auth/forgot-password", {
       method: "POST",
       body: JSON.stringify({ email })
@@ -54,12 +63,85 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  async function deleteAccount(password) {
+   async function deleteAccount(password) {
     return apiFetch("/api/auth/me", {
       method: "DELETE",
       body: JSON.stringify({ password })
     });
   }
+
+  // === Event Listeners & Flow ===
+  
+    // 0. מ‑Login ל‑Signup
+    document.getElementById("to-signup").onclick = () => {
+      document.getElementById("signup-error").classList.add("hidden");
+      show("signup-screen");
+    };
+  
+    // 1. חזרה מ‑Signup ל‑Login
+    document.getElementById("signup-back").onclick = gotoLogin;
+  
+    // 2. טיפול ב‑Signup
+    document.getElementById("signup-form").onsubmit = async e => {
+      e.preventDefault();
+      const errEl = document.getElementById("signup-error");
+      errEl.classList.add("hidden");
+      const email = document.getElementById("signup-email").value.trim();
+      const password = document.getElementById("signup-password").value;
+      try {
+        await signup(email, password);
+        alert("נרשמת בהצלחה! אנא התחברי.");
+        show("login-screen");
+      } catch (err) {
+        errEl.textContent = err;
+        errEl.classList.remove("hidden");
+      }
+    };
+  
+    // 3. Sign In
+    document.getElementById("login-form").onsubmit = async e => {
+      e.preventDefault();
+      try {
+        const email = document.getElementById("login-email").value.trim();
+        const pwd = document.getElementById("login-password").value;
+        await signin(email, pwd);
+        gotoHome();
+      } catch (_) {
+        show("wrong-password-screen");
+      }
+    };
+  
+    // 4. Wrong Password Screen
+    document.getElementById("wrong-back").onclick = gotoLogin;
+    document.getElementById("wrong-forgot").onclick = () =>
+      show("forgot-password-screen");
+  
+    // 5. Forgot Password Flow
+    document.getElementById("to-forgot").onclick = () =>
+      show("forgot-password-screen");
+    document.getElementById("forgot-form").onsubmit = async e => {
+      e.preventDefault();
+      const errEl = document.getElementById("forgot-error");
+      errEl.classList.add("hidden");
+      try {
+        const email = document.getElementById("forgot-email").value.trim();
+        await forgotPassword(email);
+        show("reset-sent-screen");
+      } catch (err) {
+        errEl.textContent = err;
+        errEl.classList.remove("hidden");
+      }
+    };
+   
+
+   const sentBackBtn = document.getElementById("sent-back");
+   console.log("sent-back element:", sentBackBtn);
+
+   if (sentBackBtn) {
+    sentBackBtn.addEventListener("click", gotoLogin);
+   }
+  
+  
 
   // === Notes Endpoints ===
   async function throwNote(text, drawingData, lat, lon, placeId) {
@@ -106,6 +188,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
   function gotoLogin() {
+      console.log("🔵 gotoLogin called");
+
     document.getElementById("login-error").classList.add("hidden");
     show("login-screen");
   }
@@ -115,78 +199,24 @@ document.addEventListener("DOMContentLoaded", function() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         setHomeBackgroundByLocation,
-        () => setHomeBackgroundImage("../images/default.jpg")
+        () => setHomeBackgroundImage()
       );
     } else {
       setHomeBackgroundImage("../images/default.jpg");
     }
     loadNearbyNotes();
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const role = user.props?.role;              // מושכים את ה-role מתוך props
+    const adminBtn = document.getElementById("admin-btn");
+
+   if (role === "admin") {
+  adminBtn.classList.remove("hidden");
+} else {
+  adminBtn.classList.add("hidden");
   }
+}
 
-  // === Event Listeners & Flow ===
-
-  // 0. מ‑Login ל‑Signup
-  document.getElementById("to-signup").onclick = () => {
-    document.getElementById("signup-error").classList.add("hidden");
-    show("signup-screen");
-  };
-
-  // 1. חזרה מ‑Signup ל‑Login
-  document.getElementById("signup-back").onclick = gotoLogin;
-
-  // 2. טיפול ב‑Signup
-  document.getElementById("signup-form").onsubmit = async e => {
-    e.preventDefault();
-    const errEl = document.getElementById("signup-error");
-    errEl.classList.add("hidden");
-    const email = document.getElementById("signup-email").value.trim();
-    const password = document.getElementById("signup-password").value;
-    try {
-      await signup(email, password);
-      alert("נרשמת בהצלחה! אנא התחברי.");
-      show("login-screen");
-    } catch (err) {
-      errEl.textContent = err;
-      errEl.classList.remove("hidden");
-    }
-  };
-
-  // 3. Sign In
-  document.getElementById("login-form").onsubmit = async e => {
-    e.preventDefault();
-    try {
-      const email = document.getElementById("login-email").value.trim();
-      const pwd = document.getElementById("login-password").value;
-      await signin(email, pwd);
-      gotoHome();
-    } catch (_) {
-      show("wrong-password-screen");
-    }
-  };
-
-  // 4. Wrong Password Screen
-  document.getElementById("wrong-back").onclick = gotoLogin;
-  document.getElementById("wrong-forgot").onclick = () =>
-    show("forgot-password-screen");
-
-  // 5. Forgot Password Flow
-  document.getElementById("to-forgot").onclick = () =>
-    show("forgot-password-screen");
-  document.getElementById("forgot-form").onsubmit = async e => {
-    e.preventDefault();
-    const errEl = document.getElementById("forgot-error");
-    errEl.classList.add("hidden");
-    try {
-      const email = document.getElementById("forgot-email").value.trim();
-      await forgotPassword(email);
-      show("reset-sent-screen");
-    } catch (err) {
-      errEl.textContent = err;
-      errEl.classList.remove("hidden");
-    }
-  };
-  document.getElementById("forgot-cancel").onclick = gotoLogin;
-  document.getElementById("sent-back").onclick = gotoLogin;
+  
 
 // 6. Logout
 const logoutBtn = document.getElementById("logout-btn");
@@ -233,13 +263,72 @@ if (backHomeBtn) {
     gotoHome();
   });
 }
+// כפתור פתיחת ה־Admin
+document.getElementById("admin-btn").addEventListener("click", () => {
+  show("admin-screen");
+  fetchAllUsers();
+  fetchAllNotes();
+});
+
+// כפתור חזרה
+document.getElementById("admin-back").addEventListener("click", gotoHome);
+
+// פונקציות העמסת הנתונים
+async function fetchAllUsers() {
+  try {
+    const users = await apiFetch("/api/admin/users");
+    const container = document.getElementById("admin-users");
+    container.innerHTML = users.map(u =>
+      `<div class="note-card">
+         <strong>${u.email}</strong> (${u.role})
+         <button data-id="${u.id}" class="btn-link admin-delete-user">מחק משתמש</button>
+       </div>`
+    ).join("");
+    // רישום מאזינים למחיקה
+    container.querySelectorAll(".admin-delete-user")
+      .forEach(btn =>
+        btn.onclick = async () => {
+          if (!confirm("למחוק משתמש זה?")) return;
+          await apiFetch(`/api/admin/users/${btn.dataset.id}`, { method: "DELETE" });
+          fetchAllUsers();
+        }
+      );
+  } catch (e) {
+    alert("שגיאה בשליפת משתמשים: " + e);
+  }
+}
+
+async function fetchAllNotes() {
+  try {
+    const notes = await apiFetch("/api/admin/notes");
+    const container = document.getElementById("admin-notes");
+    container.innerHTML = notes.map(n =>
+      `<div class="note-card">
+         <p>${n.content.text}</p>
+         <small>by ${n.userId}</small>
+         <button data-id="${n.id}" class="btn-link admin-delete-note">מחק פתק</button>
+       </div>`
+    ).join("");
+    // רישום מאזינים למחיקה
+    container.querySelectorAll(".admin-delete-note")
+      .forEach(btn =>
+        btn.onclick = async () => {
+          if (!confirm("למחוק פתק זה?")) return;
+          await apiFetch(`/api/admin/notes/${btn.dataset.id}`, { method: "DELETE" });
+          fetchAllNotes();
+        }
+      );
+  } catch (e) {
+    alert("שגיאה בשליפת פתקים: " + e);
+  }
+}
 
 
   // 8. Admin Flow (renderUsers / renderNotes)…
   
 
   // === Helpers for Home & Map ===
-// 7. Map Navigation + Geolocation
+// Map Navigation + Geolocation
 document.getElementById("to-map-btn").addEventListener("click", () => {
   if (!navigator.geolocation) {
     return alert("הדפדפן שלך לא תומך בגיאולוקיישן.");

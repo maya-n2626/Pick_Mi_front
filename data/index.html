@@ -71,9 +71,7 @@
     </div>
     <div id="forgot-error" class="error-msg hidden"></div>
     <div class="button-group">
-      <button type="button" id="forgot-cancel" class="btn">
-        Cancel
-      </button>
+    
       <button type="submit" id="forgot-submit" class="btn-primary">
         Reset Password
       </button>
@@ -87,7 +85,7 @@
     <div class="success-msg" style="margin-bottom:16px;">
       אם יש חשבון עבור כתובת האימייל הזאת, קישור לאיפוס סיסמה נשלח אליך.
     </div>
-    <button id="sent-back">חזור להתחברות</button>
+    <button id="sent-back" class="btn-link">חזור להתחברות</button>
   </div>
 
   <!-- ====== HOME ====== -->
@@ -103,6 +101,11 @@
 
 
     <button id="settings-btn" title="הגדרות">⚙️</button>
+
+    <button id="admin-btn" class="btn-link hidden" style="margin-top:10px;">
+  לוח בקרה (Admin)
+</button>
+
   </div>
 
   </div>
@@ -115,12 +118,26 @@
 <!-- ====== SETTINGS ====== -->
 <div id="settings-screen" class="container hidden">
   <h1>הגדרות</h1>
+  <h2>My Mail</h2>
+  <div id="Mail"></div>
   <button id="delete-account-btn" class="btn-danger" style="margin-top:20px;">
     מחק חשבון
   </button>
   <button id="settings-back-btn" class="btn-link" style="margin-top:20px;">
     חזור
   </button>
+</div>
+
+<!-- ====== ADMIN PANEL ====== -->
+<div id="admin-screen" class="container hidden">
+  <h1>Admin Panel</h1>
+  <button id="admin-back" class="btn-link">← חזור</button>
+
+  <h2>All Users</h2>
+  <div id="admin-users"></div>
+
+  <h2>All Notes</h2>
+  <div id="admin-notes"></div>
 </div>
 
 
@@ -130,7 +147,7 @@
 
 </script>
 
- <script defer src="../js/script.js"></script>
+<script defer src="../js/script.js"></script>
 
  
 </body>

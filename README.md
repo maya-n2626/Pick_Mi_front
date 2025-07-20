@@ -1,49 +1,24 @@
-# Pick-Mi-_fronted# Pick_Mi_front
-// 7. Map Navigation
-const mapBtn = document.getElementById("to-map-btn");
-console.log("mapBtn is", mapBtn);
-if (mapBtn) {
-  mapBtn.addEventListener("click", () => {
-    console.log("Map button clicked");
-        console.log("google.maps is", window.google && google.maps);
-
-    show("map-screen");
-    loadBigMap();
+async function fetchAllUsersAdmin() {
+  const token = localStorage.getItem("jwt");
+  const res = await fetch(API_BASE + "/api/admin/users", {
+    headers: { "Authorization": "Bearer " + token }
   });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || "Failed to fetch users");
+  }
+  return res.json();
 }
 
 
-
-document.getElementById("to-map-btn").addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    return alert("הדפדפן שלך לא תומך בגיאולוקיישן.");
+async function fetchAllUsersAdmin() {
+  const token = localStorage.getItem("jwt");
+  const res = await fetch(API_BASE + "/api/admin/users", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || "Failed to fetch users");
   }
-
-  // רק כאן שואלים הרשאה, ובאותו מקום בונים את המפה
-  navigator.geolocation.getCurrentPosition(
-    pos => {
-      // 1. עוברים למסך המפה
-      show("map-screen");
-
-      // 2. יוצרים את המפה במיקום שלך
-      const userLoc = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude
-      };
-      const map = new google.maps.Map(
-        document.getElementById("big-map"),
-        { center: userLoc, zoom: 14 }
-      );
-      // 3. מוסיפים Marker
-      new google.maps.Marker({ position: userLoc, map, title: "המיקום שלך" });
-    },
-    err => {
-      if (err.code === err.PERMISSION_DENIED) {
-        alert("לא אישרת את השימוש במיקום, לא ניתן להציג מפה.");
-      } else {
-        console.warn("שגיאה בקבלת מיקום:", err);
-        alert("לא הצלחנו לקבל את המיקום שלך.");
-      }
-    }
-  );
-});
+  return res.json();
+}

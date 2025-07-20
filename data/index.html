@@ -110,6 +110,10 @@
   לוח בקרה (Admin)
 </button>
 
+  <!-- אייקון הפתק הקבוע בתחתית הבית -->
+  <div id="new-note-btn" class="note-btn">
+    <img src="../images/ClosedNote.png" alt="פתח פתק חדש">
+
   </div>
 
   </div>
@@ -130,6 +134,23 @@
   <button id="settings-back-btn" class="btn-link" style="margin-top:20px;">
     חזור
   </button>
+</div>
+<!-- המסך לכתיבת טקסט על הפתק -->
+<div id="write-text-screen" class="container hidden">
+  <div class="note-card large">
+    <textarea id="note-text-input" placeholder="כתוב כאן…" rows="10"></textarea>
+    <button id="text-submit-btn">שלח</button>
+    <button id="text-cancel-btn">×</button>
+  </div>
+</div>
+
+<!-- המסך לצביעה על הפתק -->
+<div id="write-brush-screen" class="container hidden">
+  <div class="note-card large">
+    <canvas id="drawing-canvas" width="300" height="300"></canvas>
+    <button id="brush-submit-btn">שלח</button>
+    <button id="brush-cancel-btn">×</button>
+  </div>
 </div>
 
 <!-- ====== ADMIN PANEL ====== -->

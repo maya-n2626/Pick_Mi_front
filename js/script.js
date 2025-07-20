@@ -202,27 +202,54 @@ async function forgotPassword(email) {
     show("login-screen");
   }
 
-  function gotoHome() {
-    show("home-content");
-   // if (navigator.geolocation) {
-    //  navigator.geolocation.getCurrentPosition(
-    //    setHomeBackgroundByLocation,
-    //    () => setHomeBackgroundImage()
-    //  );
-     
-      setHomeBackgroundImage();
-    
-    loadNearbyNotes();
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const role = user.props?.role;              // מושכים את ה-role מתוך props
-    const adminBtn = document.getElementById("admin-btn");
+async function gotoHome() {
+  show("home-content");
 
-   if (role === "admin") {
-  adminBtn.classList.remove("hidden");
-} else {
-  adminBtn.classList.add("hidden");
-  }
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+
+      // 1. שליפת פתקים קרובים
+      const notes = await getNearbyNotes(lat, lon, 500);
+
+      // 2. הרכבת URL של Static Map עם מרקרים
+      const sizeW = 400, sizeH = 300;
+      const key   = "AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY";  // החליפי במפתח שלך
+      const base  = "https://maps.googleapis.com/maps/api/staticmap";
+      const centerParam = `center=${lat},${lon}&zoom=15&size=${sizeW}x${sizeH}`;
+      const userMarker  = `markers=color:blue|${lat},${lon}`;
+     const markerIconUrl = "https://cdn.jsdelivr.net/gh/maya-n2626/Pick_Mi_front@main/images/ClosedNote.png";
+
+     const noteMarkers = notes
+     .map(n =>
+    `markers=icon:${encodeURIComponent(markerIconUrl)}|${n.location.lat},${n.location.lon}`
+    )
+  .join("&");
+
+
+
+      const url = `${base}?${centerParam}&${userMarker}&${noteMarkers}&key=${key}`;
+
+      // 3. הצגת המפה הסטטית כרקע ה־card
+      const container = document.getElementById("home-content");
+      container.style.backgroundImage    = `url("${url}")`;
+      container.style.backgroundSize     = "cover";
+      container.style.backgroundPosition = "center";
+
+      // 4. הצגת/הסתרת כפתור Admin
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const role = user.props?.role;
+      document.getElementById("admin-btn")
+        .classList[role === "admin" ? "remove" : "add"]("hidden");
+    },
+    err => {
+      console.warn("לא ניתן לקבל מיקום:", err);
+    }
+  );
 }
+
+
 
   
 
@@ -330,41 +357,52 @@ async function fetchAllNotes() {
     alert("שגיאה בשליפת פתקים: " + e);
   }
 }
-
-
-  // 8. Admin Flow (renderUsers / renderNotes)…
   
 
   // === Helpers for Home & Map ===
-// Map Navigation + Geolocation
 document.getElementById("to-map-btn").addEventListener("click", () => {
   if (!navigator.geolocation) {
     return alert("הדפדפן שלך לא תומך בגיאולוקיישן.");
   }
 
   navigator.geolocation.getCurrentPosition(
-    position => {
-      // 1. עוברים למסך המפה
+    // <-- כאן תדביקי את הקוד החדש:
+    async position => {
       show("map-screen");
 
-      // 2. בונים מפה במיקום המשתמש
       const userLoc = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
+
       const map = new google.maps.Map(
         document.getElementById("big-map"),
-        {
-          center: userLoc,
-          zoom: 14
-        }
+        { center: userLoc, zoom: 14 }
       );
 
-      // 3. מוסיפים Marker
+      // סמן הבית
       new google.maps.Marker({
         position: userLoc,
         map,
         title: "המיקום שלך"
+      });
+
+      // מביאים את כל הפתקים באזור (לדוגמה 50 ק"מ)
+      const notes = await getNearbyNotes(userLoc.lat, userLoc.lng, 50000);
+
+      // מציגים כל פתק כסמן
+      notes.forEach(n => {
+        new google.maps.Marker({
+          position: { lat: n.location.lat, lng: n.location.lon },
+          map,
+          title: n.content.text,
+          icon: {
+            url: "../images/ClosedNote.png",
+            size: new google.maps.Size(51, 43),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(25, 43)
+          }
+        });
       });
     },
     error => {
@@ -379,17 +417,24 @@ document.getElementById("to-map-btn").addEventListener("click", () => {
 });
 
 
+  async function loadNearbyNotes() {
+  const userLoc = await getUserLocationPromise();
+  const notes   = await getNearbyNotes(userLoc.lat, userLoc.lon);
+  const container = document.getElementById("home-content");
+  notes.forEach(n => {
+    const el = document.createElement("div");
+    el.className = "note-pin";
+    // נניח שכל note.location חזרה עם offsetX ו־offsetY מתואמים ל־400×300
+    el.style.left = `${n.offsetX}px`;
+    el.style.top  = `${n.offsetY}px`;
+    container.appendChild(el);
 
-  async function loadNearbyNotes() { /* … */ }
-  function setHomeBackgroundImage(url) { 
-     const bg = document.getElementById("home-bg");
-  // שמים תמונה כרקע CSS
-  bg.style.backgroundImage = `url("${url}")`;
-  bg.style.backgroundSize = "cover";          // כדי שהתמונה תתפרס על כל החלל
-  bg.style.backgroundPosition = "center";     // כדי למרכז אותה
+    el.onclick = () => openNoteDetail(n.id);
+  });
+}
 
-  }
-  function setHomeBackgroundByLocation(pos) { /* … */ }
+
+
 
   // === Initial Screen ===
   gotoLogin();

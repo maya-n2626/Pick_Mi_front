@@ -131,8 +131,16 @@ async function forgotPassword(email) {
         errEl.textContent = err;
         errEl.classList.remove("hidden");
       }
+      
     };
-   
+    const forgotBackBtn = document.getElementById("forgot-back-to-login");
+  if (forgotBackBtn) {
+    forgotBackBtn.addEventListener("click", () => {
+      gotoLogin();     
+    });
+  }
+    
+    //6.Sent back screen
 
    const sentBackBtn = document.getElementById("sent-back");
    console.log("sent-back element:", sentBackBtn);
@@ -196,14 +204,14 @@ async function forgotPassword(email) {
 
   function gotoHome() {
     show("home-content");
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        setHomeBackgroundByLocation,
-        () => setHomeBackgroundImage()
-      );
-    } else {
-      setHomeBackgroundImage("../images/default.jpg");
-    }
+   // if (navigator.geolocation) {
+    //  navigator.geolocation.getCurrentPosition(
+    //    setHomeBackgroundByLocation,
+    //    () => setHomeBackgroundImage()
+    //  );
+     
+      setHomeBackgroundImage();
+    
     loadNearbyNotes();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const role = user.props?.role;              // מושכים את ה-role מתוך props
@@ -373,7 +381,14 @@ document.getElementById("to-map-btn").addEventListener("click", () => {
 
 
   async function loadNearbyNotes() { /* … */ }
-  function setHomeBackgroundImage(url) { /* … */ }
+  function setHomeBackgroundImage(url) { 
+     const bg = document.getElementById("home-bg");
+  // שמים תמונה כרקע CSS
+  bg.style.backgroundImage = `url("${url}")`;
+  bg.style.backgroundSize = "cover";          // כדי שהתמונה תתפרס על כל החלל
+  bg.style.backgroundPosition = "center";     // כדי למרכז אותה
+
+  }
   function setHomeBackgroundByLocation(pos) { /* … */ }
 
   // === Initial Screen ===

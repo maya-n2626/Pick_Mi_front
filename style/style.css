@@ -196,3 +196,20 @@ button:hover, .btn-link:hover {
   flex: 1;
   touch-action: none; 
 }
+/* קובעים גודל קבוע או מקסימום לגודל הפתק */
+#new-note-btn {
+  position: absolute;       /* אם אתה רוצה למקם אותו בפריסה יחסית ל־#home-content */
+  bottom: 16px;             /* לדוגמא: 16px מהרגל */
+  right: 16px;              /* או left: 50%; transform: translateX(-50%); למרכז */
+  width: 80px;              /* רוחב חדש */
+  height: auto;             /* גובה ייקבע אוט׳ לפי יחס התמונה */
+  cursor: pointer;          /* הסמן יהפוך ליד למראה קליקבילי */
+  z-index: 10;              /* אם צריך מעל שאר התוכן */
+}
+
+/* כדי שהתמונה תתאים במלואה לממדי ה־DIV */
+#new-note-btn img {
+  width: 100%;
+  height: auto;
+  display: block;
+}

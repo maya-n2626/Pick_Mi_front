@@ -93,30 +93,23 @@
   </div>
 
   <!-- ====== HOME ====== -->
-  <div id="home-bg" class="hidden">
-  
-  <div id="home-content" class="container hidden">
-    <div class="user-icon" title="פרטי משתמש">👤</div>
-    <h1>ברוך הבא לפיקמי!</h1>
-    <div id="notes-list"></div>
-    <button id="logout-btn" class="btn-link" style="margin-top:20px;">התנתק</button>
+<div id="home-bg" class="hidden"></div>
 
-    <button id="to-map-btn" class="btn-link" style="margin-top:20px;">מעבר למפה</button>
-
-
-    <button id="settings-btn" title="הגדרות">⚙️</button>
-
-    <button id="admin-btn" class="btn-link hidden" style="margin-top:10px;">
-  לוח בקרה (Admin)
-</button>
+<div id="home-content" class="container hidden">
+  <div class="user-icon" title="פרטי משתמש">👤</div>
+  <h1>ברוך הבא לפיקמי!</h1>
+  <div id="notes-list"></div>
+  <button id="logout-btn" class="btn-link" style="margin-top:20px;">התנתק</button>
+  <button id="to-map-btn" class="btn-link" style="margin-top:20px;">מעבר למפה</button>
+  <button id="settings-btn" title="הגדרות">⚙️</button>
+  <button id="admin-btn" class="btn-link hidden" style="margin-top:10px;">לוח בקרה (Admin)</button>
 
   <!-- אייקון הפתק הקבוע בתחתית הבית -->
   <div id="new-note-btn" class="note-btn">
-    <img src="../images/ClosedNote.png" alt="פתח פתק חדש">
-
+    <img src="../images/Note.png" alt="פתח פתק חדש">
   </div>
+</div>
 
-  </div>
   <!-- ====== MAP SCREEN ====== -->
 <div id="map-screen" class="container hidden">
   <h2>המפה בסביבה שלך</h2>
@@ -135,23 +128,29 @@
     חזור
   </button>
 </div>
-<!-- המסך לכתיבת טקסט על הפתק -->
-<div id="write-text-screen" class="container hidden">
-  <div class="note-card large">
-    <textarea id="note-text-input" placeholder="כתוב כאן…" rows="10"></textarea>
-    <button id="text-submit-btn">שלח</button>
-    <button id="text-cancel-btn">×</button>
+
+<!-- >>> מסך כתיבת הפתק בעט -->
+<div id="write-note-screen" class="container hidden">
+  <button id="write-back-btn" class="btn-link">← חזור</button>
+  <div class="note-large note-write">
+    <img src="../images/WritePen (1).png" alt="פתק לכתיבה בעט" />
+    <textarea id="note-text" placeholder="כתוב כאן..."></textarea>
+    <button id="to-brush-btn" class="btn-link">עבור לצביעה</button>
   </div>
 </div>
 
-<!-- המסך לצביעה על הפתק -->
-<div id="write-brush-screen" class="container hidden">
-  <div class="note-card large">
-    <canvas id="drawing-canvas" width="300" height="300"></canvas>
-    <button id="brush-submit-btn">שלח</button>
-    <button id="brush-cancel-btn">×</button>
+
+
+<!-- >>> מסך צביעה -->
+<div id="brush-note-screen" class="container hidden">
+  <button id="brush-back-btn" class="btn-link">← חזור</button>
+  <div class="note-large note-brush">
+    <img src="../images/WriteBrush.png" alt="פתק לצביעה" />
+    <canvas id="note-canvas" width="400" height="300"></canvas>
+    <button id="save-note-btn" class="btn-link">שמור פתק</button>
   </div>
 </div>
+
 
 <!-- ====== ADMIN PANEL ====== -->
 <div id="admin-screen" class="container hidden">

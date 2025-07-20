@@ -2,6 +2,12 @@
 
 
 document.addEventListener("DOMContentLoaded", function() {
+// יאחסן כאן את המיקום הנוכחי שהמשתמש נתן לנו
+let lastKnownLocation = {
+  lat: null,
+  lon: null,
+  placeId: null
+};
 
   // === Auth Endpoints ===
 
@@ -173,6 +179,70 @@ async function forgotPassword(email) {
       body: JSON.stringify({ latitude: lat, longitude: lon })
     });
   }
+// 1. כשלוחצים על הכפתור החדש בדף הבית
+const newNoteBtn = document.getElementById("new-note-btn");
+if (newNoteBtn) {
+  newNoteBtn.addEventListener("click", () => {
+    show("write-note-screen");
+  });
+}
+
+
+// 2. חזרה מדף כתיבה
+const writeBackBtn = document.getElementById("write-back-btn");
+if (writeBackBtn) {
+  writeBackBtn.addEventListener("click", () => {
+    gotoHome();
+  });
+}
+
+
+
+// 3. מעבר מצפייה/כתיבה לצביעה
+const toBrushBtn = document.getElementById("to-brush-btn");
+if (toBrushBtn) {
+  toBrushBtn.addEventListener("click", () => {
+    show("brush-note-screen");
+  });
+}
+
+// 4. חזרה מדף הצביעה
+const brushBackBtn = document.getElementById("brush-back-btn");
+if (brushBackBtn) {
+  brushBackBtn.addEventListener("click", () => {
+    show("write-note-screen");
+  });
+}
+
+
+// 5. כשלוחצים שמור פתק בצביעה
+document.getElementById("save-note-btn").addEventListener("click", async () => {
+  // למשל: תאסוף את הטקסט מ־textarea והציור מ־canvas
+const saveBtn = document.getElementById("save-note-btn");
+if (saveBtn) {
+  saveBtn.addEventListener("click", async () => {
+    const textInput = document.getElementById("note-text");
+    const canvas = document.getElementById("note-canvas");8
+
+    if (!textInput || !canvas) {
+      console.warn("❗ אלמנט note-text או note-canvas לא נמצא בדף הזה");
+      return;
+    }
+
+    const text = textInput.value;
+    const drawingData = canvas.toDataURL();
+
+    await throwNote(text, drawingData, currentLat, currentLon, currentPlaceId);
+    gotoHome();
+  });
+}
+
+  const drawingData = document.getElementById("note-canvas").toDataURL();
+  // תשלח ב־POST את הפתק (throwNote)
+  await throwNote(text, drawingData, currentLat, currentLon, currentPlaceId);
+  // ואז תחזור לדף הבית
+  gotoHome();
+});
 
   // === Admin Endpoints ===
   async function getAllUsers() { return apiFetch("/api/admin/users"); }
@@ -207,29 +277,32 @@ async function gotoHome() {
 
   navigator.geolocation.getCurrentPosition(
     async pos => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
+           lastKnownLocation = {
+        lat:     pos.coords.latitude,
+        lon:     pos.coords.longitude,
+        placeId: null
+      };
+
 
       // 1. שליפת פתקים קרובים
-      const notes = await getNearbyNotes(lat, lon, 500);
+      const notes = await getNearbyNotes(lastKnownLocation.lat, lastKnownLocation.lon, 500);
 
       // 2. הרכבת URL של Static Map עם מרקרים
       const sizeW = 400, sizeH = 300;
       const key   = "AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY";  // החליפי במפתח שלך
       const base  = "https://maps.googleapis.com/maps/api/staticmap";
-      const centerParam = `center=${lat},${lon}&zoom=15&size=${sizeW}x${sizeH}`;
-      const userMarker  = `markers=color:blue|${lat},${lon}`;
-     const markerIconUrl = "https://cdn.jsdelivr.net/gh/maya-n2626/Pick_Mi_front@main/images/ClosedNote.png";
+      const centerParam = `center=${lastKnownLocation.lat},${lastKnownLocation.lon}` +
+                        `&zoom=15&size=${sizeW}x${sizeH}`;
+      const markerIconUrl = "https://cdn.jsdelivr.net/gh/maya-n2626/Pick_Mi_front@main/images/ClosedNote.png";
 
-     const noteMarkers = notes
-     .map(n =>
-    `markers=icon:${encodeURIComponent(markerIconUrl)}|${n.location.lat},${n.location.lon}`
-    )
-  .join("&");
+      const userMarker  = `markers=color:blue|${lastKnownLocation.lat},${lastKnownLocation.lon}`;
+      const noteMarkers = notes
+      .map(n => `markers=icon:${encodeURIComponent(markerIconUrl)}|${n.location.lat},${n.location.lon}`)
+      .join("&");
+       const url = `${base}?${centerParam}&${userMarker}&${noteMarkers}&key=${key}`;
 
 
 
-      const url = `${base}?${centerParam}&${userMarker}&${noteMarkers}&key=${key}`;
 
       // 3. הצגת המפה הסטטית כרקע ה־card
       const container = document.getElementById("home-content");
@@ -360,35 +433,39 @@ async function fetchAllNotes() {
   
 
   // === Helpers for Home & Map ===
-document.getElementById("to-map-btn").addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    return alert("הדפדפן שלך לא תומך בגיאולוקיישן.");
-  }
+const toMapBtn = document.getElementById("to-map-btn");
+if (toMapBtn) {
+  toMapBtn.addEventListener("click", () => {
 
   navigator.geolocation.getCurrentPosition(
-    // <-- כאן תדביקי את הקוד החדש:
+    
     async position => {
       show("map-screen");
 
-      const userLoc = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
+      lastKnownLocation = {
+      lat:     position.coords.latitude,
+      lon:     position.coords.longitude,
+      placeId: null
+    };
 
       const map = new google.maps.Map(
         document.getElementById("big-map"),
-        { center: userLoc, zoom: 14 }
+      { center: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon }, zoom: 14 }
       );
 
       // סמן הבית
       new google.maps.Marker({
-        position: userLoc,
+        position: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },
         map,
         title: "המיקום שלך"
       });
 
       // מביאים את כל הפתקים באזור (לדוגמה 50 ק"מ)
-      const notes = await getNearbyNotes(userLoc.lat, userLoc.lng, 50000);
+      const notes = await getNearbyNotes( lastKnownLocation.lat,
+      lastKnownLocation.lon,
+      500)
+
+      
 
       // מציגים כל פתק כסמן
       notes.forEach(n => {
@@ -415,7 +492,7 @@ document.getElementById("to-map-btn").addEventListener("click", () => {
     }
   );
 });
-
+}
 
   async function loadNearbyNotes() {
   const userLoc = await getUserLocationPromise();

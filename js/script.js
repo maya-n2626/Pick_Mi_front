@@ -176,13 +176,19 @@ async function forgotPassword(email) {
   async function getNoteContent(id, lat, lon) {
     return apiFetch(`/api/notes/${id}?lat=${lat}&lon=${lon}`);
   }
-  async function deleteNote(id, lat, lon) {
-    return apiFetch(`/api/notes/${id}`, {
-      method: "DELETE",
-      body: JSON.stringify({ latitude: lat, longitude: lon })
-    });
+async function deleteNote(id, lat, lon) {
+  console.log("ID:", id, "LAT:", lat, "LON:", lon);
 
-  }
+  return apiFetch(`/api/notes/${id}`, {
+    method: "DELETE",
+  body: JSON.stringify({
+      latitude: Number(lat),
+      longitude: Number(lon)
+    })  });
+}
+
+
+
 // 1. כשלוחצים על הכפתור החדש בדף הבית
 const newNoteBtn = document.getElementById("new-note-btn");
 if (newNoteBtn) {
@@ -304,9 +310,15 @@ async function openNoteAndShow(noteId) {
 
   const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
 
+  
 
   const noteScreen = document.getElementById("note-content-screen");
   const contentDiv = document.getElementById("note-content");
+
+  noteScreen.dataset.noteId = noteId;
+  noteScreen.dataset.latitude = lastKnownLocation.lat;
+ noteScreen.dataset.longitude = lastKnownLocation.lon;
+
 
   // הסתרת המסכים האחרים
   document.getElementById("home-content").classList.add("hidden");
@@ -363,6 +375,8 @@ document.getElementById("close-note-btn").addEventListener("click", async () => 
   }
 
   screen.classList.add("hidden");
+  document.getElementById("note-content-screen").classList.add("hidden");
+ document.getElementById("home-content").classList.remove("hidden");
 });
 
 

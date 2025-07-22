@@ -274,3 +274,39 @@ button:hover, .btn-link:hover {
 .brush-controls input[type="range"] {
   cursor: pointer;
 }
+
+.floating-note {
+  animation: float 3s ease-in-out infinite;
+  z-index: 5;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+#note-content {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+
+.note-background {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+
+.note-text {
+  position: absolute;
+  top: 220px;
+  left: 60px;
+  right: 30px;
+  font-size: 16px;
+  color: #333;
+  white-space: pre-wrap;
+  z-index: 2;
+}

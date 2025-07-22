@@ -1,13 +1,12 @@
 
-
-
-document.addEventListener("DOMContentLoaded", function() {
-// יאחסן כאן את המיקום הנוכחי שהמשתמש נתן לנו
 let lastKnownLocation = {
   lat: null,
   lon: null,
   placeId: null
 };
+
+document.addEventListener("DOMContentLoaded", function() {
+;
 
   // === Auth Endpoints ===
 
@@ -167,9 +166,13 @@ async function forgotPassword(email) {
       })
     });
   }
-  async function getNearbyNotes(lat, lon, radius = 500) {
-    return apiFetch(`/api/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`);
+ async function getNearbyNotes(lat, lon, radius = 500) {
+  if (lat == null || lon == null) {
+    throw new Error("מיקום לא תקף — lat/lon חסרים");
   }
+  return apiFetch(`/api/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`);
+}
+
   async function getNoteContent(id, lat, lon) {
     return apiFetch(`/api/notes/${id}?lat=${lat}&lon=${lon}`);
   }
@@ -185,8 +188,28 @@ const newNoteBtn = document.getElementById("new-note-btn");
 if (newNoteBtn) {
   newNoteBtn.addEventListener("click", () => {
     show("write-note-screen");
+
+    // === בקשת מיקום ===
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          lastKnownLocation.lat = position.coords.latitude;
+          lastKnownLocation.lon = position.coords.longitude;
+          lastKnownLocation.placeId = "temp-place-id"; // זמני או לחשב בעתיד
+          console.log("📍 Location set in write-note-screen:", lastKnownLocation);
+        },
+        (err) => {
+          console.warn("⚠️ לא ניתן לקבל מיקום במסך כתיבה:", err);
+          alert("לא ניתן לקבל מיקום. לא ניתן לשמור את הפתק.");
+        }
+      );
+    } else {
+      alert("המכשיר שלך לא תומך במיקום גיאוגרפי.");
+    }
   });
 }
+
+
 
 
 // 2. חזרה מדף כתיבה
@@ -223,20 +246,23 @@ const saveBtn = document.getElementById("save-drawing-note-btn");
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     const textInput = document.getElementById("note-text");
-    const canvas = document.getElementById("note-canvas");8
+    const canvas = document.getElementById("note-canvas");
 
     if (!textInput || !canvas) {
       console.warn("❗ אלמנט note-text או note-canvas לא נמצא בדף הזה");
       return;
     }
 
-    const text = textInput.value;
+  const text = textInput.value.trim() || "פתק מצויר בלבד";
     const drawingData = canvas.toDataURL();
+  console.log("📍 Location to send:", lastKnownLocation);
 
-    await throwNote(text, drawingData, currentLat, currentLon, currentPlaceId);
+
+    await throwNote(text, drawingData, lastKnownLocation.lat, lastKnownLocation.lon, lastKnownLocation.placeId);
     gotoHome();
   });
 }
+});
 
 const saveTextBtn = document.getElementById("save-text-note-btn");
 if (saveTextBtn) {
@@ -249,14 +275,98 @@ if (saveTextBtn) {
     }
 
     const text = textInput.value;
-    const drawingData = ""; 
+    const drawingData = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==";
 
-    await throwNote(text, drawingData, currentLat, currentLon, currentPlaceId);
+    console.log("📍 Location to send:", lastKnownLocation);
+
+
+   await throwNote(
+  text,
+  drawingData,
+  lastKnownLocation.lat,
+  lastKnownLocation.lon,
+  lastKnownLocation.placeId
+);
+
     gotoHome();
-  });
-}
-
+c
 });
+ 
+  
+}
+//open note function
+
+async function openNoteAndShow(noteId) {
+    console.log("current lat:", lastKnownLocation.lat);
+  console.log("current lon:", lastKnownLocation.lon);
+
+  
+
+  const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
+
+
+  const noteScreen = document.getElementById("note-content-screen");
+  const contentDiv = document.getElementById("note-content");
+
+  // הסתרת המסכים האחרים
+  document.getElementById("home-content").classList.add("hidden");
+  noteScreen.classList.remove("hidden");
+
+  // ניקוי קודם
+  contentDiv.innerHTML = "";
+  contentDiv.style.position = "relative";
+
+  // יצירת הפתק כרקע (לפי סוג התוכן)
+  const backgroundImg = document.createElement("img");
+  backgroundImg.classList.add("note-background"); 
+  backgroundImg.src = note.content.drawingData
+    ? "../images/WriteBrush.png"
+    : "../images/WritePen (1).png";
+  contentDiv.appendChild(backgroundImg);
+
+  // טקסט
+  if (note.content.text) {
+    const p = document.createElement("p");
+    p.textContent = note.content.text;
+    p.classList.add("note-text"); 
+    contentDiv.appendChild(p);
+  }
+
+  // ציור
+  if (note.content.drawingData) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 300;
+    canvas.height = 300;
+    canvas.classList.add("note-canvas"); 
+    const ctx = canvas.getContext("2d");
+
+    const img = new Image();
+    img.onload = () => ctx.drawImage(img, 0, 0);
+    img.src = note.content.drawingData;
+
+    contentDiv.appendChild(canvas);
+  }
+
+    }
+
+//close note function 
+document.getElementById("close-note-btn").addEventListener("click", async () => {
+  const screen = document.getElementById("note-content-screen");
+  const noteId = screen.dataset.noteId;
+  const lat = screen.dataset.latitude;
+  const lon = screen.dataset.longitude;
+
+  try {
+    await deleteNote(noteId, lat, lon);
+  } catch (e) {
+    console.warn("המחיקה נכשלה", e);
+  }
+
+  screen.classList.add("hidden");
+});
+
+
+
 
   // === Admin Endpoints ===
   async function getAllUsers() { return apiFetch("/api/admin/users"); }
@@ -276,6 +386,58 @@ if (saveTextBtn) {
   if (screenId === "home-content") {
     document.getElementById("home-bg").classList.remove("hidden");
   }
+}
+function renderNotesOnHome(notes) {
+  const notesList = document.getElementById("notes-list");
+  notesList.innerHTML = "";
+
+  notes.forEach(note => {
+    const noteEl = document.createElement("img");
+    noteEl.src = "../images/ClosedNote.png";
+    noteEl.alt = "פתק";
+    noteEl.classList.add("floating-note");
+
+    // מיקום אקראי בעמוד
+    noteEl.style.position = "absolute";
+    noteEl.style.left = Math.random() * 80 + "%";
+    noteEl.style.top = Math.random() * 200 + "px";
+    noteEl.style.width = "50px";
+    noteEl.style.cursor = "pointer";
+    // לחיצה על הפתק: טוענת ומציגה אותו
+    noteEl.addEventListener("click", () => {
+      openNoteAndShow(note.id);  // מציג את הפתק (ציור או טקסט)
+      noteEl.remove();           // מסיר את הפתק מהמסך
+    });
+
+    notesList.appendChild(noteEl);
+  });
+}
+
+
+function renderNotesOnMap(notes, map) {
+    console.log("📍 Rendering notes on map:", notes);
+
+  notes.forEach(n => {
+    const title = n.content?.text?.trim() || "פתק ללא טקסט";
+
+    new google.maps.Marker({
+      position: {
+        lat: Number(n.location.lat),
+        lng: Number(n.location.lon)
+      },
+      map,
+      title,
+      icon: {
+        url: "../images/ClosedNote.png",
+        size: new google.maps.Size(51, 43),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(25, 43)
+      }
+    });
+          marker.addListener("click", () => openNoteAndShow(n.id));
+
+  });
+
 }
 
 
@@ -300,10 +462,12 @@ async function gotoHome() {
 
       // 1. שליפת פתקים קרובים
       const notes = await getNearbyNotes(lastKnownLocation.lat, lastKnownLocation.lon, 500);
+      console.log("📍 nearby notes:", notes);
 
+      renderNotesOnHome(notes);
       // 2. הרכבת URL של Static Map עם מרקרים
       const sizeW = 400, sizeH = 300;
-      const key   = "AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY";  // החליפי במפתח שלך
+      const key   = "AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY";  
       const base  = "https://maps.googleapis.com/maps/api/staticmap";
       const centerParam = `center=${lastKnownLocation.lat},${lastKnownLocation.lon}` +
                         `&zoom=15&size=${sizeW}x${sizeH}`;
@@ -477,24 +641,10 @@ if (toMapBtn) {
       // מביאים את כל הפתקים באזור (לדוגמה 50 ק"מ)
       const notes = await getNearbyNotes( lastKnownLocation.lat,
       lastKnownLocation.lon,
-      500)
+      500);
 
-      
+      renderNotesOnMap(notes,map);
 
-      // מציגים כל פתק כסמן
-      notes.forEach(n => {
-        new google.maps.Marker({
-          position: { lat: n.location.lat, lng: n.location.lon },
-          map,
-          title: n.content.text,
-          icon: {
-            url: "../images/ClosedNote.png",
-            size: new google.maps.Size(51, 43),
-            origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(25, 43)
-          }
-        });
-      });
     },
     error => {
       if (error.code === error.PERMISSION_DENIED) {
@@ -515,7 +665,6 @@ if (toMapBtn) {
   notes.forEach(n => {
     const el = document.createElement("div");
     el.className = "note-pin";
-    // נניח שכל note.location חזרה עם offsetX ו־offsetY מתואמים ל־400×300
     el.style.left = `${n.offsetX}px`;
     el.style.top  = `${n.offsetY}px`;
     container.appendChild(el);

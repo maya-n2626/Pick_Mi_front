@@ -174,6 +174,8 @@ async function forgotPassword(email) {
 }
 
   async function getNoteContent(id, lat, lon) {
+    
+
     return apiFetch(`/api/notes/${id}?lat=${lat}&lon=${lon}`);
   }
 async function deleteNote(id, lat, lon) {
@@ -261,6 +263,9 @@ if (saveBtn) {
 
   const text = textInput.value.trim() || "פתק מצויר בלבד";
     const drawingData = canvas.toDataURL();
+    console.log("🖊 text to send:", text);
+   console.log("🖼 drawingData to send:", drawingData);
+
   console.log("📍 Location to send:", lastKnownLocation);
 
 
@@ -303,24 +308,20 @@ c
 //open note function
 
 async function openNoteAndShow(noteId) {
-    console.log("current lat:", lastKnownLocation.lat);
+  console.log("current lat:", lastKnownLocation.lat);
   console.log("current lon:", lastKnownLocation.lon);
 
-  
-
   const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
-
-  
+  console.log("📜 note from server:", note);
 
   const noteScreen = document.getElementById("note-content-screen");
   const contentDiv = document.getElementById("note-content");
 
   noteScreen.dataset.noteId = noteId;
   noteScreen.dataset.latitude = lastKnownLocation.lat;
- noteScreen.dataset.longitude = lastKnownLocation.lon;
+  noteScreen.dataset.longitude = lastKnownLocation.lon;
 
-
-  // הסתרת המסכים האחרים
+  // הסתרת מסכים אחרים
   document.getElementById("home-content").classList.add("hidden");
   noteScreen.classList.remove("hidden");
 
@@ -328,39 +329,36 @@ async function openNoteAndShow(noteId) {
   contentDiv.innerHTML = "";
   contentDiv.style.position = "relative";
 
-  // יצירת הפתק כרקע (לפי סוג התוכן)
+  // ✅ קביעת רקע לפי אם יש ציור
   const backgroundImg = document.createElement("img");
-  backgroundImg.classList.add("note-background"); 
+  backgroundImg.classList.add("note-background");
   backgroundImg.src = note.content.drawingData
-    ? "../images/WriteBrush.png"
-    : "../images/WritePen (1).png";
+    ? "../images/WriteBrush.png" // מברשת – אם זה פתק מצויר
+    : "../images/WritePen (1).png"; // עט – אם זה רק טקסט
   contentDiv.appendChild(backgroundImg);
 
-  // טקסט
+  // ✅ טקסט
   if (note.content.text) {
     const p = document.createElement("p");
     p.textContent = note.content.text;
-    p.classList.add("note-text"); 
+    p.classList.add("note-text");
     contentDiv.appendChild(p);
   }
 
-  // ציור
+  // ✅ ציור – אם יש
   if (note.content.drawingData) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 300;
-    canvas.height = 300;
-    canvas.classList.add("note-canvas"); 
-    const ctx = canvas.getContext("2d");
-
-    const img = new Image();
-    img.onload = () => ctx.drawImage(img, 0, 0);
+    const img = document.createElement("img");
     img.src = note.content.drawingData;
-
-    contentDiv.appendChild(canvas);
+    img.alt = "ציור";
+    img.style.maxWidth = "100%";
+    img.style.display = "block";
+    img.classList.add("note-canvas");
+    contentDiv.appendChild(img);
   }
+}
 
-    }
 
+  
 //close note function 
 document.getElementById("close-note-btn").addEventListener("click", async () => {
   const screen = document.getElementById("note-content-screen");
@@ -376,7 +374,7 @@ document.getElementById("close-note-btn").addEventListener("click", async () => 
 
   screen.classList.add("hidden");
   document.getElementById("note-content-screen").classList.add("hidden");
- document.getElementById("home-content").classList.remove("hidden");
+  document.getElementById("home-content").classList.remove("hidden");
 });
 
 
@@ -528,6 +526,22 @@ if (logoutBtn) {
     gotoLogin();
   });
 }
+
+//icon-button
+
+logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("jwt");
+    gotoLogin();
+  });
+
+  userIcon.addEventListener("click", () => {
+    show("user-menu-screen");
+  });
+
+  document.getElementById("user-menu-back-btn").addEventListener("click", () => {
+    gotoHome();
+  })
+
 //7.Delete account
 document.getElementById("settings-btn").addEventListener("click", () => {
   show("settings-screen");

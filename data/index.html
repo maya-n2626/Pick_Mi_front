@@ -12,6 +12,12 @@
  
   <!-- ====== LOGIN ====== -->
   <div class="container" id="login-screen">
+    <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
+
+    <div class="app-bar">
+     <img src="./images/app-icon.png" alt="App Icon" class="app-icon" />
+   </div>
+
     <h1>התחברות</h1>
     <form id="login-form">
       <div class="input-group">
@@ -35,6 +41,12 @@
 
   <!-- ====== SIGNUP ====== -->
   <div class="container hidden" id="signup-screen">
+    <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
+
+    <div class="app-bar">
+     <img src="./images/app-icon.png" alt="App Icon" class="app-icon" />
+   </div>
+
     <h1>הרשמה</h1>
     <form id="signup-form">
       <div class="input-group">
@@ -53,6 +65,12 @@
 
   <!-- ====== WRONG PASSWORD ====== -->
   <div class="container hidden" id="wrong-password-screen">
+    <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
+
+    <div class="app-bar">
+     <img src="./images/app-icon.png" alt="App Icon" class="app-icon" />
+    </div>
+
     <h1>סיסמה שגויה</h1>
     <div class="error-msg" style="margin-bottom:20px;">הסיסמה או האימייל שהזנת שגויים.</div>
     <button id="wrong-back">חזור להתחברות</button>
@@ -61,6 +79,8 @@
 
   <!-- ====== FORGOT PASSWORD ====== -->
 <div class="container hidden" id="forgot-password-screen">
+  <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
+
   <h1>איפוס סיסמה</h1>
   <form id="forgot-form">
     <div class="input-group">
@@ -84,6 +104,8 @@
 
   <!-- ====== RESET SENT CONFIRM ====== -->
   <div class="container hidden" id="reset-sent-screen">
+    <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
+
     <h1>קישור נשלח</h1>
     <div class="success-msg" style="margin-bottom:16px;">
       אם יש חשבון עבור כתובת האימייל הזאת, קישור לאיפוס סיסמה נשלח אליך.
@@ -92,10 +114,16 @@
   </div>
 
   <!-- ====== HOME ====== -->
-<div id="home-bg" class="hidden"></div>
 
 <div id="home-content" class="container hidden">
+
+<img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
+
+<div id="home-bg" ></div>
+
 <img id="user-icon" src="../images/indicator-Day.png" alt="אייקון משתמש" style="width: 40px; cursor: pointer;" title="פרטי משתמש" />
+
+
   <div id="notes-list"></div>
   <button id="logout-btn" class="btn-link" style="margin-top:20px;">התנתק</button>
   <button id="to-map-btn" class="btn-link" style="margin-top:20px;">מעבר למפה</button>
@@ -120,6 +148,8 @@
 
   <!-- ====== MAP SCREEN ====== -->
 <div id="map-screen" class="container hidden">
+    <img id="status-bar" src="../images/status-bar.png" />
+
   <h2>המפה בסביבה שלך</h2>
   <div id="big-map" style="width:100%;height:400px"></div>
   <button id="back-to-home" class="btn-link" style="margin-top:20px;">חזור לדף הבית</button>
@@ -128,6 +158,8 @@
 
 <!-- >>> מסך כתיבת הפתק בעט -->
 <div id="write-note-screen" class="container hidden">
+    <img id="status-bar" src="../images/status-bar.png" />
+
   <button id="write-back-btn" class="btn-link">← חזור</button>
   <div class="note-large note-write">
     <img src="../images/WritePen (1).png" alt="פתק לכתיבה בעט" />
@@ -143,6 +175,8 @@
 
 <!-- >>> מסך צביעה -->
 <div id="brush-note-screen" class="container hidden">
+    <img id="status-bar" src="../images/status-bar.png" />
+
   <button id="brush-back-btn" class="btn-link">← חזור</button>
   <div class="note-large note-brush">
     <img src="../images/WriteBrush.png" alt="פתק לצביעה" />
@@ -168,6 +202,8 @@
 
 <!-- ====== ADMIN PANEL ====== -->
 <div id="admin-screen" class="container hidden">
+    <img id="status-bar" src="../images/status-bar.png" />
+
   <h1>Admin Panel</h1>
   <button id="admin-back" class="btn-link">← חזור</button>
 

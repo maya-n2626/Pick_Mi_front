@@ -368,3 +368,12 @@ button:hover, .btn-link:hover {
   white-space: pre-wrap;
   z-index: 2;
 }
+
+#nav-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: 20;
+}

@@ -13,6 +13,14 @@ document.addEventListener("DOMContentLoaded", function() {
 // === Constants & Tokens ===
   const API_BASE = "http://localhost:3000";
   const jwt = () => localStorage.getItem("jwt") || "";
+ const token = jwt();
+if (!token) {
+  console.warn("אין JWT – המשתמש לא מחובר");
+} else {
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  console.log(payload);
+}
+
 
 
   // === API Wrapper ===
@@ -247,9 +255,8 @@ if (brushBackBtn) {
 }
 
 
-// 5. כשלוחצים שמור פתק בצביעה
-document.getElementById("save-drawing-note-btn").addEventListener("click", async () => {
-  // למשל: תאסוף את הטקסט מ־textarea והציור מ־canvas
+
+  
 const saveBtn = document.getElementById("save-drawing-note-btn");
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
@@ -273,7 +280,7 @@ if (saveBtn) {
     gotoHome();
   });
 }
-});
+
 
 const saveTextBtn = document.getElementById("save-text-note-btn");
 if (saveTextBtn) {
@@ -300,9 +307,9 @@ if (saveTextBtn) {
 );
 
     gotoHome();
-c
+
 });
- 
+
   
 }
 //open note function
@@ -312,16 +319,17 @@ async function openNoteAndShow(noteId) {
   console.log("current lon:", lastKnownLocation.lon);
 
   const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
-  console.log("📜 note from server:", note);
+  console.log("📩 note from server:", note);
 
   const noteScreen = document.getElementById("note-content-screen");
   const contentDiv = document.getElementById("note-content");
 
+  // שמירת מיקום וזיהוי הפתק
   noteScreen.dataset.noteId = noteId;
   noteScreen.dataset.latitude = lastKnownLocation.lat;
   noteScreen.dataset.longitude = lastKnownLocation.lon;
 
-  // הסתרת מסכים אחרים
+  // מעבר למסך הפתק
   document.getElementById("home-content").classList.add("hidden");
   noteScreen.classList.remove("hidden");
 
@@ -329,15 +337,19 @@ async function openNoteAndShow(noteId) {
   contentDiv.innerHTML = "";
   contentDiv.style.position = "relative";
 
-  // ✅ קביעת רקע לפי אם יש ציור
+  // ✅ הוספת רקע לפי תבנית
+
+
   const backgroundImg = document.createElement("img");
   backgroundImg.classList.add("note-background");
   backgroundImg.src = note.content.drawingData
-    ? "../images/WriteBrush.png" // מברשת – אם זה פתק מצויר
-    : "../images/WritePen (1).png"; // עט – אם זה רק טקסט
+    ? "../images/WriteBrush.png"  // יש ציור
+    : "../images/WritePen (1).png"; // אין ציור
   contentDiv.appendChild(backgroundImg);
 
-  // ✅ טקסט
+  contentDiv.appendChild(backgroundImg);
+
+  // ✅ הוספת טקסט אם יש
   if (note.content.text) {
     const p = document.createElement("p");
     p.textContent = note.content.text;
@@ -345,7 +357,7 @@ async function openNoteAndShow(noteId) {
     contentDiv.appendChild(p);
   }
 
-  // ✅ ציור – אם יש
+  // ✅ הוספת ציור אם יש
   if (note.content.drawingData) {
     const img = document.createElement("img");
     img.src = note.content.drawingData;
@@ -356,6 +368,7 @@ async function openNoteAndShow(noteId) {
     contentDiv.appendChild(img);
   }
 }
+
 
 
   
@@ -432,7 +445,7 @@ function renderNotesOnMap(notes, map) {
   notes.forEach(n => {
     const title = n.content?.text?.trim() || "פתק ללא טקסט";
 
-    new google.maps.Marker({
+    const marker=new google.maps.Marker({
       position: {
         lat: Number(n.location.lat),
         lng: Number(n.location.lon)
@@ -525,7 +538,10 @@ if (logoutBtn) {
     localStorage.removeItem("jwt");
     gotoLogin();
   });
+
 }
+
+
 
 //icon-button
 
@@ -534,21 +550,23 @@ logoutBtn.addEventListener("click", () => {
     gotoLogin();
   });
 
-  userIcon.addEventListener("click", () => {
-    show("user-menu-screen");
-  });
-
-  document.getElementById("user-menu-back-btn").addEventListener("click", () => {
+  document.getElementById("user-icon").addEventListener("click", () => {
+  show("user-menu-screen");
+    document.getElementById("user-menu-back-btn").addEventListener("click", () => {
     gotoHome();
   })
+  // שליפת מייל מהטוקן או אחסון קודם
+  const token = localStorage.getItem("jwt");
+  if (token) {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const email = payload.email;
+    document.getElementById("user-email").textContent = email;
+  }
+});
 
-//7.Delete account
-document.getElementById("settings-btn").addEventListener("click", () => {
-  show("settings-screen");
-});
-document.getElementById("settings-back-btn").addEventListener("click", () => {
-  gotoHome();
-});
+
+
+
 document.getElementById("delete-account-btn").addEventListener("click", async () => {
   const ok = confirm("אתה בטוח שברצונך למחוק את החשבון שלך? פעולה זו אינה ניתנת לביטול.");
   if (!ok) return;

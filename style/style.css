@@ -1,17 +1,38 @@
+
+
+
+
+
+
 body {
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
   background: #f4f4f4;
+
 }
+
+.login-screen {
+  width: 412px;
+  height: 892px;
+  margin: auto;
+  position: relative;
+  
+  background-size: cover;
+  background-position: center;
+  border-radius: 30px; /* כמו בפיגמה */
+  overflow: hidden;
+}
+
 .container {
-  max-width: 350px;
-  margin: 60px auto;
+  max-width: 412px;
+  margin:  auto;
   padding: 28px 24px 30px;
-  background: #fff;
+  height: 892px;
   border-radius: 18px;
   box-shadow: 0 6px 20px 0 #0001;
   position: relative;
   z-index: 10;
+  background-image: url("../images/Park_BG.png");
 }
 h1 {
   text-align: center;
@@ -198,13 +219,16 @@ button:hover, .btn-link:hover {
 }
 /* קובעים גודל קבוע או מקסימום לגודל הפתק */
 #new-note-btn {
-  position: absolute;       /* אם אתה רוצה למקם אותו בפריסה יחסית ל־#home-content */
-  bottom: 16px;             /* לדוגמא: 16px מהרגל */
-  right: 16px;              /* או left: 50%; transform: translateX(-50%); למרכז */
-  width: 80px;              /* רוחב חדש */
-  height: auto;             /* גובה ייקבע אוט׳ לפי יחס התמונה */
-  cursor: pointer;          /* הסמן יהפוך ליד למראה קליקבילי */
-  z-index: 10;              /* אם צריך מעל שאר התוכן */
+  position: absolute;        
+  bottom: 16px;           /* חצי מוסתר מתחת למסך */
+  right: 2px;
+  width: 300px;
+  top:190px;
+
+}
+
+#new-note-btn:hover {
+  bottom: 8px;
 }
 
 /* כדי שהתמונה תתאים במלואה לממדי ה־DIV */

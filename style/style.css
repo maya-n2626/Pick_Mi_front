@@ -226,6 +226,39 @@ button:hover, .btn-link:hover {
   display: none;
 }
 
+#notes-wrapper {
+  width: 429px;
+  height: 572px;
+  position: absolute;
+  top: 557px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* או flex-start אם רוצים שהכפתור יישב ממש מתחת לרשימה */
+}
+
+#notes-list {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+#admin-btn {
+  margin-top: 12px;
+  font-size: 16px;
+  background: none;
+  color: #000;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
 .note-card.large {
   position: absolute;
   top: 50%; left: 50%;
@@ -256,8 +289,8 @@ button:hover, .btn-link:hover {
   position: absolute;        
   bottom: 16px;           /* חצי מוסתר מתחת למסך */
   right: 2px;
-  width: 300px;
-  top:190px;
+  width: 400px;
+  top:700px;
 
 }
 

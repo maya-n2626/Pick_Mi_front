@@ -223,13 +223,18 @@ button:hover, .btn-link:hover {
 #home-bg {
   display:none;
 }
+#admin-btn {
+  z-index: 10;
+  position: relative;
+  cursor: pointer;
+}
 
 #notes-list {
   margin: 24px 0 0 0;
 }
 .note-card {
-  background: #fafaff;
-  border: 1px solid #d3eaff;
+
+  
   border-radius: 9px;
   padding: 15px 12px;
   margin-bottom: 15px;
@@ -432,6 +437,7 @@ button:hover, .btn-link:hover {
   white-space: pre-wrap;
   z-index: 2;
 }
+
 
 #nav-bar {
   position: absolute;

@@ -314,78 +314,79 @@ if (saveTextBtn) {
 //open note function
 
 async function openNoteAndShow(noteId) {
-  console.log("current lat:", lastKnownLocation.lat);
-  console.log("current lon:", lastKnownLocation.lon);
+    // הגדרת המחרוזת של הציור הזמני כדי שנוכל להשוות אליה
+    const PLACEHOLDER_DRAWING = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==";
 
-  const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
-  console.log("📩 note from server:", note);
+    const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
+    console.log("📩 note from server:", note);
 
-  const noteScreen = document.getElementById("note-content-screen");
-  const contentDiv = document.getElementById("note-content");
+    // בדיקה חכמה: האם יש נתוני ציור, והאם הם שונים מהציור הזמני?
+    const hasRealDrawing = note.content.drawingData && note.content.drawingData !== PLACEHOLDER_DRAWING;
 
-  // שמירת מיקום וזיהוי הפתק
-  noteScreen.dataset.noteId = noteId;
-  noteScreen.dataset.latitude = lastKnownLocation.lat;
-  noteScreen.dataset.longitude = lastKnownLocation.lon;
+    const noteScreen = document.getElementById("note-content-screen");
+    const contentDiv = document.getElementById("note-content");
 
-  // מעבר למסך הפתק
-// מעבר למסך הפתק
-show("note-content-screen");
+    noteScreen.dataset.noteId = noteId;
+    noteScreen.dataset.latitude = lastKnownLocation.lat;
+    noteScreen.dataset.longitude = lastKnownLocation.lon;
 
-  // ניקוי קודם
-  contentDiv.innerHTML = "";
-  contentDiv.style.position = "relative";
+    show("note-content-screen");
 
-  // ✅ הוספת רקע לפי תבנית
+    contentDiv.innerHTML = "";
+    contentDiv.style.position = "relative";
 
+    // 1. הוספת רקע לפי סוג הפתק האמיתי
+    const backgroundImg = document.createElement("img");
+    backgroundImg.classList.add("note-background");
+    backgroundImg.src = hasRealDrawing // שימוש במשתנה החדש
+        ? "../images/WriteBrush.png"  // אם יש ציור אמיתי
+        : "../images/WritePen (1).png"; // אם אין ציור אמיתי
+    contentDiv.appendChild(backgroundImg);
 
-  const backgroundImg = document.createElement("img");
-  backgroundImg.classList.add("note-background");
-  backgroundImg.src = note.content.drawingData
-    ? "../images/WriteBrush.png"  // יש ציור
-    : "../images/WritePen (1).png"; // אין ציור
-  contentDiv.appendChild(backgroundImg);
+    // 2. הוספת טקסט אם קיים
+    if (note.content.text) {
+        const p = document.createElement("p");
+        p.textContent = note.content.text;
+        p.classList.add("note-text");
+        contentDiv.appendChild(p);
+    }
 
-
-  // ✅ הוספת טקסט אם יש
-  if (note.content.text) {
-    const p = document.createElement("p");
-    p.textContent = note.content.text;
-    p.classList.add("note-text");
-    contentDiv.appendChild(p);
-  }
-
-  // ✅ הוספת ציור אם יש
-  if (note.content.drawingData) {
-    const img = document.createElement("img");
-    img.src = note.content.drawingData;
-    img.alt = "ציור";
-    img.style.maxWidth = "100%";
-    img.style.display = "block";
-    img.classList.add("note-canvas");
-    contentDiv.appendChild(img);
-  }
+    // 3. הוספת ציור רק אם הוא אמיתי
+    if (hasRealDrawing) { // שימוש במשתנה החדש
+        const img = document.createElement("img");
+        img.src = note.content.drawingData;
+        img.alt = "ציור";
+        img.style.maxWidth = "100%";
+        img.style.display = "block";
+        img.classList.add("note-canvas");
+        contentDiv.appendChild(img);
+    }
 }
 
 
 
   
 //close note function 
+// close note function 
 document.getElementById("close-note-btn").addEventListener("click", async () => {
-  const screen = document.getElementById("note-content-screen");
-  const noteId = screen.dataset.noteId;
-  const lat = screen.dataset.latitude;
-  const lon = screen.dataset.longitude;
+    const screen = document.getElementById("note-content-screen");
+    const noteId = screen.dataset.noteId;
+    const lat = screen.dataset.latitude;
+    const lon = screen.dataset.longitude;
 
-  try {
-    await deleteNote(noteId, lat, lon);
-  } catch (e) {
-    console.warn("המחיקה נכשלה", e);
-  }
+    try {
+        // 1. מחיקת הפתק מהשרת
+        await deleteNote(noteId, lat, lon);
 
-  screen.classList.add("hidden");
-  document.getElementById("note-content-screen").classList.add("hidden");
-  document.getElementById("home-content").classList.remove("hidden");
+        // 2. חזרה למסך הבית וריענון המפות
+        gotoHome(); 
+
+    } catch (e) {
+        console.warn("המחיקה נכשלה", e);
+        alert("לא ניתן היה למחוק את הפתק.");
+        // במקרה של שגיאה, עדיין נחזור למסך הבית
+        gotoHome();
+    }
 });
 
 
@@ -438,32 +439,36 @@ function renderNotesOnHome(notes) {
 
 
 function renderNotesOnMap(notes, map) {
-    console.log("📍 Rendering notes on map:", notes);
+    console.log(`Starting to render ${notes.length} notes...`);
 
-  notes.forEach(n => {
-    const title = n.content?.text?.trim() || "פתק ללא טקסט";
+    notes.forEach((note, index) => {
+        // הדפסה חדשה שמראה את פרטי המיקום של כל פתק
+        console.log(`--- Processing Note #${index + 1} ---`);
+        console.log('Location data for this note:', note.location);
 
-    const marker=new google.maps.Marker({
-      position: {
-        lat: Number(n.location.lat),
-        lng: Number(n.location.lon)
-      },
-      map,
-      title,
-      icon: {
-        url: "../images/ClosedNote.png",
-        size: new google.maps.Size(51, 43),
-        origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(25, 43)
-      }
+        if (note && note.location && note.location.latitude != null && note.location.longitude != null) {
+            console.log('✅ Coordinates are valid. Creating marker.');
+            
+            const title = note.content?.text?.trim() || "פתק ללא טקסט";
+            
+            new google.maps.Marker({
+                position: {
+                    lat: Number(note.location.latitude),
+                    lng: Number(note.location.longitude)
+                },
+                map,
+                title,
+                icon: {
+                    url: "../images/ClosedNote.png", 
+                    scaledSize: new google.maps.Size(40, 40), 
+                    anchor: new google.maps.Point(20, 20) 
+                }
+            }).addListener("click", () => openNoteAndShow(note.id));
+        } else {
+            console.warn(`❌ SKIPPING note due to invalid or missing coordinates.`);
+        }
     });
-          marker.addListener("click", () => openNoteAndShow(n.id));
-
-  });
-
 }
-
-
   function gotoLogin() {
       console.log("🔵 gotoLogin called");
 
@@ -485,7 +490,7 @@ async function gotoHome() {
 
       // 1. שליפת פתקים קרובים
       const notes = await getNearbyNotes(lastKnownLocation.lat, lastKnownLocation.lon, 500);
-      console.log("📍 nearby notes:", notes);
+            console.log("Data for STATIC map:", JSON.stringify(notes, null, 2));
 
       renderNotesOnHome(notes);
       // 2. הרכבת URL של Static Map עם מרקרים
@@ -650,51 +655,60 @@ async function fetchAllNotes() {
   // === Helpers for Home & Map ===
 const toMapBtn = document.getElementById("to-map-btn");
 if (toMapBtn) {
-  toMapBtn.addEventListener("click", () => {
+    toMapBtn.addEventListener("click", async () => {
+        try {
+            // קבלת מיקום מהדפדפן
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject);
+            });
 
-  navigator.geolocation.getCurrentPosition(
-    
-    async position => {
-      show("map-screen");
+            show("map-screen");
 
-      lastKnownLocation = {
-      lat:     position.coords.latitude,
-      lon:     position.coords.longitude,
-      placeId: null
-    };
+            lastKnownLocation = {
+                lat: position.coords.latitude,
+                lon: position.coords.longitude,
+                placeId: null
+            };
 
-      const map = new google.maps.Map(
-        document.getElementById("big-map"),
-      { center: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon }, zoom: 14 }
-      );
+            // יצירת המפה
+            const map = new google.maps.Map(document.getElementById("big-map"), {
+                center: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },
+                zoom: 14
+            });
 
-      // סמן הבית
-      new google.maps.Marker({
-        position: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },
-        map,
-        title: "המיקום שלך"
-      });
+            // הוספת סמן של המיקום הנוכחי
+            new google.maps.Marker({
+                position: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },
+                map,
+                title: "המיקום שלך"
+            });
 
-      // מביאים את כל הפתקים באזור (לדוגמה 50 ק"מ)
-      const notes = await getNearbyNotes( lastKnownLocation.lat,
-      lastKnownLocation.lon,
-      500);
+            // שלב קריטי: קבלת הפתקים מהשרת
+            console.log("Fetching notes for map...");
+            const notes = await getNearbyNotes(
+                lastKnownLocation.lat,
+                lastKnownLocation.lon,
+                5000 // הגדלתי את הרדיוס ל-5 ק"מ כדי לוודא שאנחנו תופסים משהו
+            );
 
-      renderNotesOnMap(notes,map);
+            // שלב קריטי: בדיקת הנתונים שהתקבלו
+            console.log("✅ Data received for map:", notes);
 
-    },
-    error => {
-      if (error.code === error.PERMISSION_DENIED) {
-        alert("לא אישרת את השימוש במיקום, לא ניתן להציג מפה.");
-      } else {
-        console.warn("שגיאה בקבלת מיקום:", error);
-        alert("לא הצלחנו לקבל את המיקום שלך.");
-      }
-    }
-  );
-});
+            // רינדור הפתקים על המפה
+            renderNotesOnMap(notes, map);
+
+        } catch (error) {
+            // כאן נתפוס כל שגיאה שתתרחש בתהליך
+            console.error("❌ An error occurred while loading the map or notes:", error);
+
+            if (error.code === error.PERMISSION_DENIED) {
+                alert("לא אישרת שימוש במיקום, לא ניתן להציג את המפה.");
+            } else {
+                alert("אירעה שגיאה בטעינת המפה. בדוק את הקונסול (F12) לפרטים נוספים.");
+            }
+        }
+    });
 }
-
   async function loadNearbyNotes() {
   const userLoc = await getUserLocationPromise();
   const notes   = await getNearbyNotes(userLoc.lat, userLoc.lon);

@@ -160,6 +160,25 @@ button:hover, .btn-link:hover {
 
 
 }
+
+.app-bar {
+  width: 100%;
+  height: 86px; /* לפי העיצוב שלך ב-Figma */
+  top: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  direction: ltr; /* כדי שהמרכוז יעבוד גם בעברית */
+  z-index: 10;
+}
+.indicator-Day{
+    width: 116px;
+  height: 116px;
+  object-fit: contain;
+  
+    
+}
 #home-bg {
   display:none;
 }

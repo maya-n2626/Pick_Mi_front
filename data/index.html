@@ -14,9 +14,10 @@
   <div class="container" id="login-screen">
     <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
 
-    <div class="app-bar">
-     <img src="./images/app-icon.png" alt="App Icon" class="app-icon" />
-   </div>
+   <div class="app-bar">
+<img src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
+
+</div>
 
     <h1>התחברות</h1>
     <form id="login-form">
@@ -37,15 +38,18 @@
       <button class="btn-link" id="to-forgot">שכחתי סיסמה</button>
       <button class="btn-link" id="to-signup">הרשמה</button>
     </div>
+
+    <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
+
   </div>
 
   <!-- ====== SIGNUP ====== -->
   <div class="container hidden" id="signup-screen">
     <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
 
-    <div class="app-bar">
-     <img src="./images/app-icon.png" alt="App Icon" class="app-icon" />
-   </div>
+   <div class="app-bar">
+<img src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
+</div>
 
     <h1>הרשמה</h1>
     <form id="signup-form">
@@ -55,12 +59,15 @@
       </div>
       <div class="input-group">
         <label for="signup-password">סיסמה</label>
+
         <input type="password" id="signup-password" name="password" required>
       </div>
       <div id="signup-error" class="error-msg hidden"></div>
       <button type="submit">שמור</button>
     </form>
     <button class="btn-link" id="signup-back">חזור להתחברות</button>
+        <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
+
   </div>
 
   <!-- ====== WRONG PASSWORD ====== -->
@@ -68,8 +75,8 @@
     <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
 
     <div class="app-bar">
-     <img src="./images/app-icon.png" alt="App Icon" class="app-icon" />
-    </div>
+<img  src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
+</div>
 
     <h1>סיסמה שגויה</h1>
     <div class="error-msg" style="margin-bottom:20px;">הסיסמה או האימייל שהזנת שגויים.</div>
@@ -80,6 +87,10 @@
   <!-- ====== FORGOT PASSWORD ====== -->
 <div class="container hidden" id="forgot-password-screen">
   <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
+
+  <div class="app-bar">
+<img  src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
+</div>
 
   <h1>איפוס סיסמה</h1>
   <form id="forgot-form">
@@ -106,6 +117,10 @@
   <div class="container hidden" id="reset-sent-screen">
     <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
 
+    <div class="app-bar">
+<img src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
+</div>
+
     <h1>קישור נשלח</h1>
     <div class="success-msg" style="margin-bottom:16px;">
       אם יש חשבון עבור כתובת האימייל הזאת, קישור לאיפוס סיסמה נשלח אליך.
@@ -119,9 +134,12 @@
 
 <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
 
+<div class="app-bar">
+<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+</div>
+
 <div id="home-bg" ></div>
 
-<img id="user-icon" src="../images/indicator-Day.png" alt="אייקון משתמש" style="width: 40px; cursor: pointer;" title="פרטי משתמש" />
 
 
   <div id="notes-list"></div>
@@ -136,6 +154,11 @@
 
 <!-- ====== USER MENU SCREEN ====== -->
 <div id="user-menu-screen" class="container hidden">
+  <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
+
+<div class="app-bar">
+<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+</div>
   <h2>👤 פרטי משתמש</h2>
   <p id="user-email" style="font-weight: bold; direction: ltr;">user@example.com</p>
   <br>
@@ -150,6 +173,11 @@
 <div id="map-screen" class="container hidden">
     <img id="status-bar" src="../images/status-bar.png" />
 
+<div class="app-bar">
+<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+</div>    
+
+
   <h2>המפה בסביבה שלך</h2>
   <div id="big-map" style="width:100%;height:400px"></div>
   <button id="back-to-home" class="btn-link" style="margin-top:20px;">חזור לדף הבית</button>
@@ -159,6 +187,10 @@
 <!-- >>> מסך כתיבת הפתק בעט -->
 <div id="write-note-screen" class="container hidden">
     <img id="status-bar" src="../images/status-bar.png" />
+
+<div class="app-bar">
+<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+</div>
 
   <button id="write-back-btn" class="btn-link">← חזור</button>
   <div class="note-large note-write">
@@ -177,6 +209,9 @@
 <div id="brush-note-screen" class="container hidden">
     <img id="status-bar" src="../images/status-bar.png" />
 
+<div class="app-bar">
+<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+</div>
   <button id="brush-back-btn" class="btn-link">← חזור</button>
   <div class="note-large note-brush">
     <img src="../images/WriteBrush.png" alt="פתק לצביעה" />
@@ -203,6 +238,10 @@
 <!-- ====== ADMIN PANEL ====== -->
 <div id="admin-screen" class="container hidden">
     <img id="status-bar" src="../images/status-bar.png" />
+
+<div class="app-bar">
+<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+</div>
 
   <h1>Admin Panel</h1>
   <button id="admin-back" class="btn-link">← חזור</button>

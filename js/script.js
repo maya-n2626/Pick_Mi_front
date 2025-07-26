@@ -550,7 +550,7 @@ logoutBtn.addEventListener("click", () => {
     gotoLogin();
   });
 
-  document.getElementById("user-icon").addEventListener("click", () => {
+  document.getElementById("app-icon").addEventListener("click", () => {
   show("user-menu-screen");
     document.getElementById("user-menu-back-btn").addEventListener("click", () => {
     gotoHome();

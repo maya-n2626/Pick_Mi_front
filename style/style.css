@@ -11,7 +11,13 @@ body {
 
 }
 
+#logout-btn {
+  left: 10px; /* בפינה שמאלית */
+}
 
+#to-map-btn {
+  right: 10px; /* בפינה ימנית */
+}
 
 .container {
   max-width: 412px;
@@ -75,6 +81,15 @@ button, .btn-link {
   border: none;
   cursor: pointer;
   z-index: 10;          
+}
+
+.write-card{
+  display:block;
+   width: 320px;
+  
+  margin-left: 20px;
+  
+  padding: 24px;
 }
 
 button:hover, .btn-link:hover {
@@ -160,24 +175,50 @@ button:hover, .btn-link:hover {
 
 
 }
-
+.App-icon{
+  margin-right: 15px;
+}
 .app-bar {
   width: 100%;
-  height: 86px; /* לפי העיצוב שלך ב-Figma */
+  height: 86px; 
   top: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
   direction: ltr; /* כדי שהמרכוז יעבוד גם בעברית */
-  z-index: 10;
+  
 }
+
+
 .indicator-Day{
     width: 116px;
   height: 116px;
   object-fit: contain;
   
     
+}
+
+.login-card {
+  width: 320px;
+  height: 322px;
+  margin-left: 20px;
+  margin-top: 230px;
+  padding: 24px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  
+
+  
+}
+
+.button-wrapper.logout {
+  left: 16px;
+}
+
+.button-wrapper.map {
+  right: 16px;
 }
 #home-bg {
   display:none;
@@ -197,20 +238,9 @@ button:hover, .btn-link:hover {
   font-size: 1rem;
 }
 .user-icon {
-  position: absolute;
-  top: 10px; right: 16px;
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: #0099ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 1.3em;
-  font-weight: 600;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 6px #0002;
-  cursor: pointer;
+  position: absolute;  
+ right:20px;
+ gap:10px;
 }
 @media (max-width: 600px) {
   #map {
@@ -308,6 +338,7 @@ button:hover, .btn-link:hover {
 /* === פתק כתיבה בעט === */
 .note-write {
   position: relative;
+  
 }
 .note-write img {
   width: 100%;
@@ -409,4 +440,63 @@ button:hover, .btn-link:hover {
   width: 100%;
   height: auto;
   z-index: 20;
+}
+
+.btn-field {
+  width: 272px;
+  height: 40px;
+  background-color:rgb(15, 15, 15); /* צבע כהה כמו בפיגמה */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left:20px;
+}
+
+  .map-card {
+  width: 320px;
+  height: auto; /* יתאים לגובה המפה והכפתור */
+  background-color: rgba(0, 0, 0, 0.6); /* רקע כהה שקוף */
+  border-radius: 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: absolute;
+  top: 230px; /* זה מה שיזיז את כל הקופסה למטה */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.settings-card{
+    width: 320px;
+  height: auto; /* יתאים לגובה המפה והכפתור */
+  background-color: rgba(0, 0, 0, 0.6); /* רקע כהה שקוף */
+  border-radius: 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: absolute;
+  top: 230px; /* זה מה שיזיז את כל הקופסה למטה */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+.btn-field:hover {
+
+  background-color:rgb(40, 40, 40); /* גוון מעט בהיר יותר כשעוברים עם העכבר */
+}
+
+.auth-field{
+  width: 272px;
+  height: 40px;
+  
+
 }

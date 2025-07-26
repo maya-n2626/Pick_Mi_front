@@ -91,8 +91,7 @@ async function forgotPassword(email) {
       show("signup-screen");
     };
   
-    // 1. חזרה מ‑Signup ל‑Login
-    document.getElementById("signup-back").onclick = gotoLogin;
+   
   
     // 2. טיפול ב‑Signup
     document.getElementById("signup-form").onsubmit = async e => {
@@ -330,8 +329,8 @@ async function openNoteAndShow(noteId) {
   noteScreen.dataset.longitude = lastKnownLocation.lon;
 
   // מעבר למסך הפתק
-  document.getElementById("home-content").classList.add("hidden");
-  noteScreen.classList.remove("hidden");
+// מעבר למסך הפתק
+show("note-content-screen");
 
   // ניקוי קודם
   contentDiv.innerHTML = "";
@@ -347,7 +346,6 @@ async function openNoteAndShow(noteId) {
     : "../images/WritePen (1).png"; // אין ציור
   contentDiv.appendChild(backgroundImg);
 
-  contentDiv.appendChild(backgroundImg);
 
   // ✅ הוספת טקסט אם יש
   if (note.content.text) {
@@ -545,25 +543,18 @@ if (logoutBtn) {
 
 //icon-button
 
-logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("jwt");
-    gotoLogin();
-  });
 
-  document.getElementById("app-icon").addEventListener("click", () => {
-  show("user-menu-screen");
-    document.getElementById("user-menu-back-btn").addEventListener("click", () => {
-    gotoHome();
-  })
-  // שליפת מייל מהטוקן או אחסון קודם
-  const token = localStorage.getItem("jwt");
-  if (token) {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const email = payload.email;
-    document.getElementById("user-email").textContent = email;
+
+ ["app-icon1", "app-icon2", "app-icon3", "app-icon4", "app-icon5"].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) {
+    btn.addEventListener("click", () => {
+      show("user-menu-screen");
+      const backBtn = document.getElementById("user-menu-back-btn");
+      backBtn && backBtn.addEventListener("click", gotoHome);
+    });
   }
 });
-
 
 
 

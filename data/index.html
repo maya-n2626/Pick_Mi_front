@@ -18,27 +18,27 @@
 <img src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
 
 </div>
-
-    <h1>התחברות</h1>
+ <div class="login-card">
+    <h1>Login</h1>
     <form id="login-form">
       <div class="input-group">
-        <label for="login-email">אימייל</label>
-        <input type="email" id="login-email" name="email" required>
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email"  class="auth-field"  name="email" required>
 
       </div>
       <div class="input-group">
-        <label for="login-password">סיסמה</label>
-        <input type="password" id="login-password" name="password" required>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password"  class="auth-field" name="password" required>
 
       </div>
       <div id="login-error" class="error-msg hidden"></div>
-      <button type="submit">התחבר</button>
+      <button type="submit"  class="btn-field">Sign In</button>
     </form>
     <div class="button-group">
-      <button class="btn-link" id="to-forgot">שכחתי סיסמה</button>
-      <button class="btn-link" id="to-signup">הרשמה</button>
+      <button class="btn-link" id="to-forgot">Forgot Password?</button>
+      <button class="btn-link" id="to-signup">Sign Up</button>
     </div>
-
+ </div>
     <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 
   </div>
@@ -50,22 +50,24 @@
    <div class="app-bar">
 <img src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
 </div>
+ <div class="login-card">
 
-    <h1>הרשמה</h1>
+    <h1>Sign Up</h1>
     <form id="signup-form">
       <div class="input-group">
-        <label for="signup-email">אימייל</label>
-        <input type="email" id="signup-email" name="email" required>
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" class="auth-field" name="email" required>
       </div>
       <div class="input-group">
-        <label for="signup-password">סיסמה</label>
+        <label for="signup-password">Password</label>
 
-        <input type="password" id="signup-password" name="password" required>
+        <input type="password" id="signup-password"  class="auth-field" name="password" required>
       </div>
-      <div id="signup-error" class="error-msg hidden"></div>
-      <button type="submit">שמור</button>
+      <div id="signup-error" class="btn-field"></div>
+      <button type="submit"  class="btn-field">Save</button>
     </form>
-    <button class="btn-link" id="signup-back">חזור להתחברות</button>
+    <button id="signup-back" class="btn-field">Back to Home</button>
+ </div>
         <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 
   </div>
@@ -77,11 +79,13 @@
     <div class="app-bar">
 <img  src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
 </div>
-
+ <div class="login-card">
     <h1>סיסמה שגויה</h1>
     <div class="error-msg" style="margin-bottom:20px;">הסיסמה או האימייל שהזנת שגויים.</div>
-    <button id="wrong-back">חזור להתחברות</button>
-    <button class="btn-link" id="wrong-forgot">שכחתי סיסמה</button>
+    <button id="wrong-back" class="btn-field">Back to Home</button>
+    <button class="btn-link" id="wrong-forgot" class="btn-field">Forgot Password</button>
+
+ </div>
      <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 
   </div>
@@ -94,26 +98,28 @@
 <img  src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
 </div>
 
-  <h1>איפוס סיסמה</h1>
+ <div class="login-card">
+  <h1>Reset Password</h1>
   <form id="forgot-form">
     <div class="input-group">
-      <label for="forgot-email">Email</label>
-      <input type="email" id="forgot-email" name="email" required>
+      <label for="forgot-email" >Email </label>
+      <input type="email" id="forgot-email" name="email"  class="auth-field" required>
 
     </div>
     <div id="forgot-error" class="error-msg hidden"></div>
     <div class="button-group">
     
-      <button type="submit" id="forgot-submit" class="btn-primary">
+      <button type="submit" id="forgot-submit" class="btn-field">
         Reset Password
       </button>
       
-      <button id="forgot-back-to-login" class="btn-link">
-        חזור לדף הבית
+      <button id="forgot-back-to-login" class="btn-field">
+        Back to Home
       </button>
     </div>
+    
   </form>
-
+ </div>
       <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 
 </div>
@@ -126,15 +132,27 @@
 <img src="../images/Generic avatar.png" alt="App Icon" class="app-icon" />
 </div>
 
+ <div class="login-card">
+
     <h1>קישור נשלח</h1>
     <div class="success-msg" style="margin-bottom:16px;">
       אם יש חשבון עבור כתובת האימייל הזאת, קישור לאיפוס סיסמה נשלח אליך.
     </div>
-    <button id="sent-back" class="btn-link">חזור להתחברות</button>
+    <button id="sent-back" class="btn-link">Back to Home</button>
+
+ </div>
 
         <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 
   </div>
+
+
+ 
+
+ 
+
+ 
+
 
   <!-- ====== HOME ====== -->
 
@@ -143,11 +161,18 @@
 <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
 
 <div class="app-bar">
+    <div class="button-wrapper logout">
     <button id="logout-btn" class="btn-link" style="margin-top:20px;">התנתק</button>
+    </div>
 
-<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+    <div class="center-icon">
+
+<img id="app-icon1" src="../images/indicator-Day.png" alt="App Icon" class="App-icon" />
+    </div>
+  <div class="button-wrapper map">
+
   <button id="to-map-btn" class="btn-link" style="margin-top:20px;">מעבר למפה</button>
-
+  </div>
 </div>
 
 <div id="home-bg" ></div>
@@ -173,14 +198,20 @@
   <img id="status-bar" src="../images/status-bar.png" alt="סטטוס בר" />
 
 <div class="app-bar">
-<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+<img id="app-icon2" src="../images/indicator-Day.png" alt="App Icon" class="App-icon" />
 </div>
-  <h2>👤 פרטי משתמש</h2>
-  <p id="user-email" style="font-weight: bold; direction: ltr;">user@example.com</p>
+
+
+ <div class="settings-card">
+  <h2>Settings</h2>
+  
   <br>
 
-<button id="delete-account-btn" class="btn-link">🗑️ מחק חשבון</button>
-<button id="user-menu-back-btn" class="btn-link">חזרה לדף בית</button>
+<button id="delete-account-btn" class="btn-field">
+  🗑️ Delete Account
+</button>
+<button id="user-menu-back-btn" class="btn-link">  Back to home</button>
+ </div>
     <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 
 </div>
@@ -191,15 +222,15 @@
     <img id="status-bar" src="../images/status-bar.png" />
 
 <div class="app-bar">
-<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+<img id="app-icon3" src="../images/indicator-Day.png" alt="App Icon" class="App-icon" />
 </div>    
 
-
-  <h2>המפה בסביבה שלך</h2>
+ <div class="map-card">
+  <h2>Map in your area</h2>
   <div id="big-map" style="width:100%;height:400px"></div>
-  <button id="back-to-home" class="btn-link" style="margin-top:20px;">חזור לדף הבית</button>
+  <button id="back-to-home" class="btn-link" style="margin-top:20px;">Back to Home</button>
       <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
-
+ </div>
 </div>
 
 
@@ -208,16 +239,20 @@
     <img id="status-bar" src="../images/status-bar.png" />
 
 <div class="app-bar">
-<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+<img id="app-icon4" src="../images/indicator-Day.png" alt="App Icon" class="App-icon" />
+
 </div>
 
-  <button id="write-back-btn" class="btn-link">← חזור</button>
+ 
+
+  <div class="write-card">
   <div class="note-large note-write">
     <img src="../images/WritePen (1).png" alt="פתק לכתיבה בעט" />
-    <textarea id="note-text" placeholder="כתוב כאן..."></textarea>
+    <textarea id="note-text" ></textarea>
 
-    <button id="to-brush-btn" class="btn-link">עבור לצביעה</button>
-    <button id="save-text-note-btn" class="btn-primary">שמור פתק</button>
+    <button id="save-text-note-btn" class="btn-field">Save Note</button>
+        <button id="to-brush-btn" class="btn-link">עבור לצביעה</button>
+  </div>
 
   </div>
 
@@ -227,37 +262,62 @@
 
 
 
-<!-- >>> מסך צביעה -->
+<!-- ====== BRUSH NOTE SCREEN ====== -->
 <div id="brush-note-screen" class="container hidden">
-    <img id="status-bar" src="../images/status-bar.png" />
+  <img id="status-bar" src="../images/status-bar.png" />
 
-<div class="app-bar">
-<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
-</div>
-  <button id="brush-back-btn" class="btn-link">← חזור</button>
-  <div class="note-large note-brush">
-    <img src="../images/WriteBrush.png" alt="פתק לצביעה" />
-    <canvas id="note-canvas" width="400" height="300"></canvas>
-    <!-- אפשרויות מברשת -->
- <div class="brush-controls">
-  <label for="brush-color">צבע:</label>
-  <input type="color" id="brush-color" value="#000000">
-
-  <label for="brush-size">עובי:</label>
-  <input type="range" id="brush-size" min="1" max="30" value="5">
-</div>
-
-<button id="save-drawing-note-btn" class="btn-primary">שמור פתק</button>
+  <div class="app-bar">
+    <img id="app-icon5" src="../images/indicator-Day.png" alt="App Icon" class="App-icon" />
   </div>
+
+  <div class="brush-card">
+    
+
+    <div class="note-large note-brush">
+      <img src="../images/WriteBrush.png" alt="פתק לצביעה" />
+      <canvas id="note-canvas" width="400" height="300"></canvas>
+    </div>
+
+    <!-- אפשרויות מברשת -->
+    <div class="brush-controls">
+      <label for="brush-color">צבע:</label>
+      <input type="color" id="brush-color" value="#000000">
+
+      <label for="brush-size">עובי:</label>
+      <input type="range" id="brush-size" min="1" max="30" value="5">
+    </div>
+
+    <!-- כפתורי פעולה -->
+    <div class="button-group">
+      <button id="save-drawing-note-btn" class="btn-primary">שמור פתק</button>
+      <button id="brush-back-btn" class="btn-link">← חזור</button>
+    </div>
+  </div>
+
+  <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 </div>
 
-<div id="note-content-screen" class="hidden">
-  <div id="note-content" class="note-card"></div>
-  <button id="close-note-btn">חזור</button>
 
-      <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 
+<!-- ====== NOTE CONTENT SCREEN ====== -->
+<div id="note-content-screen" class="container hidden">
+  <img id="status-bar" src="../images/status-bar.png" />
+
+  <div class="app-bar">
+    <img src="../images/indicator-Day.png" alt="App Icon" class="App-icon" />
+  </div>
+
+  <div class="note-card" id="note-content">
+    
+  </div>
+
+  <div class="button-wrapper">
+    <button id="close-note-btn" class="btn-field">← חזור</button>
+  </div>
+
+  <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 </div>
+
 
 
 <!-- ====== ADMIN PANEL ====== -->
@@ -265,7 +325,7 @@
     <img id="status-bar" src="../images/status-bar.png" />
 
 <div class="app-bar">
-<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="app-icon" />
+<img id="app-icon" src="../images/indicator-Day.png" alt="App Icon" class="App-icon" />
 </div>
 
   <h1>Admin Panel</h1>

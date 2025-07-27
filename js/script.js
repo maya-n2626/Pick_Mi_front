@@ -279,6 +279,29 @@ if (saveBtn) {
     gotoHome();
   });
 }
+const saveBtn1 = document.getElementById("save-drawing-note-btn1");
+if (saveBtn1) {
+  saveBtn1.addEventListener("click", async () => {
+    const textInput = document.getElementById("note-text");
+    const canvas = document.getElementById("note-canvas");
+
+    if (!textInput || !canvas) {
+      console.warn("❗ אלמנט note-text או note-canvas לא נמצא בדף הזה");
+      return;
+    }
+
+  const text = textInput.value.trim() || "פתק מצויר בלבד";
+    const drawingData = canvas.toDataURL();
+    console.log("🖊 text to send:", text);
+   console.log("🖼 drawingData to send:", drawingData);
+
+  console.log("📍 Location to send:", lastKnownLocation);
+
+
+    await throwNote(text, drawingData, lastKnownLocation.lat, lastKnownLocation.lon, lastKnownLocation.placeId);
+    gotoHome();
+  });
+}
 
 
 const saveTextBtn = document.getElementById("save-text-note-btn");

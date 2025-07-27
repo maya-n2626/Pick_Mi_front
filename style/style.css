@@ -175,18 +175,20 @@ button:hover, .btn-link:hover {
 
 
 }
-.App-icon{
-  margin-right: 15px;
+.app-icon{
+  margin-left: 28px;
 }
+  
 .app-bar {
   width: 100%;
+  left:40%;
   height: 86px; 
   top: 52px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   position: absolute;
-  direction: ltr; /* כדי שהמרכוז יעבוד גם בעברית */
+  
   
 }
 
@@ -403,7 +405,7 @@ button:hover, .btn-link:hover {
 
 /* סגנון גם לרקע וגם לציור כדי שימלאו את כל העטיפה */
 #save-drawing-note-btn {
-  margin-top: 20px; /* או אפילו יותר, תנסי 30 אם צריך */
+  margin-top: 20px; 
   padding: 12px 24px;
   font-size: 18px;
   border-radius: 20px;
@@ -417,6 +419,78 @@ button:hover, .btn-link:hover {
   gap: 8px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
+.app-bar1{
+width: 100%;
+  
+  height: 86px; 
+  top: 52px;
+  display: flex;
+  align-items: center;
+  left:3%;
+  position: absolute;
+  gap:120px;
+}
+h2{
+  color:white;
+}
+h1{
+  color:white;
+}
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  margin-top: 100px;
+}
+
+.admin-box {
+  background: rgba(255, 255, 255, 0.5); /* לבן שקוף */
+  padding: 15px;
+  margin: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+#admin-users,
+#admin-notes {
+  max-height: 180px;         /* אפשר לשנות לפי הצורך */
+  overflow-y: auto;          /* פס גלילה אנכי */
+  padding-right: 5px;        /* מרווח קטן שלא יחתוך טקסט */
+}
+
+/* אם את רוצה גם גלילה מעוצבת */
+#admin-users::-webkit-scrollbar,
+#admin-notes::-webkit-scrollbar {
+  width: 6px;
+}
+
+#admin-users::-webkit-scrollbar-thumb,
+#admin-notes::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+#admin-users::-webkit-scrollbar-track,
+#admin-notes::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#save-drawing-note-btn1 {
+  margin-top: 20px; 
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 20px;
+  background-color: #34c759; /* ירוק אפל סטייל */
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
 
 .button-group{
  display: flex;

@@ -246,14 +246,36 @@
 </div>
 
  
-
   <div class="write-card">
+    
+    
+
   <div class="note-large note-write">
+       <!-- כפתורי פעולה -->
+     <div class="button-group">
+    <button id="to-brush-btn" class="btn-link">Brush</button>
+
+      <button id="save-drawing-note-btn" class="btn-stamp">✉️</button>
+
+    </div>
     <img src="../images/WritePen (1).png" alt="פתק לכתיבה בעט" />
     <textarea id="note-text" ></textarea>
 
-    <button id="save-text-note-btn" class="btn-field">Save Note</button>
-        <button id="to-brush-btn" class="btn-link">עבור לצביעה</button>
+      <div class="brush-controls">
+      
+
+      <button id="clear-canvas-btn1" title="נקה ציור">🗑️</button>
+     <!-- שליטה על צבע ועובי של הטקסט -->
+<div class="text-style-controls">
+  <label for="text-color"></label>
+  <input type="color" id="text-color" value="#000000">
+
+ 
+</div>
+
+    </div>
+
+
   </div>
 
   </div>
@@ -276,24 +298,29 @@
     
 
     <div class="note-large note-brush">
+       <!-- כפתורי פעולה -->
+     <div class="button-group">
+     <button id="brush-back-btn" class="btn-link">← Back to</button>
+
+      <button id="save-drawing-note-btn" class="btn-stamp">✉️ </button>
+    </div>
       <img src="../images/WriteBrush.png" alt="פתק לצביעה" />
-      <canvas id="note-canvas" width="400" height="300"></canvas>
+      <canvas id="note-canvas" width="420" height="300"></canvas>
     </div>
 
     <!-- אפשרויות מברשת -->
     <div class="brush-controls">
-      <label for="brush-color">צבע:</label>
+      <label for="brush-color"></label>
       <input type="color" id="brush-color" value="#000000">
 
-      <label for="brush-size">עובי:</label>
+      <label for="brush-size"></label>
       <input type="range" id="brush-size" min="1" max="30" value="5">
+
+      <button id="clear-canvas-btn" title="נקה ציור">🗑️</button>
+
     </div>
 
-    <!-- כפתורי פעולה -->
-    <div class="button-group">
-      <button id="save-drawing-note-btn" class="btn-primary">שמור פתק</button>
-      <button id="brush-back-btn" class="btn-link">← חזור</button>
-    </div>
+   
   </div>
   <img id="nav-bar" src="../images/navigation.png" alt="Navigation Bar" />
 </div>

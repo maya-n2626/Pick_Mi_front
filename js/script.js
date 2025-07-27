@@ -363,30 +363,45 @@ async function openNoteAndShow(noteId) {
     }
 }
 
+  const noteText = document.getElementById("note-text");
+  const textColorPicker = document.getElementById("text-color");
+  const textWeightSelector = document.getElementById("text-weight");
+
+  if (noteText && textColorPicker) {
+    textColorPicker.addEventListener("input", () => {
+      noteText.style.color = textColorPicker.value;
+    });
+  }
 
 
-  
+
+
+document.getElementById("clear-canvas-btn").addEventListener("click", () => {
+  const canvas = document.getElementById("note-canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+  document.getElementById("clear-canvas-btn1").addEventListener("click", () => {
+   const textInput = document.getElementById("note-text");
+  if (textInput) textInput.value = ""; // מנקה את תיבת הטקסט
+});
 //close note function 
-// close note function 
 document.getElementById("close-note-btn").addEventListener("click", async () => {
-    const screen = document.getElementById("note-content-screen");
-    const noteId = screen.dataset.noteId;
-    const lat = screen.dataset.latitude;
-    const lon = screen.dataset.longitude;
+  const screen = document.getElementById("note-content-screen");
+  const noteId = screen.dataset.noteId;
+  const lat = screen.dataset.latitude;
+  const lon = screen.dataset.longitude;
 
-    try {
-        // 1. מחיקת הפתק מהשרת
-        await deleteNote(noteId, lat, lon);
+  try {
+    await deleteNote(noteId, lat, lon);
+  } catch (e) {
+    console.warn("המחיקה נכשלה", e);
+  }
 
-        // 2. חזרה למסך הבית וריענון המפות
-        gotoHome(); 
-
-    } catch (e) {
-        console.warn("המחיקה נכשלה", e);
-        alert("לא ניתן היה למחוק את הפתק.");
-        // במקרה של שגיאה, עדיין נחזור למסך הבית
-        gotoHome();
-    }
+  screen.classList.add("hidden");
+  document.getElementById("note-content-screen").classList.add("hidden");
+  document.getElementById("home-content").classList.remove("hidden");
 });
 
 

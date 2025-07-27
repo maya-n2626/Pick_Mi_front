@@ -60,7 +60,7 @@ input[type="email"], input[type="password"], input[type="text"] {
   box-sizing: border-box;
 }
 button, .btn-link {
-  background: #35aaff;
+  background: #1d2e1a;
   color: #fff;
   font-weight: 600;
   padding: 10px 0;
@@ -310,7 +310,7 @@ button:hover, .btn-link:hover {
 #note-text-input {
   flex: 1;
   font-size: 1rem;
-  padding: 8px;
+  padding: 18px;
   border: 1px solid #ccc;
 }
 #drawing-canvas {
@@ -352,7 +352,7 @@ button:hover, .btn-link:hover {
 }
 #note-text {
   position: absolute;
-  top: 26%;
+  top: 30%;
   left: 13%;
   width: 74%;
   height: 55%;
@@ -376,21 +376,121 @@ button:hover, .btn-link:hover {
 }
 #note-canvas {
   position: absolute;
-  top: 26%;
-  left: 13%;
-  width: 74%;
-  height: 55%;
+  top: 34%;
+  left: 10%;
+  width: 95%;
+  height: 50%;
   background: transparent;
   touch-action: none;
 }
+.text-style-controls {
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-.brush-controls {
-  margin-top: 12px;
+.text-style-controls label {
+  font-size: 14px;
+}
+
+#note-text {
+  color: #000;
+  font-weight: normal;
+  font-size: 18px;
+  font-family: Arial;
+}
+
+/* סגנון גם לרקע וגם לציור כדי שימלאו את כל העטיפה */
+#save-drawing-note-btn {
+  margin-top: 20px; /* או אפילו יותר, תנסי 30 אם צריך */
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 20px;
+  background-color: #34c759; /* ירוק אפל סטייל */
+  color: white;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
   justify-content: center;
-  font-size: 0.9rem;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.button-group{
+ display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 0 8px;
+}
+.note-large {
+  position: relative;
+}
+.btn-stamp{
+ background-color: rgba(255, 255, 255, 0.4);
+  border: none;
+  border-radius: 30%;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
+}
+.btn-stamp:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+
+.brush-back-btn{
+    background-color: transparent;
+  border: none;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.brush-controls {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin: auto;
+  left: 50%;
+}
+.btn-stamp {
+    background: #4caf50;
+    color: white;
+    font-family: 'Pixel', sans-serif;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: 2px solid white;
+    border-radius: 24px;
+    box-shadow: 0 4px #357a38;
+    transition: 0.1s ease;
+  }
+
+  .btn-stamp:hover {
+    transform: scale(1.05);
+    background: #45a049;
+  }
+
+.brush-controls button {
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.brush-controls button:hover {
+  transform: scale(1.2);
 }
 
 .brush-controls label {

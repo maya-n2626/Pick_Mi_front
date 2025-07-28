@@ -5,8 +5,17 @@ let lastKnownLocation = {
   placeId: null
 };
 
+import { API_BASE, jwt, apiFetch, signup, signin, forgotPassword, resetPassword, deleteAccount } from '../modules/auth.js';
+import { throwNote, getNearbyNotes, getNoteContent, deleteNote } from '../modules/notes.js';
+import { show, renderNotesOnHome, renderNotesOnMap, gotoLogin, gotoHome } from '../modules/uis.js';
+import { initMap } from '../modules/map.js'; // נצטרך פונקציה כזו במודול המפה
+import { initCanvas, clearCanvas } from '../modules/canvas.js'; // נצטרך פונקציות כאלה במודול הקנבס
+
+
 document.addEventListener("DOMContentLoaded", function() {
-;
+
+
+
 
   // === Auth Endpoints ===
 
@@ -84,13 +93,16 @@ async function forgotPassword(email) {
   }
 
   // === Event Listeners & Flow ===
+
+   
+
   
     // 0. מ‑Login ל‑Signup
     document.getElementById("to-signup").onclick = () => {
       document.getElementById("signup-error").classList.add("hidden");
       show("signup-screen");
     };
-  
+   
    
   
     // 2. טיפול ב‑Signup
@@ -109,6 +121,9 @@ async function forgotPassword(email) {
         errEl.classList.remove("hidden");
       }
     };
+
+    document.getElementById("back-to-login").addEventListener("click", gotoLogin);
+
   
     // 3. Sign In
     document.getElementById("login-form").onsubmit = async e => {
@@ -173,7 +188,7 @@ async function forgotPassword(email) {
       })
     });
   }
- async function getNearbyNotes(lat, lon, radius = 500) {
+ async function getNearbyNotes(lat, lon, radius = 1000) {
   if (lat == null || lon == null) {
     throw new Error("מיקום לא תקף — lat/lon חסרים");
   }
@@ -337,45 +352,45 @@ if (saveTextBtn) {
 //open note function
 
 async function openNoteAndShow(noteId) {
-    // הגדרת המחרוזת של הציור הזמני כדי שנוכל להשוות אליה
     const PLACEHOLDER_DRAWING = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==";
-
     const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
-    console.log("📩 note from server:", note);
 
-    // בדיקה חכמה: האם יש נתוני ציור, והאם הם שונים מהציור הזמני?
-    const hasRealDrawing = note.content.drawingData && note.content.drawingData !== PLACEHOLDER_DRAWING;
+    // ================== שלב דיבאגינג 1: בדיקת המידע מהשרת ==================
+    // השורה הזו תדפיס לקונסול את כל המידע שחזר מהשרת בצורה קריאה.
+    console.log("מידע שהגיע מהשרת:", JSON.stringify(note, null, 2));
+    // =======================================================================
 
+    const isDrawingNote = !!note.content.drawingData;
+
+    // ================== שלב דיבאגינג 2: בדיקת תוצאת הלוגיקה =================
+    // השורה הזו תגיד לנו אם התנאי שלנו החזיר true או false.
+    console.log("האם זה פתק ציור?", isDrawingNote);
+    // =======================================================================
+
+
+    // --- שאר הקוד נשאר אותו הדבר ---
     const noteScreen = document.getElementById("note-content-screen");
     const contentDiv = document.getElementById("note-content");
-
     noteScreen.dataset.noteId = noteId;
     noteScreen.dataset.latitude = lastKnownLocation.lat;
     noteScreen.dataset.longitude = lastKnownLocation.lon;
-
     show("note-content-screen");
-
     contentDiv.innerHTML = "";
     contentDiv.style.position = "relative";
-
-    // 1. הוספת רקע לפי סוג הפתק האמיתי
     const backgroundImg = document.createElement("img");
     backgroundImg.classList.add("note-background");
-    backgroundImg.src = hasRealDrawing // שימוש במשתנה החדש
-        ? "../images/WriteBrush.png"  // אם יש ציור אמיתי
-        : "../images/WritePen (1).png"; // אם אין ציור אמיתי
+    backgroundImg.src = isDrawingNote
+        ? "../images/WriteBrush.png"
+        : "../images/WritePen (1).png";
     contentDiv.appendChild(backgroundImg);
-
-    // 2. הוספת טקסט אם קיים
     if (note.content.text) {
         const p = document.createElement("p");
         p.textContent = note.content.text;
         p.classList.add("note-text");
         contentDiv.appendChild(p);
     }
-
-    // 3. הוספת ציור רק אם הוא אמיתי
-    if (hasRealDrawing) { // שימוש במשתנה החדש
+    const hasRealDrawing = note.content.drawingData && note.content.drawingData !== PLACEHOLDER_DRAWING;
+    if (hasRealDrawing) {
         const img = document.createElement("img");
         img.src = note.content.drawingData;
         img.alt = "ציור";
@@ -385,7 +400,6 @@ async function openNoteAndShow(noteId) {
         contentDiv.appendChild(img);
     }
 }
-
   const noteText = document.getElementById("note-text");
   const textColorPicker = document.getElementById("text-color");
   const textWeightSelector = document.getElementById("text-weight");
@@ -409,6 +423,7 @@ document.getElementById("clear-canvas-btn").addEventListener("click", () => {
    const textInput = document.getElementById("note-text");
   if (textInput) textInput.value = ""; // מנקה את תיבת הטקסט
 });
+
 //close note function 
 document.getElementById("close-note-btn").addEventListener("click", async () => {
   const screen = document.getElementById("note-content-screen");
@@ -647,7 +662,7 @@ async function fetchAllUsers() {
     container.innerHTML = users.map(u =>
       `<div class="note-card">
          <strong>${u.email}</strong> (${u.role})
-         <button data-id="${u.id}" class="btn-link admin-delete-user">מחק משתמש</button>
+         <button data-id="${u.id}" class="btn-link admin-delete-user">Delete User</button>
        </div>`
     ).join("");
     // רישום מאזינים למחיקה
@@ -672,7 +687,7 @@ async function fetchAllNotes() {
       `<div class="note-card">
          <p>${n.content.text}</p>
          <small>by ${n.userId}</small>
-         <button data-id="${n.id}" class="btn-link admin-delete-note">מחק פתק</button>
+         <button data-id="${n.id}" class="btn-link admin-delete-note">Delete Note/button>
        </div>`
     ).join("");
     // רישום מאזינים למחיקה

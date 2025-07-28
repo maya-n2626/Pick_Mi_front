@@ -19,6 +19,9 @@ body {
   right: 10px; /* בפינה ימנית */
 }
 
+
+
+
 .container {
   max-width: 412px;
   margin:  auto;
@@ -67,7 +70,7 @@ button, .btn-link {
   border: none;
   border-radius: 6px;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
@@ -93,11 +96,15 @@ button, .btn-link {
 }
 
 button:hover, .btn-link:hover {
-  background: #0099ff;
+  background:#cbc4c4;
+    opacity: 0.5;
+
+  
 }
+
 .btn-link {
   background: none;
-  color: #0099ff;
+  color: #50e2ff;
   text-decoration: underline;
   border: none;
   padding: 0;
@@ -116,12 +123,14 @@ button:hover, .btn-link:hover {
   text-align: center;
 }
 .success-msg {
-  background: #d5ffd6;
+  background: #d5ead5;
   color: #258a24;
   border-radius: 5px;
   padding: 8px;
-  margin-bottom: 14px;
+  opacity: 0.8;
+  margin-bottom: 6px;
   text-align: center;
+
 }
 
 #big-map {
@@ -300,7 +309,7 @@ button:hover, .btn-link:hover {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 90vw; max-width: 400px;
+  width: 90vw; max-width: 200px;
   height: 90vh; max-height: 600px;
   background: #f9f0d6;
   border-radius: 16px;
@@ -402,14 +411,24 @@ button:hover, .btn-link:hover {
   font-size: 18px;
   font-family: Arial;
 }
+.btn-stamp{
+ 
+  border: none;
+  
+  border-radius: 30%;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
 
+}
 /* סגנון גם לרקע וגם לציור כדי שימלאו את כל העטיפה */
 #save-drawing-note-btn {
   margin-top: 20px; 
   padding: 12px 24px;
   font-size: 18px;
   border-radius: 20px;
-  background-color: #34c759; /* ירוק אפל סטייל */
+  background-color: #50e2ff;
+
   color: white;
   border: none;
   cursor: pointer;
@@ -417,7 +436,7 @@ button:hover, .btn-link:hover {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.8);
 }
 .app-bar1{
 width: 100%;
@@ -480,7 +499,7 @@ h1{
   padding: 12px 24px;
   font-size: 18px;
   border-radius: 20px;
-  background-color: #34c759; /* ירוק אפל סטייל */
+  background-color: #50e2ff; 
   color: white;
   border: none;
   cursor: pointer;
@@ -502,20 +521,8 @@ h1{
 .note-large {
   position: relative;
 }
-.btn-stamp{
- background-color: rgba(255, 255, 255, 0.4);
-  border: none;
-  border-radius: 30%;
-  width: 36px;
-  height: 36px;
-  font-size: 18px;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s ease;
-}
-.btn-stamp:hover {
-  background-color: rgba(255, 255, 255, 0.9);
-}
+
+
 
 
 .brush-back-btn{
@@ -538,22 +545,9 @@ h1{
   margin: auto;
   left: 50%;
 }
-.btn-stamp {
-    background: #4caf50;
-    color: white;
-    font-family: 'Pixel', sans-serif;
-    font-size: 16px;
-    padding: 12px 24px;
-    border: 2px solid white;
-    border-radius: 24px;
-    box-shadow: 0 4px #357a38;
-    transition: 0.1s ease;
-  }
 
-  .btn-stamp:hover {
-    transform: scale(1.05);
-    background: #45a049;
-  }
+
+ 
 
 .brush-controls button {
   background-color: transparent;
@@ -590,9 +584,30 @@ h1{
 #note-content {
   position: relative;
   width: fit-content;
+  word-break: break-word;
+  
   margin: 0 auto;
 }
+label[for="login-email"] {
+  color:#b5b7be;
+}
 
+label[for="login-password"]{
+    color:#b5b7be;
+
+}
+label[for="signup-email"]{
+    color:#b5b7be;
+
+}
+label[for="signup-password"]{
+    color:#b5b7be;
+
+}
+label[for="forgot-email"]{
+      color:#b5b7be;
+
+}
 
 .note-background {
   display: block;

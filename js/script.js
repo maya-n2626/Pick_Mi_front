@@ -12,7 +12,7 @@ import {
   deleteAccount,
 } from "./modules/auth.js";
 
-import { apiFetch, jwt, API_BASE } from "./utils.js";
+import { apiFetch, jwt, API_BASE } from "./modules/utils.js";
 import {
   throwNote,
   getNearbyNotes,

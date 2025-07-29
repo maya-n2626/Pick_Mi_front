@@ -1,5 +1,5 @@
 // modules/notes.js
-import { apiFetch } from "./auth.js";
+import { apiFetch } from "./utils.js";
 
 export async function throwNote(text, drawingData, lat, lon, placeId) {
   return apiFetch("/api/notes", {
@@ -32,4 +32,3 @@ export async function deleteNote(id, lat, lon) {
     }),
   });
 }
-

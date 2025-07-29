@@ -1,6 +1,6 @@
 // modules/uis.js
 import { getNearbyNotes } from "./notes.js";
-import { API_BASE, jwt, apiFetch } from "./auth.js";
+import { API_BASE, jwt, apiFetch } from "./utils.js";
 
 export function show(screenId) {
   document

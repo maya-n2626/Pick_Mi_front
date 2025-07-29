@@ -5,23 +5,14 @@ let lastKnownLocation = {
   placeId: null
 };
 
-import { API_BASE, jwt, apiFetch, signup, signin, forgotPassword, resetPassword, deleteAccount } from '../modules/auth.js';
-import { throwNote, getNearbyNotes, getNoteContent, deleteNote } from '../modules/notes.js';
-import { show, renderNotesOnHome, renderNotesOnMap, gotoLogin, gotoHome } from '../modules/uis.js';
-import { initMap } from '../modules/map.js'; // נצטרך פונקציה כזו במודול המפה
-import { initCanvas, clearCanvas } from '../modules/canvas.js'; // נצטרך פונקציות כאלה במודול הקנבס
+import { signup, signin, forgotPassword, resetPassword, deleteAccount, apiFetch, jwt, API_BASE } from './modules/auth.js';
+import { throwNote, getNearbyNotes, getNoteContent, deleteNote } from './modules/notes.js';
+import { show,  gotoLogin, } from './modules/ui.js';
+import { fetchAllUsers, fetchAllNotes } from './modules/admin.js';
 
 
 document.addEventListener("DOMContentLoaded", function() {
 
-
-
-
-  // === Auth Endpoints ===
-
-// === Constants & Tokens ===
-  const API_BASE = "http://localhost:3000";
-  const jwt = () => localStorage.getItem("jwt") || "";
  const token = jwt();
 if (!token) {
   console.warn("אין JWT – המשתמש לא מחובר");
@@ -30,81 +21,14 @@ if (!token) {
   console.log(payload);
 }
 
-
-
-  // === API Wrapper ===
-  async function apiFetch(path, options = {}) {
-    const headers = options.headers || {};
-    if (!headers.Authorization && jwt()) headers.Authorization = "Bearer " + jwt();
-    if (options.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
-    const res = await fetch(API_BASE + path, { ...options, headers });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw err.error?.message || res.statusText;
-    }
-    return res.status !== 204 ? res.json() : {};
-  }
-
-
-  async function signup(email, password) {
-    return apiFetch("/api/auth/signup", {
-      method: "POST",
-      body: JSON.stringify({ email, password })
-    });
-  }
-
-  async function signin(email, password) {
-    try {
-      const response = await apiFetch("/api/auth/signin", {
-        method: "POST",
-        body: JSON.stringify({ email, password })
-      });
-      console.log("signin response:", response);
-      const { token, user } = response;
-      localStorage.setItem("jwt", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      return { user, token };
-    } catch (err) {
-      console.error("signin failed:", err);
-      throw err;
-    }
-  }
-
-async function forgotPassword(email) {
-    return apiFetch("/api/auth/forgot-password", {
-      method: "POST",
-      body: JSON.stringify({ email })
-    });
-  }
-
-  async function resetPassword(token, newPassword) {
-    return apiFetch("/api/auth/reset-password", {
-      method: "POST",
-      body: JSON.stringify({ token, newPassword })
-    });
-  }
-
-   async function deleteAccount(password) {
-    return apiFetch("/api/auth/me", {
-      method: "DELETE",
-      body: JSON.stringify({ password })
-    });
-  }
-
   // === Event Listeners & Flow ===
 
-   
-
-  
     // 0. מ‑Login ל‑Signup
     document.getElementById("to-signup").onclick = () => {
       document.getElementById("signup-error").classList.add("hidden");
       show("signup-screen");
     };
-   
-   
-  
+     
     // 2. טיפול ב‑Signup
     document.getElementById("signup-form").onsubmit = async e => {
       e.preventDefault();
@@ -132,7 +56,7 @@ async function forgotPassword(email) {
         const email = document.getElementById("login-email").value.trim();
         const pwd = document.getElementById("login-password").value;
         await signin(email, pwd);
-        gotoHome();
+        gotoHome(lastKnownLocation);
       } catch (_) {
         show("wrong-password-screen");
       }
@@ -176,42 +100,6 @@ async function forgotPassword(email) {
     sentBackBtn.addEventListener("click", gotoLogin);
    }
   
-  
-
-  // === Notes Endpoints ===
-  async function throwNote(text, drawingData, lat, lon, placeId) {
-    return apiFetch("/api/notes", {
-      method: "POST",
-      body: JSON.stringify({
-        content: { text, drawingData },
-        location: { latitude: lat, longitude: lon, placeId }
-      })
-    });
-  }
- async function getNearbyNotes(lat, lon, radius = 1000) {
-  if (lat == null || lon == null) {
-    throw new Error("מיקום לא תקף — lat/lon חסרים");
-  }
-  return apiFetch(`/api/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`);
-}
-
-  async function getNoteContent(id, lat, lon) {
-    
-
-    return apiFetch(`/api/notes/${id}?lat=${lat}&lon=${lon}`);
-  }
-async function deleteNote(id, lat, lon) {
-  console.log("ID:", id, "LAT:", lat, "LON:", lon);
-
-  return apiFetch(`/api/notes/${id}`, {
-    method: "DELETE",
-  body: JSON.stringify({
-      latitude: Number(lat),
-      longitude: Number(lon)
-    })  });
-}
-
-
 
 // 1. כשלוחצים על הכפתור החדש בדף הבית
 const newNoteBtn = document.getElementById("new-note-btn");
@@ -246,7 +134,7 @@ if (newNoteBtn) {
 const writeBackBtn = document.getElementById("write-back-btn");
 if (writeBackBtn) {
   writeBackBtn.addEventListener("click", () => {
-    gotoHome();
+    gotoHome(lastKnownLocation);
   });
 }
 
@@ -291,7 +179,7 @@ if (saveBtn) {
 
 
     await throwNote(text, drawingData, lastKnownLocation.lat, lastKnownLocation.lon, lastKnownLocation.placeId);
-    gotoHome();
+    gotoHome(lastKnownLocation);
   });
 }
 const saveBtn1 = document.getElementById("save-drawing-note-btn1");
@@ -314,7 +202,7 @@ if (saveBtn1) {
 
 
     await throwNote(text, drawingData, lastKnownLocation.lat, lastKnownLocation.lon, lastKnownLocation.placeId);
-    gotoHome();
+    gotoHome(lastKnownLocation);
   });
 }
 
@@ -343,7 +231,7 @@ if (saveTextBtn) {
   lastKnownLocation.placeId
 );
 
-    gotoHome();
+    gotoHome(lastKnownLocation);
 
 });
 
@@ -351,9 +239,64 @@ if (saveTextBtn) {
 }
 //open note function
 
+
+
+
+async function gotoHome(locationData) {
+  show("home-content");
+
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+            locationData.lat = pos.coords.latitude;
+            locationData.lon = pos.coords.longitude;
+            locationData.placeId = null;
+
+
+      // 1. שליפת פתקים קרובים
+      const notes = await getNearbyNotes(locationData.lat, locationData.lon, 500);
+            console.log("Data for STATIC map:", JSON.stringify(notes, null, 2));
+
+      renderNotesOnHome(notes);
+      // 2. הרכבת URL של Static Map עם מרקרים
+      const sizeW = 400, sizeH = 300;
+      const key   = "AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY";  
+      const base  = "https://maps.googleapis.com/maps/api/staticmap";
+      const centerParam = `center=${locationData.lat},${locationData.lon}` +
+                        `&zoom=15&size=${sizeW}x${sizeH}`;
+      const markerIconUrl = "https://cdn.jsdelivr.net/gh/maya-n2626/Pick_Mi_front@main/images/ClosedNote.png";
+
+      const userMarker  = `markers=color:blue|${locationData.lat},${locationData.lon}`;
+      const noteMarkers = notes
+      .map(n => `markers=icon:${encodeURIComponent(markerIconUrl)}|${n.location.lat},${n.location.lon}`)
+      .join("&");
+       const url = `${base}?${centerParam}&${userMarker}&${noteMarkers}&key=${key}`;
+
+
+
+
+      // 3. הצגת המפה הסטטית כרקע ה־card
+      const container = document.getElementById("home-content");
+      container.style.backgroundImage    = `url("${url}")`;
+      container.style.backgroundSize     = "cover";
+      container.style.backgroundPosition = "center";
+
+      // 4. הצגת/הסתרת כפתור Admin
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const role = user.props?.role;
+      document.getElementById("admin-btn")
+        .classList[role === "admin" ? "remove" : "add"]("hidden");
+    },
+    err => {
+      console.warn("לא ניתן לקבל מיקום:", err);
+    }
+  );
+}
+
+
 async function openNoteAndShow(noteId) {
     const PLACEHOLDER_DRAWING = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==";
     const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
+    window.openNoteAndShow = openNoteAndShow; 
 
     // ================== שלב דיבאגינג 1: בדיקת המידע מהשרת ==================
     // השורה הזו תדפיס לקונסול את כל המידע שחזר מהשרת בצורה קריאה.
@@ -412,59 +355,7 @@ async function openNoteAndShow(noteId) {
 
 
 
-
-document.getElementById("clear-canvas-btn").addEventListener("click", () => {
-  const canvas = document.getElementById("note-canvas");
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-});
-
-  document.getElementById("clear-canvas-btn1").addEventListener("click", () => {
-   const textInput = document.getElementById("note-text");
-  if (textInput) textInput.value = ""; // מנקה את תיבת הטקסט
-});
-
-//close note function 
-document.getElementById("close-note-btn").addEventListener("click", async () => {
-  const screen = document.getElementById("note-content-screen");
-  const noteId = screen.dataset.noteId;
-  const lat = screen.dataset.latitude;
-  const lon = screen.dataset.longitude;
-
-  try {
-    await deleteNote(noteId, lat, lon);
-  } catch (e) {
-    console.warn("המחיקה נכשלה", e);
-  }
-
-  screen.classList.add("hidden");
-  document.getElementById("note-content-screen").classList.add("hidden");
-  document.getElementById("home-content").classList.remove("hidden");
-});
-
-
-
-
-  // === Admin Endpoints ===
-  async function getAllUsers() { return apiFetch("/api/admin/users"); }
-  async function getAllNotesAdmin() { return apiFetch("/api/admin/notes"); }
-  async function getUserById(userId) { return apiFetch(`/api/admin/users/${userId}`); }
-  async function getNoteById(noteId) { return apiFetch(`/api/admin/notes/${noteId}`); }
-  async function getUserNotes(userId) { return apiFetch(`/api/admin/users/${userId}/notes`); }
-  async function deleteUser(userId) { return apiFetch(`/api/admin/users/${userId}`, { method: "DELETE" }); }
-  async function deleteNoteAdmin(noteId) { return apiFetch(`/api/admin/notes/${noteId}`, { method: "DELETE" }); }
-
-  // === UI Navigation & Screens ===
-  function show(screenId) {
-  document.querySelectorAll(
-    ".container, #home-bg, #home-content, #map-screen, #settings-screen"
-  ).forEach(el => el.classList.add("hidden"));
-  document.getElementById(screenId).classList.remove("hidden");
-  if (screenId === "home-content") {
-    document.getElementById("home-bg").classList.remove("hidden");
-  }
-}
-function renderNotesOnHome(notes) {
+ function renderNotesOnHome(notes) {
   const notesList = document.getElementById("notes-list");
   notesList.innerHTML = "";
 
@@ -489,8 +380,6 @@ function renderNotesOnHome(notes) {
     notesList.appendChild(noteEl);
   });
 }
-
-
 function renderNotesOnMap(notes, map) {
     console.log(`Starting to render ${notes.length} notes...`);
 
@@ -522,68 +411,41 @@ function renderNotesOnMap(notes, map) {
         }
     });
 }
-  function gotoLogin() {
-      console.log("🔵 gotoLogin called");
 
-    document.getElementById("login-error").classList.add("hidden");
-    show("login-screen");
+
+
+
+
+document.getElementById("clear-canvas-btn").addEventListener("click", () => {
+  const canvas = document.getElementById("note-canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+  document.getElementById("clear-canvas-btn1").addEventListener("click", () => {
+   const textInput = document.getElementById("note-text");
+  if (textInput) textInput.value = ""; // מנקה את תיבת הטקסט
+});
+
+//close note function 
+document.getElementById("close-note-btn").addEventListener("click", async () => {
+  const screen = document.getElementById("note-content-screen");
+  const noteId = screen.dataset.noteId;
+  const lat = screen.dataset.latitude;
+  const lon = screen.dataset.longitude;
+
+  try {
+    await deleteNote(noteId, lat, lon);
+  } catch (e) {
+    console.warn("המחיקה נכשלה", e);
   }
 
-async function gotoHome() {
-  show("home-content");
-
-  navigator.geolocation.getCurrentPosition(
-    async pos => {
-           lastKnownLocation = {
-        lat:     pos.coords.latitude,
-        lon:     pos.coords.longitude,
-        placeId: null
-      };
-
-
-      // 1. שליפת פתקים קרובים
-      const notes = await getNearbyNotes(lastKnownLocation.lat, lastKnownLocation.lon, 500);
-            console.log("Data for STATIC map:", JSON.stringify(notes, null, 2));
-
-      renderNotesOnHome(notes);
-      // 2. הרכבת URL של Static Map עם מרקרים
-      const sizeW = 400, sizeH = 300;
-      const key   = "AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY";  
-      const base  = "https://maps.googleapis.com/maps/api/staticmap";
-      const centerParam = `center=${lastKnownLocation.lat},${lastKnownLocation.lon}` +
-                        `&zoom=15&size=${sizeW}x${sizeH}`;
-      const markerIconUrl = "https://cdn.jsdelivr.net/gh/maya-n2626/Pick_Mi_front@main/images/ClosedNote.png";
-
-      const userMarker  = `markers=color:blue|${lastKnownLocation.lat},${lastKnownLocation.lon}`;
-      const noteMarkers = notes
-      .map(n => `markers=icon:${encodeURIComponent(markerIconUrl)}|${n.location.lat},${n.location.lon}`)
-      .join("&");
-       const url = `${base}?${centerParam}&${userMarker}&${noteMarkers}&key=${key}`;
-
-
-
-
-      // 3. הצגת המפה הסטטית כרקע ה־card
-      const container = document.getElementById("home-content");
-      container.style.backgroundImage    = `url("${url}")`;
-      container.style.backgroundSize     = "cover";
-      container.style.backgroundPosition = "center";
-
-      // 4. הצגת/הסתרת כפתור Admin
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      const role = user.props?.role;
-      document.getElementById("admin-btn")
-        .classList[role === "admin" ? "remove" : "add"]("hidden");
-    },
-    err => {
-      console.warn("לא ניתן לקבל מיקום:", err);
-    }
-  );
-}
-
-
-
+  screen.classList.add("hidden");
+  document.getElementById("note-content-screen").classList.add("hidden");
+  document.getElementById("home-content").classList.remove("hidden");
+});
   
+  // === UI Navigation & Screens ===
 
 // 6. Logout
 const logoutBtn = document.getElementById("logout-btn");
@@ -609,7 +471,7 @@ if (logoutBtn) {
     btn.addEventListener("click", () => {
       show("user-menu-screen");
       const backBtn = document.getElementById("user-menu-back-btn");
-      backBtn && backBtn.addEventListener("click", gotoHome);
+      backBtn && backBtn.addEventListener("click", () => gotoHome(lastKnownLocation));
     });
   }
 });
@@ -641,7 +503,7 @@ console.log("backHomeBtn is", backHomeBtn);
 if (backHomeBtn) {
   backHomeBtn.addEventListener("click", () => {
     console.log("Back to home clicked");
-    gotoHome();
+    gotoHome(lastKnownLocation);
   });
 }
 // כפתור פתיחת ה־Admin
@@ -652,58 +514,8 @@ document.getElementById("admin-btn").addEventListener("click", () => {
 });
 
 // כפתור חזרה
-document.getElementById("admin-back").addEventListener("click", gotoHome);
+document.getElementById("admin-back").addEventListener("click", () => gotoHome(lastKnownLocation));
 
-// פונקציות העמסת הנתונים
-async function fetchAllUsers() {
-  try {
-    const users = await apiFetch("/api/admin/users");
-    const container = document.getElementById("admin-users");
-    container.innerHTML = users.map(u =>
-      `<div class="note-card">
-         <strong>${u.email}</strong> (${u.role})
-         <button data-id="${u.id}" class="btn-link admin-delete-user">Delete User</button>
-       </div>`
-    ).join("");
-    // רישום מאזינים למחיקה
-    container.querySelectorAll(".admin-delete-user")
-      .forEach(btn =>
-        btn.onclick = async () => {
-          if (!confirm("למחוק משתמש זה?")) return;
-          await apiFetch(`/api/admin/users/${btn.dataset.id}`, { method: "DELETE" });
-          fetchAllUsers();
-        }
-      );
-  } catch (e) {
-    alert("שגיאה בשליפת משתמשים: " + e);
-  }
-}
-
-async function fetchAllNotes() {
-  try {
-    const notes = await apiFetch("/api/admin/notes");
-    const container = document.getElementById("admin-notes");
-    container.innerHTML = notes.map(n =>
-      `<div class="note-card">
-         <p>${n.content.text}</p>
-         <small>by ${n.userId}</small>
-         <button data-id="${n.id}" class="btn-link admin-delete-note">Delete Note/button>
-       </div>`
-    ).join("");
-    // רישום מאזינים למחיקה
-    container.querySelectorAll(".admin-delete-note")
-      .forEach(btn =>
-        btn.onclick = async () => {
-          if (!confirm("למחוק פתק זה?")) return;
-          await apiFetch(`/api/admin/notes/${btn.dataset.id}`, { method: "DELETE" });
-          fetchAllNotes();
-        }
-      );
-  } catch (e) {
-    alert("שגיאה בשליפת פתקים: " + e);
-  }
-}
-  
 
   // === Helpers for Home & Map ===
 const toMapBtn = document.getElementById("to-map-btn");

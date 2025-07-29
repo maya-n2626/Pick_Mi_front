@@ -1,5 +1,5 @@
 // modules/notes.js
-import { apiFetch } from './auth.js'; // יבוא של apiFetch
+import { apiFetch } from './auth.js'; 
 
 export async function throwNote(text, drawingData, lat, lon, placeId) {
     return apiFetch("/api/notes", {

@@ -1,4 +1,4 @@
-# PickMi-Backend Web App API Specification
+# PickMi-Backend+Frontend Web App API Specification
 
 This document defines the API contract between the frontend (HTML/CSS/JS) and the backend (Node.js/Express) for the anonymous note-throwing web application PickMi.
 

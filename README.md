@@ -658,8 +658,6 @@ These endpoints are for the core functionality of the app.
     }
     ```
 
-
-
 ### 6. Delete a Note
 
 - **Endpoint**: `DELETE /api/admin/notes/:id`

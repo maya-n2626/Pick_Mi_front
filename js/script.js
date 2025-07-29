@@ -9,6 +9,8 @@ import { signup, signin, forgotPassword, resetPassword, deleteAccount, apiFetch,
 import { throwNote, getNearbyNotes, getNoteContent, deleteNote } from './modules/notes.js';
 import { show,  gotoLogin, } from './modules/ui.js';
 import { fetchAllUsers, fetchAllNotes } from './modules/admin.js';
+import {
+  initCanvas} from './modules/canvas.js';
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -145,6 +147,7 @@ const toBrushBtn = document.getElementById("to-brush-btn");
 if (toBrushBtn) {
   toBrushBtn.addEventListener("click", () => {
     show("brush-note-screen");
+    initCanvas();
   });
 }
 
@@ -156,10 +159,8 @@ if (brushBackBtn) {
   });
 }
 
-
-
-  
-const saveBtn = document.getElementById("save-drawing-note-btn");
+//save text note  
+const saveBtn = document.getElementById("save-text-note-btn");
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     const textInput = document.getElementById("note-text");
@@ -182,7 +183,8 @@ if (saveBtn) {
     gotoHome(lastKnownLocation);
   });
 }
-const saveBtn1 = document.getElementById("save-drawing-note-btn1");
+//save drawing
+const saveBtn1 = document.getElementById("save-drawing-note-btn");
 if (saveBtn1) {
   saveBtn1.addEventListener("click", async () => {
     const textInput = document.getElementById("note-text");
@@ -206,42 +208,7 @@ if (saveBtn1) {
   });
 }
 
-
-const saveTextBtn = document.getElementById("save-text-note-btn");
-if (saveTextBtn) {
-  saveTextBtn.addEventListener("click", async () => {
-    const textInput = document.getElementById("note-text");
-
-    if (!textInput) {
-      console.warn("❗ אלמנט note-text לא נמצא");
-      return;
-    }
-
-    const text = textInput.value;
-    const drawingData = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==";
-
-    console.log("📍 Location to send:", lastKnownLocation);
-
-
-   await throwNote(
-  text,
-  drawingData,
-  lastKnownLocation.lat,
-  lastKnownLocation.lon,
-  lastKnownLocation.placeId
-);
-
-    gotoHome(lastKnownLocation);
-
-});
-
-  
-}
-//open note function
-
-
-
-
+//go to home
 async function gotoHome(locationData) {
   show("home-content");
 
@@ -291,27 +258,16 @@ async function gotoHome(locationData) {
     }
   );
 }
-
-
+//open notes on screen
 async function openNoteAndShow(noteId) {
     const PLACEHOLDER_DRAWING = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==";
     const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
-    window.openNoteAndShow = openNoteAndShow; 
 
-    // ================== שלב דיבאגינג 1: בדיקת המידע מהשרת ==================
-    // השורה הזו תדפיס לקונסול את כל המידע שחזר מהשרת בצורה קריאה.
     console.log("מידע שהגיע מהשרת:", JSON.stringify(note, null, 2));
-    // =======================================================================
-
+    
     const isDrawingNote = !!note.content.drawingData;
-
-    // ================== שלב דיבאגינג 2: בדיקת תוצאת הלוגיקה =================
-    // השורה הזו תגיד לנו אם התנאי שלנו החזיר true או false.
     console.log("האם זה פתק ציור?", isDrawingNote);
-    // =======================================================================
-
-
-    // --- שאר הקוד נשאר אותו הדבר ---
+  
     const noteScreen = document.getElementById("note-content-screen");
     const contentDiv = document.getElementById("note-content");
     noteScreen.dataset.noteId = noteId;
@@ -353,8 +309,7 @@ async function openNoteAndShow(noteId) {
     });
   }
 
-
-
+//render notes on home
  function renderNotesOnHome(notes) {
   const notesList = document.getElementById("notes-list");
   notesList.innerHTML = "";
@@ -380,6 +335,7 @@ async function openNoteAndShow(noteId) {
     notesList.appendChild(noteEl);
   });
 }
+//render notes on map
 function renderNotesOnMap(notes, map) {
     console.log(`Starting to render ${notes.length} notes...`);
 
@@ -411,20 +367,15 @@ function renderNotesOnMap(notes, map) {
         }
     });
 }
-
-
-
-
-
+//clear canvas
 document.getElementById("clear-canvas-btn").addEventListener("click", () => {
   const canvas = document.getElementById("note-canvas");
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
-
   document.getElementById("clear-canvas-btn1").addEventListener("click", () => {
    const textInput = document.getElementById("note-text");
-  if (textInput) textInput.value = ""; // מנקה את תיבת הטקסט
+  if (textInput) textInput.value = "";
 });
 
 //close note function 
@@ -444,8 +395,6 @@ document.getElementById("close-note-btn").addEventListener("click", async () => 
   document.getElementById("note-content-screen").classList.add("hidden");
   document.getElementById("home-content").classList.remove("hidden");
 });
-  
-  // === UI Navigation & Screens ===
 
 // 6. Logout
 const logoutBtn = document.getElementById("logout-btn");
@@ -458,14 +407,8 @@ if (logoutBtn) {
   });
 
 }
-
-
-
 //icon-button
-
-
-
- ["app-icon1", "app-icon2", "app-icon3", "app-icon4", "app-icon5"].forEach(id => {
+ ["app-icon1", "app-icon2", "app-icon3", "app-icon4", "app-icon5","app-icon6"].forEach(id => {
   const btn = document.getElementById(id);
   if (btn) {
     btn.addEventListener("click", () => {
@@ -476,8 +419,7 @@ if (logoutBtn) {
   }
 });
 
-
-
+//Delete Account
 document.getElementById("delete-account-btn").addEventListener("click", async () => {
   const ok = confirm("אתה בטוח שברצונך למחוק את החשבון שלך? פעולה זו אינה ניתנת לביטול.");
   if (!ok) return;
@@ -495,8 +437,6 @@ document.getElementById("delete-account-btn").addEventListener("click", async ()
   }
 });
 
-
-
 // 8. Back from Map
 const backHomeBtn = document.getElementById("back-to-home");
 console.log("backHomeBtn is", backHomeBtn);
@@ -513,9 +453,8 @@ document.getElementById("admin-btn").addEventListener("click", () => {
   fetchAllNotes();
 });
 
-// כפתור חזרה
+// back admin
 document.getElementById("admin-back").addEventListener("click", () => gotoHome(lastKnownLocation));
-
 
   // === Helpers for Home & Map ===
 const toMapBtn = document.getElementById("to-map-btn");
@@ -556,9 +495,6 @@ if (toMapBtn) {
                 5000 // הגדלתי את הרדיוס ל-5 ק"מ כדי לוודא שאנחנו תופסים משהו
             );
 
-            // שלב קריטי: בדיקת הנתונים שהתקבלו
-            console.log("✅ Data received for map:", notes);
-
             // רינדור הפתקים על המפה
             renderNotesOnMap(notes, map);
 
@@ -574,71 +510,6 @@ if (toMapBtn) {
         }
     });
 }
-  async function loadNearbyNotes() {
-  const userLoc = await getUserLocationPromise();
-  const notes   = await getNearbyNotes(userLoc.lat, userLoc.lon);
-  const container = document.getElementById("home-content");
-  notes.forEach(n => {
-    const el = document.createElement("div");
-    el.className = "note-pin";
-    el.style.left = `${n.offsetX}px`;
-    el.style.top  = `${n.offsetY}px`;
-    container.appendChild(el);
-
-    el.onclick = () => openNoteDetail(n.id);
-  });
-}
-
-
-const canvas = document.getElementById("note-canvas");
-const ctx = canvas.getContext("2d");
-const colorPicker = document.getElementById("brush-color");
-const sizePicker = document.getElementById("brush-size");
-
-let painting = false;
-let brushColor = "#000000";
-let brushSize = 5;
-
-colorPicker.addEventListener("input", (e) => {
-  brushColor = e.target.value;
-});
-
-sizePicker.addEventListener("input", (e) => {
-  brushSize = e.target.value;
-});
-
-canvas.addEventListener("mousedown", startPaint);
-canvas.addEventListener("mouseup", stopPaint);
-canvas.addEventListener("mouseout", stopPaint);
-canvas.addEventListener("mousemove", draw);
-
-function startPaint(e) {
-  painting = true;
-  draw(e);
-}
-
-function stopPaint() {
-  painting = false;
-  ctx.beginPath();
-}
-
-function draw(e) {
-  if (!painting) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  ctx.lineWidth = brushSize;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = brushColor;
-
-  ctx.lineTo(x, y);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-}
-
 
   // === Initial Screen ===
   gotoLogin();

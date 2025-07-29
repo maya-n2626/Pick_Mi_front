@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PickMi - Anonymous Note Throwing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <!-- ====== LOGIN ====== -->
+    <div class="container" id="login-screen">
+      <img id="status-bar" src=".images/status-bar.png" alt="סטטוס בר" />
+
+      <div class="app-bar">
+        <img
+          src="./images/Generic avatar.png"
+          alt="App Icon"
+          class="app-icon"
+        />
+      </div>
+      <div class="login-card">
+        <h1>Login</h1>
+        <form id="login-form">
+          <div class="input-group">
+            <label for="login-email">Email</label>
+            <input
+              type="email"
+              id="login-email"
+              class="auth-field"
+              name="email"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="login-password">Password</label>
+            <input
+              type="password"
+              id="login-password"
+              class="auth-field"
+              name="password"
+              required
+            />
+          </div>
+          <div id="login-error" class="error-msg hidden"></div>
+          <button type="submit" class="btn-field">Sign In</button>
+        </form>
+        <div class="button-group">
+          <button class="btn-link" id="to-forgot">Forgot Password?</button>
+          <button class="btn-link" id="to-signup">Sign Up</button>
+        </div>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== SIGNUP ====== -->
+    <div class="container hidden" id="signup-screen">
+      <img id="status-bar" src="./images/status-bar.png" alt="סטטוס בר" />
+
+      <div class="app-bar">
+        <img
+          src="./images/Generic avatar.png"
+          alt="App Icon"
+          class="app-icon"
+        />
+      </div>
+      <div class="login-card">
+        <h1>Sign Up</h1>
+        <form id="signup-form">
+          <div class="input-group">
+            <label for="signup-email">Email</label>
+            <input
+              type="email"
+              id="signup-email"
+              class="auth-field"
+              name="email"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="signup-password">Password</label>
+
+            <input
+              type="password"
+              id="signup-password"
+              class="auth-field"
+              name="password"
+              required
+            />
+          </div>
+          <div id="signup-error" class="btn-field"></div>
+          <button type="submit" class="btn-field">Save</button>
+          <button id="back-to-login" type="button" class="btn-link">
+            Back
+          </button>
+        </form>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== WRONG PASSWORD ====== -->
+    <div class="container hidden" id="wrong-password-screen">
+      <img id="status-bar" src="./images/status-bar.png" alt="סטטוס בר" />
+
+      <div class="app-bar">
+        <img
+          src="./images/Generic avatar.png"
+          alt="App Icon"
+          class="app-icon"
+        />
+      </div>
+      <div class="login-card">
+        <h1>Wrong Password</h1>
+        <div class="error-msg" style="margin-bottom: 20px">
+          Wrong password or email
+        </div>
+        <button id="wrong-back" class="btn-field">Home</button>
+        <button class="btn-link" id="wrong-forgot" class="btn-field">
+          Forgot Password
+        </button>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== FORGOT PASSWORD ====== -->
+    <div class="container hidden" id="forgot-password-screen">
+      <img id="status-bar" src="./images/status-bar.png" alt="סטטוס בר" />
+
+      <div class="app-bar">
+        <img
+          src="./images/Generic avatar.png"
+          alt="App Icon"
+          class="app-icon"
+        />
+      </div>
+
+      <div class="login-card">
+        <h1>Reset Password</h1>
+        <form id="forgot-form">
+          <div class="input-group">
+            <label for="forgot-email">Email </label>
+            <input
+              type="email"
+              id="forgot-email"
+              name="email"
+              class="auth-field"
+              required
+            />
+          </div>
+          <div id="forgot-error" class="error-msg hidden"></div>
+
+          <button type="submit" id="forgot-submit" class="btn-field">
+            Reset Password
+          </button>
+
+          <button id="forgot-back-to-login" class="btn-link">Back</button>
+        </form>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== RESET SENT CONFIRM ====== -->
+    <div class="container hidden" id="reset-sent-screen">
+      <img id="status-bar" src="./images/status-bar.png" alt="סטטוס בר" />
+
+      <div class="app-bar">
+        <img
+          src="./images/Generic avatar.png"
+          alt="App Icon"
+          class="app-icon"
+        />
+      </div>
+
+      <div class="login-card">
+        <h1>Link Sent</h1>
+        <div class="success-msg" style="margin-bottom: 16px">
+          If there's an account associated with this email address, we've sent
+          you a link to reset your password.
+        </div>
+        <button id="sent-back" class="btn-link">Home</button>
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== HOME ====== -->
+
+    <div id="home-content" class="container hidden">
+      <img id="status-bar" src="./images/status-bar.png" alt="סטטוס בר" />
+      <button id="admin-btn" class="btn-link hidden">Admin</button>
+
+      <div class="app-bar1">
+        <div class="button-wrapper logout">
+          <button id="logout-btn" class="btn-link" style="margin-top: 20px">
+            Logout
+          </button>
+        </div>
+
+        <div class="center-icon">
+          <img
+            id="app-icon1"
+            src="./images/indicator-Day.png"
+            alt="App Icon"
+            class="App-icon"
+          />
+        </div>
+        <div class="button-wrapper map">
+          ,
+          <button id="to-map-btn" class="btn-link" style="margin-top: 20px">
+            Map
+          </button>
+        </div>
+      </div>
+
+      <div id="home-bg"></div>
+
+      <div id="notes-wrapper">
+        <div id="notes-list"></div>
+      </div>
+
+      <div id="new-note-btn" class="note-btn">
+        <img src="./images/WritePen (1).png" alt="פתח פתק חדש" />
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== USER MENU SCREEN ====== -->
+    <div id="user-menu-screen" class="container hidden">
+      <img id="status-bar" src="./images/status-bar.png" alt="סטטוס בר" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon2"
+          src="./images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="settings-card">
+        <h2>Settings</h2>
+
+        <br />
+
+        <button id="delete-account-btn" class="btn-field">
+          🗑️ Delete Account
+        </button>
+        <button id="user-menu-back-btn" class="btn-link">home</button>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== MAP SCREEN ====== -->
+    <div id="map-screen" class="container hidden">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon3"
+          src="./images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="map-card">
+        <h2>Map in your area</h2>
+        <div id="big-map" style="width: 100%; height: 400px"></div>
+        <button id="back-to-home" class="btn-link" style="margin-top: 20px">
+          Home
+        </button>
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- >>> מסך כתיבת הפתק בעט -->
+    <div id="write-note-screen" class="container hidden">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon4"
+          src="./images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="write-card">
+        <div class="note-large note-write">
+          <!-- כפתורי פעולה -->
+          <div class="button-group">
+            <button id="to-brush-btn" class="btn-link">Brush</button>
+
+            <button id="save-text-note-btn" class="btn-stamp">✉️</button>
+          </div>
+          <img src="./images/WritePen (1).png" alt="פתק לכתיבה בעט" />
+          <textarea id="note-text"></textarea>
+
+          <div class="brush-controls">
+            <button id="clear-canvas-btn1" title="נקה ציור">🗑️</button>
+            <!-- שליטה על צבע ועובי של הטקסט -->
+            <div class="text-style-controls">
+              <label for="text-color"></label>
+              <input type="color" id="text-color" value="#000000" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== BRUSH NOTE SCREEN ====== -->
+    <div id="brush-note-screen" class="container hidden">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon5"
+          src="./images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="write-card">
+        <div class="note-large note-brush">
+          <!-- כפתורי פעולה -->
+          <div class="button-group">
+            <button id="brush-back-btn" class="btn-link">← Back</button>
+
+            <button id="save-drawing-note-btn" class="btn-stamp">✉️</button>
+          </div>
+          <img src="./images/WriteBrush.png" alt="פתק לצביעה" />
+          <canvas id="note-canvas" width="420" height="300"></canvas>
+        </div>
+
+        <!-- אפשרויות מברשת -->
+        <div class="brush-controls">
+          <label for="brush-color"></label>
+          <input type="color" id="brush-color" value="#000000" />
+
+          <label for="brush-size"></label>
+          <input type="range" id="brush-size" min="1" max="30" value="5" />
+
+          <button id="clear-canvas-btn" title="נקה ציור">🗑️</button>
+        </div>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== NOTE CONTENT SCREEN ====== -->
+    <div id="note-content-screen" class="container hidden">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img src="./images/indicator-Day.png" alt="App Icon" class="App-icon" />
+      </div>
+      <div class="write-card">
+        <div class="note-card" id="note-content"></div>
+
+        <div class="button-wrapper">
+          <button id="close-note-btn" class="btn-field">← Home</button>
+        </div>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <!-- ====== ADMIN PANEL ====== -->
+    <div id="admin-screen" class="container hidden">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon6"
+          src="./images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="admin-header">
+        <button id="admin-back" class="btn-link">← Back</button>
+      </div>
+
+      <h2>All Users</h2>
+      <div class="admin-box">
+        <div id="admin-users"></div>
+      </div>
+
+      <h2>All Notes</h2>
+      <div class="admin-box">
+        <div id="admin-notes"></div>
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <script
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY&libraries=places"
+    ></script>
+
+    <script type="module" defer src="./js/script.js"></script>
+  </body>
+</html>

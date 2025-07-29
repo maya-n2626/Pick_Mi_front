@@ -18,9 +18,18 @@ document.addEventListener("DOMContentLoaded", function() {
  const token = jwt();
 if (!token) {
   console.warn("אין JWT – המשתמש לא מחובר");
-} else {
+} 
+else {
   const payload = JSON.parse(atob(token.split('.')[1]));
   console.log(payload);
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = user.props?.role;
+  const adminBtn = document.getElementById("admin-btn");
+  if (adminBtn) {
+    adminBtn.classList[role === "admin" ? "remove" : "add"]("hidden");
+
+}
 }
 
   // === Event Listeners & Flow ===
@@ -171,8 +180,10 @@ if (saveBtn) {
       return;
     }
 
-  const text = textInput.value.trim() || "פתק מצויר בלבד";
+  const text = textInput.value.trim();
     const drawingData = canvas.toDataURL();
+
+    
     console.log("🖊 text to send:", text);
    console.log("🖼 drawingData to send:", drawingData);
 
@@ -195,7 +206,7 @@ if (saveBtn1) {
       return;
     }
 
-  const text = textInput.value.trim() || "פתק מצויר בלבד";
+  const text = textInput.value.trim() ;
     const drawingData = canvas.toDataURL();
     console.log("🖊 text to send:", text);
    console.log("🖼 drawingData to send:", drawingData);
@@ -513,6 +524,5 @@ if (toMapBtn) {
 
   // === Initial Screen ===
   gotoLogin();
-});
-
-
+}
+);

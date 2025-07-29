@@ -268,9 +268,7 @@ button:hover, .btn-link:hover {
     padding: 12px 8px;
   }
 }
-.hidden {
-  display: none;
-}
+
 
 #notes-wrapper {
   width: 429px;
@@ -494,7 +492,7 @@ h1{
   padding-right: 5px;        /* מרווח קטן שלא יחתוך טקסט */
 }
 
-/* אם את רוצה גם גלילה מעוצבת */
+
 #admin-users::-webkit-scrollbar,
 #admin-notes::-webkit-scrollbar {
   width: 6px;
@@ -511,22 +509,6 @@ h1{
   background: transparent;
 }
 
-#save-drawing-note-btn1 {
-  margin-top: 20px; 
-  padding: 12px 24px;
-  font-size: 18px;
-  border-radius: 20px;
-  background-color: #50e2ff; 
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-
 
 .button-group{
  display: flex;
@@ -538,8 +520,6 @@ h1{
 .note-large {
   position: relative;
 }
-
-
 
 
 .brush-back-btn{
@@ -563,8 +543,6 @@ h1{
   left: 50%;
 }
 
-
- 
 
 .brush-controls button {
   background-color: transparent;
@@ -657,7 +635,7 @@ label[for="forgot-email"]{
 .btn-field {
   width: 272px;
   height: 40px;
-  background-color:rgb(15, 15, 15); /* צבע כהה כמו בפיגמה */
+  background-color:rgb(15, 15, 15); 
   color: white;
   border: none;
   border-radius: 12px;
@@ -670,7 +648,7 @@ label[for="forgot-email"]{
 
   .map-card {
   width: 320px;
-  height: auto; /* יתאים לגובה המפה והכפתור */
+  height: auto; 
   background-color: rgba(0, 0, 0, 0.6); /* רקע כהה שקוף */
   border-radius: 24px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
@@ -687,7 +665,7 @@ label[for="forgot-email"]{
 
 .settings-card{
     width: 320px;
-  height: auto; /* יתאים לגובה המפה והכפתור */
+  height: auto; 
   background-color: rgba(0, 0, 0, 0.6); /* רקע כהה שקוף */
   border-radius: 24px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
@@ -696,14 +674,14 @@ label[for="forgot-email"]{
   flex-direction: column;
   gap: 16px;
   position: absolute;
-  top: 230px; /* זה מה שיזיז את כל הקופסה למטה */
+  top: 230px; 
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
 }
 .btn-field:hover {
 
-  background-color:rgb(40, 40, 40); /* גוון מעט בהיר יותר כשעוברים עם העכבר */
+  background-color:rgb(40, 40, 40); 
 }
 
 .auth-field{
@@ -711,4 +689,7 @@ label[for="forgot-email"]{
   height: 40px;
   
 
+}
+.hidden{
+  display: none;
 }

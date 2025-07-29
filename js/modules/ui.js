@@ -21,10 +21,3 @@ export function gotoLogin() {
 
 
 
-// openNoteAndShow - יש להעביר את הפונקציה הזו לפה אם היא לא גלובלית ב-script.js
-// או ליצור מנגנון קריאה אחר (למשל, EventEmitter)
-/*
-export async function openNoteAndShow(noteId) {
-    // ... הקוד של הפונקציה ...
-}
-*/

@@ -21,7 +21,7 @@ export async function fetchAllUsers() {
     container.innerHTML = users.map(u =>
       `<div class="note-card">
          <strong>${u.email}</strong> (${u.role})
-         <button data-id="${u.id}" class="btn-link admin-delete-user">Delete User/button>
+         <button data-id="${u.id}" class="btn-link admin-delete-user">Delete User</button>
        </div>`
     ).join("");
     // רישום מאזינים למחיקה
@@ -46,7 +46,7 @@ export async function fetchAllNotes() {
       `<div class="note-card">
          <p>${n.content.text}</p>
          <small>by ${n.userId}</small>
-         <button data-id="${n.id}" class="btn-link admin-delete-note">Delete Note/button>
+         <button data-id="${n.id}" class="btn-link admin-delete-note">Delete Note</button>
        </div>`
     ).join("");
     // רישום מאזינים למחיקה

@@ -438,6 +438,23 @@ button:hover, .btn-link:hover {
   gap: 8px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.8);
 }
+#save-text-note-btn{
+   margin-top: 20px; 
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 20px;
+  background-color: #50e2ff;
+
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+}
+
 .app-bar1{
 width: 100%;
   

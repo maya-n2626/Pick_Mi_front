@@ -124,11 +124,39 @@ document.addEventListener("DOMContentLoaded", function () {
           (position) => {
             lastKnownLocation.lat = position.coords.latitude;
             lastKnownLocation.lon = position.coords.longitude;
-            lastKnownLocation.placeId = "temp-place-id"; // זמני או לחשב בעתיד
-            console.log(
-              "📍 Location set in write-note-screen:",
-              lastKnownLocation,
+
+            // Use Google Places API to get placeId
+            const service = new google.maps.places.PlacesService(
+              document.createElement("div"),
             );
+            const request = {
+              location: new google.maps.LatLng(
+                lastKnownLocation.lat,
+                lastKnownLocation.lon,
+              ),
+              radius: "100",
+              type: ["establishment"], // Look for establishments (e.g., businesses, points of interest)
+            };
+
+            service.nearbySearch(request, (results, status) => {
+              if (
+                status === google.maps.places.PlacesServiceStatus.OK &&
+                results &&
+                results.length > 0
+              ) {
+                lastKnownLocation.placeId = results[0].place_id;
+                console.log(
+                  "📍 Location and Place ID set in write-note-screen:",
+                  lastKnownLocation,
+                );
+              } else {
+                console.warn(
+                  "⚠️ Could not find nearby place or Places API error:",
+                  status,
+                );
+                lastKnownLocation.placeId = ""; // Set to null if no place found or error
+              }
+            });
           },
           (err) => {
             console.warn("⚠️ לא ניתן לקבל מיקום במסך כתיבה:", err);
@@ -282,7 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
   //open notes on screen
   async function openNoteAndShow(noteId) {
     const PLACEHOLDER_DRAWING =
-      "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==";
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2NgAAIAAAUAAR4f7BQAAAAASUVORK5CYII=";
     const note = await getNoteContent(
       noteId,
       lastKnownLocation.lat,

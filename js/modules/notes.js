@@ -14,7 +14,7 @@ export async function throwNote(text, drawingData, lat, lon, placeId) {
     method: "POST",
     body: JSON.stringify({
       content: content,
-      location: { latitude: lat, longitude: lon, placeId },
+      location: { latitude: lat, longitude: lon, placeId: placeId || '' },
     }),
   });
 }

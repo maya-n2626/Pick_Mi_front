@@ -309,9 +309,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const base = "https://maps.googleapis.com/maps/api/staticmap";
         const centerParam =
           `center=${locationData.lat},${locationData.lon}` +
-          `&zoom=15&size=${sizeW}x${sizeH}`;
+          `&zoom=15&size=${sizeW}x${sizeH}&scale=2`;
         const markerIconUrl =
-          "https://cdn.jsdelivr.net/gh/maya-n2626/Pick_Mi_front@main/images/ClosedNote.png";
+          "../images/ClosedNote.png";
 
         const userMarker = `markers=color:blue|${locationData.lat},${locationData.lon}`;
         const noteMarkers = notes
@@ -582,6 +582,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const map = new google.maps.Map(document.getElementById("big-map"), {
           center: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },
           zoom: 14,
+          mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID,
         });
 
         // הוספת סמן של המיקום הנוכחי

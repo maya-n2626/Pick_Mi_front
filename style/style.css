@@ -42,8 +42,44 @@ h1 {
   font-size: 2rem;
   margin-bottom: 28px;
 }
-.hidden {
+.hidden{
   display: none;
+}
+
+#reset-password-screen .login-card {
+  margin-top: 150px;
+}
+
+#reset-password-form {
+  margin-top: 20px;
+}
+
+#reset-password-form .btn-field {
+  margin-top: 20px;
+}
+
+#reset-password-form .btn-link {
+  margin-top: 15px;
+  display: inline-block;
+}
+
+#reset-error.hidden, #reset-success.hidden {
+  display: none;
+}
+
+#reset-error {
+  color: #ff4d4d;
+  background-color: #ffebeb;
+  border: 1px solid #ffc2c2;
+}
+
+#reset-success {
+  color: #28a745;
+  background-color: #e9f7eb;
+  border: 1px solid #c3e6cb;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
 }
 .input-group {
   margin-bottom: 16px;

@@ -45,4 +45,3 @@ export async function deleteAccount(password) {
     body: JSON.stringify({ password }),
   });
 }
-

@@ -1,11 +1,19 @@
 // modules/notes.js
 import { apiFetch } from "./utils.js";
 
+const PLACEHOLDER_DRAWING = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2NgAAIAAAUAAR4f7BQAAAAASUVORK5CYII=";
+
 export async function throwNote(text, drawingData, lat, lon, placeId) {
+  const content = { text };
+
+  if (drawingData && drawingData !== PLACEHOLDER_DRAWING) {
+    content.drawingData = drawingData;
+  }
+
   return apiFetch("/api/notes", {
     method: "POST",
     body: JSON.stringify({
-      content: { text, drawingData },
+      content: content,
       location: { latitude: lat, longitude: lon, placeId },
     }),
   });

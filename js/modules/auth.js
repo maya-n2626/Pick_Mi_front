@@ -1,5 +1,29 @@
 // modules/auth.js
-import { apiFetch } from "./utils";
+import { apiFetch, jwt } from "./utils.js";
+
+export function getUser() {
+  const token = jwt();
+  if (!token) return null;
+
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Invalid JWT: not composed of 3 parts');
+    }
+    const payload = JSON.parse(atob(parts[1]));
+    return payload;
+  } catch (e) {
+    console.error("Failed to parse JWT:", e.message);
+    // It's good practice to remove a malformed token
+    localStorage.removeItem("jwt");
+    return null;
+  }
+}
+
+export function isAdmin() {
+  const user = getUser();
+  return user?.role === "admin";
+}
 
 export async function signup(email, password) {
   return apiFetch("/api/auth/signup", {
@@ -15,10 +39,9 @@ export async function signin(email, password) {
       body: JSON.stringify({ email, password }),
     });
     console.log("signin response:", response);
-    const { token, user } = response;
+    const token = response.token || response;
     localStorage.setItem("jwt", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    return { user, token };
+    return { token };
   } catch (err) {
     console.error("signin failed:", err);
     throw err;

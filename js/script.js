@@ -23,21 +23,17 @@ import { show, gotoLogin } from "./modules/ui.js";
 import { fetchAllUsers, fetchAllNotes } from "./modules/admin.js";
 import { initCanvas } from "./modules/canvas.js";
 
-document.addEventListener("DOMContentLoaded", function () {
-  const token = jwt();
-  if (!token) {
-    console.warn("אין JWT – המשתמש לא מחובר");
-  } else {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    console.log(payload);
+import { isAdmin } from "./modules/auth.js";
 
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const role = user.props?.role;
-    const adminBtn = document.getElementById("admin-btn");
-    if (adminBtn) {
-      adminBtn.classList[role === "admin" ? "remove" : "add"]("hidden");
-    }
+function updateAdminButtonVisibility() {
+  const adminBtn = document.getElementById("admin-btn");
+  if (adminBtn) {
+    adminBtn.classList.toggle("hidden", !isAdmin());
   }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  updateAdminButtonVisibility();
 
   // === Event Listeners & Flow ===
 
@@ -71,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
     try {
       const email = document.getElementById("login-email").value.trim();
-      const pwd = document.getElementById("login-password").value;
+      const pwd = document.getElementById("login-password").value.trim();
       await signin(email, pwd);
       gotoHome(lastKnownLocation);
     } catch (_) {
@@ -252,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // 2. הרכבת URL של Static Map עם מרקרים
         const sizeW = 400,
           sizeH = 300;
-                const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
         const base = "https://maps.googleapis.com/maps/api/staticmap";
         const centerParam =
           `center=${locationData.lat},${locationData.lon}` +
@@ -276,11 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
         container.style.backgroundPosition = "center";
 
         // 4. הצגת/הסתרת כפתור Admin
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-        const role = user.props?.role;
-        document
-          .getElementById("admin-btn")
-          .classList[role === "admin" ? "remove" : "add"]("hidden");
+        updateAdminButtonVisibility();
       },
       (err) => {
         console.warn("לא ניתן לקבל מיקום:", err);

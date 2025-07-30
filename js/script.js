@@ -100,7 +100,7 @@ function renderLockedMapWithNotes(notes, locationData) {
 
   // Add user marker
   const userMarkerEl = document.createElement("img");
-  userMarkerEl.src = "../images/Generic avatar.png";
+  userMarkerEl.src = "/images/Generic avatar.png";
   userMarkerEl.style.width = "40px";
   userMarkerEl.style.height = "40px";
 
@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         console.log("Data for STATIC map:", JSON.stringify(notes, null, 2));
 
-        renderNotesOnHome(notes);
+        // renderNotesOnHome(notes);
         // 2. הרכבת URL של Static Map עם מרקרים
         // const sizeW = 400,
         //   sizeH = 300;
@@ -400,8 +400,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const backgroundImg = document.createElement("img");
     backgroundImg.classList.add("note-background");
     backgroundImg.src = isDrawingNote
-      ? "../images/WriteBrush.png"
-      : "../images/WritePen (1).png";
+      ? "/images/WriteBrush.png"
+      : "/images/WritePen (1).png";
     contentDiv.appendChild(backgroundImg);
     if (note.content.text) {
       const p = document.createElement("p");
@@ -436,7 +436,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     notes.forEach((note) => {
       const noteEl = document.createElement("img");
-      noteEl.src = "../images/ClosedNote.png";
+      noteEl.src = "/images/ClosedNote.png";
       noteEl.alt = "פתק";
       noteEl.classList.add("floating-note");
 
@@ -475,7 +475,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const title = note.content?.text?.trim() || "פתק ללא טקסט";
 
         const noteMarkerElement = document.createElement("img");
-        noteMarkerElement.src = "../images/ClosedNote.png";
+        noteMarkerElement.src = "/images/ClosedNote.png";
         noteMarkerElement.style.width = "40px";
         noteMarkerElement.style.height = "40px";
 
@@ -627,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // הוספת סמן של המיקום הנוכחי
         const userMarkerElement = document.createElement("img");
-        userMarkerElement.src = "./images/Generic avatar.png";
+        userMarkerElement.src = "/images/Generic avatar.png";
         userMarkerElement.style.width = "40px";
         userMarkerElement.style.height = "40px";
 

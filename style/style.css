@@ -640,6 +640,10 @@ label[for="forgot-email"]{
 
 }
 
+label[for="reset-password-input"] {
+  color: white;
+}
+
 .note-background {
   display: block;
   max-width: 100%;

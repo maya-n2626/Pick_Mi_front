@@ -302,7 +302,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         console.log("Data for STATIC map:", JSON.stringify(notes, null, 2));
 
-        renderNotesOnHome(notes);
+        renderNotesOnHome(notes, locationData);
         // 2. הרכבת URL של Static Map עם מרקרים
         const sizeW = 400,
           sizeH = 300;
@@ -390,26 +390,67 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   //render notes on home
-  function renderNotesOnHome(notes) {
+  function renderNotesOnHome(notes, locationData) {
     const notesList = document.getElementById("notes-list");
     notesList.innerHTML = "";
 
+    const mapWidth = 800; // Static map width in pixels (400 * 2 because scale=2)
+    const mapHeight = 600; // Static map height in pixels (300 * 2)
+    const zoom = 15;
+    const iconSize = 50; // Your note image size (px)
+
+    const centerLat = locationData.lat;
+    const centerLon = locationData.lon;
+
+    function latLngToPoint(lat, lon) {
+      const siny = Math.sin((lat * Math.PI) / 180);
+      const y = 0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI);
+      const x = (lon + 180) / 360;
+      return { x, y };
+    }
+
+    function latLngToPixel(lat, lon) {
+      const scale = Math.pow(2, zoom);
+      const centerPt = latLngToPoint(centerLat, centerLon);
+      const targetPt = latLngToPoint(lat, lon);
+
+      const dx = (targetPt.x - centerPt.x) * 256 * scale;
+      const dy = (targetPt.y - centerPt.y) * 256 * scale;
+
+      return {
+        left: mapWidth / 2 + dx,
+        top: mapHeight / 2 + dy,
+      };
+    }
+
     notes.forEach((note) => {
+      const { lat, lon } = note.location;
+      const pixel = latLngToPixel(lat, lon);
+
+      // Clamp values to keep note image fully inside the screen
+      const clampedLeft = Math.min(
+        Math.max(pixel.left - iconSize / 2, 0),
+        mapWidth - iconSize,
+      );
+      const clampedTop = Math.min(
+        Math.max(pixel.top - iconSize / 2, 0),
+        mapHeight - iconSize,
+      );
+
       const noteEl = document.createElement("img");
       noteEl.src = "/images/ClosedNote.png";
       noteEl.alt = "פתק";
       noteEl.classList.add("floating-note");
 
-      // מיקום אקראי בעמוד
       noteEl.style.position = "absolute";
-      noteEl.style.left = Math.random() * 80 + "%";
-      noteEl.style.top = Math.random() * 200 + "px";
-      noteEl.style.width = "50px";
+      noteEl.style.left = `${clampedLeft}px`;
+      noteEl.style.top = `${clampedTop}px`;
+      noteEl.style.width = `${iconSize}px`;
       noteEl.style.cursor = "pointer";
-      // לחיצה על הפתק: טוענת ומציגה אותו
+
       noteEl.addEventListener("click", () => {
-        openNoteAndShow(note.id); // מציג את הפתק (ציור או טקסט)
-        noteEl.remove(); // מסיר את הפתק מהמסך
+        openNoteAndShow(note.id);
+        noteEl.remove();
       });
 
       notesList.appendChild(noteEl);

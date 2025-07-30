@@ -4,6 +4,26 @@ let lastKnownLocation = {
   placeId: null,
 };
 
+async function getPlaceIdFromCoordinates(lat, lon) {
+  return new Promise((resolve) => {
+    const service = new google.maps.places.PlacesService(document.createElement('div'));
+    const request = {
+      location: new google.maps.LatLng(lat, lon),
+      radius: '100', // Search within 100 meters
+      type: ['establishment'] // Look for establishments (e.g., businesses, points of interest)
+    };
+
+    service.nearbySearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+        resolve(results[0].place_id);
+      } else {
+        console.warn("⚠️ Could not find nearby place or Places API error:", status);
+        resolve("0"); // Return "0" if no place found or error
+      }
+    });
+  });
+}
+
 import {
   signup,
   signin,
@@ -124,39 +144,11 @@ document.addEventListener("DOMContentLoaded", function () {
           (position) => {
             lastKnownLocation.lat = position.coords.latitude;
             lastKnownLocation.lon = position.coords.longitude;
-
-            // Use Google Places API to get placeId
-            const service = new google.maps.places.PlacesService(
-              document.createElement("div"),
+            lastKnownLocation.placeId = await getPlaceIdFromCoordinates(lastKnownLocation.lat, lastKnownLocation.lon);
+            console.log(
+              "📍 Location and Place ID set in write-note-screen:",
+              lastKnownLocation,
             );
-            const request = {
-              location: new google.maps.LatLng(
-                lastKnownLocation.lat,
-                lastKnownLocation.lon,
-              ),
-              radius: "100",
-              type: ["establishment"], // Look for establishments (e.g., businesses, points of interest)
-            };
-
-            service.nearbySearch(request, (results, status) => {
-              if (
-                status === google.maps.places.PlacesServiceStatus.OK &&
-                results &&
-                results.length > 0
-              ) {
-                lastKnownLocation.placeId = results[0].place_id;
-                console.log(
-                  "📍 Location and Place ID set in write-note-screen:",
-                  lastKnownLocation,
-                );
-              } else {
-                console.warn(
-                  "⚠️ Could not find nearby place or Places API error:",
-                  status,
-                );
-                lastKnownLocation.placeId = ""; // Set to null if no place found or error
-              }
-            });
           },
           (err) => {
             console.warn("⚠️ לא ניתן לקבל מיקום במסך כתיבה:", err);
@@ -262,7 +254,8 @@ document.addEventListener("DOMContentLoaded", function () {
       async (pos) => {
         locationData.lat = pos.coords.latitude;
         locationData.lon = pos.coords.longitude;
-        locationData.placeId = null;
+        locationData.placeId = await getPlaceIdFromCoordinates(locationData.lat, locationData.lon);
+        console.log("📍 Location and Place ID set in gotoHome:", locationData);
 
         // 1. שליפת פתקים קרובים
         const notes = await getNearbyNotes(
@@ -547,7 +540,7 @@ document.addEventListener("DOMContentLoaded", function () {
         lastKnownLocation = {
           lat: position.coords.latitude,
           lon: position.coords.longitude,
-          placeId: null,
+          placeId: await getPlaceIdFromCoordinates(position.coords.latitude, position.coords.longitude),
         };
 
         // יצירת המפה

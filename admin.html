@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PickMi - Anonymous Note Throwing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <!-- ====== ADMIN PANEL ====== -->
+    <div id="admin-screen" class="container">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon6"
+          src="/images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="admin-header">
+        <button id="admin-back" class="btn-link">← Back</button>
+      </div>
+
+      <h2>All Users</h2>
+      <div class="admin-box">
+        <div id="admin-users"></div>
+      </div>
+
+      <h2>All Notes</h2>
+      <div class="admin-box">
+        <div id="admin-notes"></div>
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+    <script type="module" defer src="./js/admin.js"></script>
+  </body>
+</html>

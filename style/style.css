@@ -31,9 +31,6 @@ h1 {
   font-size: 2rem;
   margin-bottom: 28px;
 }
-.hidden {
-  display: none;
-}
 
 #reset-password-screen .login-card {
   margin-top: 150px;
@@ -52,8 +49,8 @@ h1 {
   display: inline-block;
 }
 
-#reset-error.hidden,
-#reset-success.hidden {
+#reset-error,
+#reset-success {
   display: none;
 }
 
@@ -695,7 +692,3 @@ label[for="reset-password-input"] {
   width: 272px;
   height: 40px;
 }
-.hidden {
-  display: none;
-}
-

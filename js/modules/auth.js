@@ -22,6 +22,8 @@ export function getUser() {
 
 export function isAdmin() {
   const user = getUser();
+  console.log("isAdmin - user:", user);
+  console.log("isAdmin - user.role:", user?.role);
   return user?.role === "admin";
 }
 

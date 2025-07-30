@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PickMi - Anonymous Note Throwing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <!-- ====== MAP SCREEN ====== -->
+    <div id="map-screen" class="container">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon3"
+          src="/images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="map-card">
+        <h2>Map in your area</h2>
+        <div id="big-map" style="width: 100%; height: 400px"></div>
+        <button id="back-to-home" class="btn-link" style="margin-top: 20px">
+          Home
+        </button>
+        
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=%VITE_GOOGLE_MAPS_API_KEY%&libraries=places,marker&callback=initMapPage&loading=async"
+    ></script>
+
+    <script type="module" defer src="./js/map.js"></script>
+  </body>
+</html>

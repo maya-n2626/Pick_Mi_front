@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PickMi - Anonymous Note Throwing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <!-- ====== NOTE CONTENT SCREEN ====== -->
+    <div id="note-content-screen" class="container">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img src="/images/indicator-Day.png" alt="App Icon" class="App-icon" />
+      </div>
+      <div class="write-card">
+        <div class="note-card" id="note-content"></div>
+
+        <div class="button-wrapper">
+          <button id="close-note-btn" class="btn-field">← Home</button>
+        </div>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+    <script type="module" defer src="./js/note-content.js"></script>
+  </body>
+</html>

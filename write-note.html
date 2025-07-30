@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PickMi - Anonymous Note Throwing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <!-- >>> מסך כתיבת הפתק בעט -->
+    <div id="write-note-screen" class="container">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon4"
+          src="/images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="write-card">
+        <div class="note-large note-write">
+          <!-- כפתורי פעולה -->
+          <div class="button-group">
+            <button id="to-brush-btn" class="btn-link">Brush</button>
+
+            <button id="save-text-note-btn" class="btn-stamp">✉️</button>
+          </div>
+          <img src="/images/WritePen (1).png" alt="פתק לכתיבה בעט" />
+          <textarea id="note-text"></textarea>
+
+          <div class="brush-controls">
+            <button id="clear-canvas-btn1" title="נקה ציור">🗑️</button>
+            <!-- שליטה על צבע ועובי של הטקסט -->
+            <div class="text-style-controls">
+              <label for="text-color"></label>
+              <input type="color" id="text-color" value="#000000" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+    <script type="module" defer src="./js/write-note.js"></script>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PickMi - Anonymous Note Throwing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <!-- ====== LOGIN ====== -->
+    <div class="container" id="login-screen">
+      <img id="status-bar" src="/images/status-bar.png" alt="סטטוס בר" />
+
+      <div class="app-bar">
+        <img
+          src="./images/Generic avatar.png"
+          alt="App Icon"
+          class="app-icon"
+        />
+      </div>
+      <div class="login-card">
+        <h1>Login</h1>
+        <form id="login-form">
+          <div class="input-group">
+            <label for="login-email">Email</label>
+            <input
+              type="email"
+              id="login-email"
+              class="auth-field"
+              name="email"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="login-password">Password</label>
+            <input
+              type="password"
+              id="login-password"
+              class="auth-field"
+              name="password"
+              required
+            />
+          </div>
+          <div id="login-error" class="error-msg hidden"></div>
+          <button type="submit" class="btn-field">Sign In</button>
+        </form>
+        <div class="button-group">
+          <button class="btn-link" id="to-forgot">Forgot Password?</button>
+          <button class="btn-link" id="to-signup">Sign Up</button>
+        </div>
+      </div>
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+    <script type="module" defer src="./js/login.js"></script>
+  </body>
+</html>

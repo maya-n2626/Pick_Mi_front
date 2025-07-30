@@ -523,6 +523,7 @@ document.addEventListener("DOMContentLoaded", function () {
       screen.classList.add("hidden");
       document.getElementById("note-content-screen").classList.add("hidden");
       document.getElementById("home-content").classList.remove("hidden");
+      gotoHome(lastKnownLocation);
     });
 
   // 6. Logout

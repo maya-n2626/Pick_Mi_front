@@ -2,87 +2,20 @@ import { throwNote } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
 import { initCanvas, isCanvasEmpty } from "./modules/canvas.js";
 import { getUser } from "./modules/auth.js";
+import { lastKnownLocation, updateCurrentLocation } from "./modules/location.js";
 
 // Check if user is logged in
 if (!getUser()) {
   goto("login");
 }
 
-let lastKnownLocation = {
-  lat: null,
-  lon: null,
-  placeId: null,
-};
-
-async function getPlaceIdFromCoordinates(lat, lon) {
-  return new Promise(async (resolve) => {
-    const center = new google.maps.LatLng(lat, lon);
-
-    const request = {
-      fields: ["displayName", "location", "id"],
-      locationRestriction: {
-        center,
-        radius: 100, // Search within 100 meters
-      },
-      includedPrimaryTypes: [
-        "park",
-        "school",
-        "university",
-        "library",
-        "shopping_mall",
-        "restaurant",
-        "cafe",
-        "bar",
-        "gym",
-        "movie_theater",
-        "museum",
-        "church",
-        "mosque",
-        "synagogue",
-        "city_hall",
-        "police",
-        "post_office",
-      ],
-      maxResultCount: 1,
-      rankPreference: google.maps.places.SearchNearbyRankPreference.DISTANCE,
-    };
-
-    try {
-      const { places } = await google.maps.places.Place.searchNearby(request);
-      if (places && places.length > 0) {
-        resolve(places[0].id);
-      } else {
-        console.warn("⚠️ No nearby places found.");
-        resolve("0");
-      }
-    } catch (error) {
-      console.warn("⚠️ Error during Place.searchNearby:", error);
-      resolve("0");
-    }
-  });
-}
-
 document.addEventListener("DOMContentLoaded", function () {
   initCanvas();
 
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        lastKnownLocation.lat = position.coords.latitude;
-        lastKnownLocation.lon = position.coords.longitude;
-        lastKnownLocation.placeId = await getPlaceIdFromCoordinates(
-          lastKnownLocation.lat,
-          lastKnownLocation.lon,
-        );
-      },
-      (err) => {
-        console.warn("⚠️ לא ניתן לקבל מיקום במסך כתיבה:", err);
-        alert("לא ניתן לקבל מיקום. לא ניתן לשמור את הפתק.");
-      },
-    );
-  } else {
-    alert("המכשיר שלך לא תומך במיקום גיאוגרפי.");
-  }
+  updateCurrentLocation().catch((err) => {
+    console.warn("⚠️ Could not get location in create-note:", err);
+    alert("לא ניתן לקבל מיקום. לא ניתן לשמור את הפתק.");
+  });
 
   const saveBtn = document.getElementById("save-note-btn");
   if (saveBtn) {

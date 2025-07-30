@@ -1,64 +1,11 @@
 import { getNearbyNotes, getNoteContent } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
 import { getUser } from "./modules/auth.js";
+import { lastKnownLocation, updateCurrentLocation } from "./modules/location.js";
 
 // Check if user is logged in
 if (!getUser()) {
   goto("login");
-}
-
-let lastKnownLocation = {
-  lat: null,
-  lon: null,
-  placeId: null,
-};
-
-async function getPlaceIdFromCoordinates(lat, lon) {
-  return new Promise(async (resolve) => {
-    const center = new google.maps.LatLng(lat, lon);
-
-    const request = {
-      fields: ["displayName", "location", "id"],
-      locationRestriction: {
-        center,
-        radius: 100, // Search within 100 meters
-      },
-      includedPrimaryTypes: [
-        "park",
-        "school",
-        "university",
-        "library",
-        "shopping_mall",
-        "restaurant",
-        "cafe",
-        "bar",
-        "gym",
-        "movie_theater",
-        "museum",
-        "church",
-        "mosque",
-        "synagogue",
-        "city_hall",
-        "police",
-        "post_office",
-      ],
-      maxResultCount: 1,
-      rankPreference: google.maps.places.SearchNearbyRankPreference.DISTANCE,
-    };
-
-    try {
-      const { places } = await google.maps.places.Place.searchNearby(request);
-      if (places && places.length > 0) {
-        resolve(places[0].id);
-      } else {
-        console.warn("⚠️ No nearby places found.");
-        resolve("0");
-      }
-    } catch (error) {
-      console.warn("⚠️ Error during Place.searchNearby:", error);
-      resolve("0");
-    }
-  });
 }
 
 function renderNotesOnMap(notes, map) {
@@ -97,23 +44,11 @@ function renderNotesOnMap(notes, map) {
 window.initMapPage = async function () {
   const storedLocation = localStorage.getItem("lastKnownLocation");
   if (storedLocation) {
-    lastKnownLocation = JSON.parse(storedLocation);
+    Object.assign(lastKnownLocation, JSON.parse(storedLocation));
   }
 
   try {
-    const position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject);
-    });
-
-    lastKnownLocation = {
-      lat: position.coords.latitude,
-      lon: position.coords.longitude,
-      placeId: await getPlaceIdFromCoordinates(
-        position.coords.latitude,
-        position.coords.longitude,
-      ),
-    };
-    localStorage.setItem("lastKnownLocation", JSON.stringify(lastKnownLocation));
+    await updateCurrentLocation();
 
     const map = new google.maps.Map(document.getElementById("big-map"), {
       center: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },

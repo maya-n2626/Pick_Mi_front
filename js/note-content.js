@@ -1,6 +1,7 @@
 import { getNoteContent, deleteNote } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
 import { getUser } from "./modules/auth.js";
+import { lastKnownLocation } from "./modules/location.js";
 
 // Check if user is logged in
 if (!getUser()) {
@@ -9,14 +10,8 @@ if (!getUser()) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const noteId = localStorage.getItem("noteId");
-  const storedLocation = localStorage.getItem("lastKnownLocation");
-  let lastKnownLocation = null;
 
-  if (storedLocation) {
-    lastKnownLocation = JSON.parse(storedLocation);
-  }
-
-  if (!noteId || !lastKnownLocation) {
+  if (!noteId || !lastKnownLocation.lat) { // Check if lastKnownLocation has been populated
     goto("home");
     return;
   }

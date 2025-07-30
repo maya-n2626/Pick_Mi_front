@@ -434,18 +434,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const title = note.content?.text?.trim() || "פתק ללא טקסט";
 
-        new google.maps.Marker({
+        const noteMarkerElement = document.createElement("img");
+        noteMarkerElement.src = "../images/ClosedNote.png";
+        noteMarkerElement.style.width = "40px";
+        noteMarkerElement.style.height = "40px";
+
+        new google.maps.marker.AdvancedMarkerElement({
           position: {
             lat: Number(note.location.latitude),
             lng: Number(note.location.longitude),
           },
           map,
           title,
-          icon: {
-            url: "../images/ClosedNote.png",
-            scaledSize: new google.maps.Size(40, 40),
-            anchor: new google.maps.Point(20, 20),
-          },
+          content: noteMarkerElement,
         }).addListener("click", () => openNoteAndShow(note.id));
       } else {
         console.warn(`❌ SKIPPING note due to invalid or missing coordinates.`);
@@ -584,10 +585,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // הוספת סמן של המיקום הנוכחי
-        new google.maps.Marker({
+        const userMarkerElement = document.createElement("img");
+        userMarkerElement.src = "./images/Generic avatar.png";
+        userMarkerElement.style.width = "40px";
+        userMarkerElement.style.height = "40px";
+
+        new google.maps.marker.AdvancedMarkerElement({
           position: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },
           map,
           title: "המיקום שלך",
+          content: userMarkerElement,
         });
 
         // שלב קריטי: קבלת הפתקים מהשרת

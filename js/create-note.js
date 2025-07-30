@@ -2,7 +2,7 @@ import { throwNote } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
 import { initCanvas, isCanvasEmpty } from "./modules/canvas.js";
 import { getUser } from "./modules/auth.js";
-import { lastKnownLocation, updateCurrentLocation } from "./modules/location.js";
+import { getLastKnownLocation, updateCurrentLocation } from "./modules/location.js";
 
 // Check if user is logged in
 if (!getUser()) {
@@ -41,9 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
       await throwNote(
         text,
         drawingData,
-        lastKnownLocation.lat,
-        lastKnownLocation.lon,
-        lastKnownLocation.placeId,
+        getLastKnownLocation().lat,
+        getLastKnownLocation().lon,
+        getLastKnownLocation().placeId,
       );
       goto("home");
     });

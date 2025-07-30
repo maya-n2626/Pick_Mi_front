@@ -1,8 +1,12 @@
-export let lastKnownLocation = {
+let lastKnownLocation = {
   lat: null,
   lon: null,
   placeId: null,
 };
+
+export function getLastKnownLocation() {
+  return lastKnownLocation;
+}
 
 export async function getPlaceIdFromCoordinates(lat, lon) {
   return new Promise(async (resolve) => {

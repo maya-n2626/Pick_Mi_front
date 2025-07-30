@@ -1,7 +1,7 @@
 import { getNoteContent, deleteNote } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
 import { getUser } from "./modules/auth.js";
-import { lastKnownLocation, updateCurrentLocation } from "./modules/location.js";
+import { getLastKnownLocation, updateCurrentLocation } from "./modules/location.js";
 
 // Check if user is logged in
 if (!getUser()) {
@@ -24,15 +24,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   console.log("note-content.js: noteId =", noteId);
 
-  console.log("note-content.js: lastKnownLocation (after update) =", lastKnownLocation);
+  console.log("note-content.js: lastKnownLocation (after update) =", getLastKnownLocation());
 
-  if (!noteId || lastKnownLocation.lat === null) { // Check if lastKnownLocation.lat is null
+  if (!noteId || getLastKnownLocation().lat === null) { // Check if lastKnownLocation.lat is null
     console.log("note-content.js: Redirecting to home due to missing noteId or location.");
     goto("home");
     return;
   }
 
-  const note = await getNoteContent(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
+  const note = await getNoteContent(noteId, getLastKnownLocation().lat, getLastKnownLocation().lon);
   console.log("note-content.js: Fetched note data:", note);
 
   const contentDiv = document.getElementById("note-content");
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     .getElementById("close-note-btn")
     .addEventListener("click", async () => {
       try {
-        await deleteNote(noteId, lastKnownLocation.lat, lastKnownLocation.lon);
+        await deleteNote(noteId, getLastKnownLocation().lat, getLastKnownLocation().lon);
       } catch (e) {
         console.warn("המחיקה נכשלה", e);
       }

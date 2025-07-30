@@ -1,7 +1,7 @@
 import { getNearbyNotes, getNoteContent, deleteNote } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
 import { isAdmin, getUser } from "./modules/auth.js";
-import { lastKnownLocation, updateCurrentLocation } from "./modules/location.js";
+import { getLastKnownLocation, updateCurrentLocation } from "./modules/location.js";
 
 console.log("home.js is running");
 
@@ -36,17 +36,17 @@ async function updateLocationAndRenderHome() {
   console.log("updateLocationAndRenderHome started.");
   try {
     await updateCurrentLocation();
-    console.log("Geolocation position obtained and lastKnownLocation updated:", lastKnownLocation);
+    console.log("Geolocation position obtained and lastKnownLocation updated:", getLastKnownLocation());
 
     console.log("Fetching nearby notes...");
     const notes = await getNearbyNotes(
-      lastKnownLocation.lat,
-      lastKnownLocation.lon,
+      getLastKnownLocation().lat,
+      getLastKnownLocation().lon,
       500,
     );
     console.log("Nearby notes fetched:", notes);
 
-    renderNotesOnHome(notes, lastKnownLocation);
+    renderNotesOnHome(notes, getLastKnownLocation());
     console.log("Notes rendered on home.");
 
     const sizeW = 400,
@@ -54,11 +54,11 @@ async function updateLocationAndRenderHome() {
     const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const base = "https://maps.googleapis.com/maps/api/staticmap";
     const centerParam =
-      `center=${lastKnownLocation.lat},${lastKnownLocation.lon}` +
+      `center=${getLastKnownLocation().lat},${getLastKnownLocation().lon}` +
       `&zoom=15&size=${sizeW}x${sizeH}&scale=2`;
     const markerIconUrl = "../images/ClosedNote.png";
 
-    const userMarker = `markers=icon:${encodeURIComponent(markerIconUrl)}|${lastKnownLocation.lat},${lastKnownLocation.lon}`;
+    const userMarker = `markers=icon:${encodeURIComponent(markerIconUrl)}|${getLastKnownLocation().lat},${getLastKnownLocation().lon}`;
     const noteMarkers = notes
       .map(
         (n) =>
@@ -144,7 +144,7 @@ function renderNotesOnHome(notes, locationData) {
 
     noteEl.addEventListener("click", () => {
         localStorage.setItem("noteId", note.id);
-        localStorage.setItem("lastKnownLocation", JSON.stringify(lastKnownLocation));
+        localStorage.setItem("lastKnownLocation", JSON.stringify(getLastKnownLocation()));
         goto("note-content");
         noteEl.remove();
       });
@@ -157,8 +157,8 @@ window.initHomeMap = async function () {
   console.log("initHomeMap called.");
   const storedLocation = localStorage.getItem("lastKnownLocation");
   if (storedLocation) {
-    Object.assign(lastKnownLocation, JSON.parse(storedLocation));
-    console.log("Loaded lastKnownLocation from localStorage:", lastKnownLocation);
+    Object.assign(getLastKnownLocation(), JSON.parse(storedLocation));
+    console.log("Loaded lastKnownLocation from localStorage:", getLastKnownLocation());
   }
 
   await updateLocationAndRenderHome();

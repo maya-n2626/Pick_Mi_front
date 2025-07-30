@@ -1,7 +1,7 @@
 import { getNearbyNotes, getNoteContent } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
 import { getUser } from "./modules/auth.js";
-import { lastKnownLocation, updateCurrentLocation } from "./modules/location.js";
+import { getLastKnownLocation, updateCurrentLocation } from "./modules/location.js";
 
 // Check if user is logged in
 if (!getUser()) {
@@ -44,14 +44,14 @@ function renderNotesOnMap(notes, map) {
 window.initMapPage = async function () {
   const storedLocation = localStorage.getItem("lastKnownLocation");
   if (storedLocation) {
-    Object.assign(lastKnownLocation, JSON.parse(storedLocation));
+    Object.assign(getLastKnownLocation(), JSON.parse(storedLocation));
   }
 
   try {
     await updateCurrentLocation();
 
     const map = new google.maps.Map(document.getElementById("big-map"), {
-      center: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },
+      center: { lat: getLastKnownLocation().lat, lng: getLastKnownLocation().lon },
       zoom: 14,
       mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID,
       disableDefaultUI: true, // This will remove all default UI controls
@@ -63,15 +63,15 @@ window.initMapPage = async function () {
     userMarkerElement.style.height = "40px";
 
     new google.maps.marker.AdvancedMarkerElement({
-      position: { lat: lastKnownLocation.lat, lng: lastKnownLocation.lon },
+      position: { lat: getLastKnownLocation().lat, lng: getLastKnownLocation().lon },
       map,
       title: "המיקום שלך",
       content: userMarkerElement,
     });
 
     const notes = await getNearbyNotes(
-      lastKnownLocation.lat,
-      lastKnownLocation.lon,
+      getLastKnownLocation().lat,
+      getLastKnownLocation().lon,
       5000,
     );
 

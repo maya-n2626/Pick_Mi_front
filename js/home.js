@@ -157,7 +157,7 @@ window.initHomeMap = async function () {
   console.log("initHomeMap called.");
   const storedLocation = localStorage.getItem("lastKnownLocation");
   if (storedLocation) {
-    lastKnownLocation = JSON.parse(storedLocation);
+    Object.assign(lastKnownLocation, JSON.parse(storedLocation));
     console.log("Loaded lastKnownLocation from localStorage:", lastKnownLocation);
   }
 

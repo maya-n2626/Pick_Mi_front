@@ -30,6 +30,8 @@ export function initCanvas() {
   ctx = canvas.getContext("2d");
 
   // Set canvas dimensions to match its displayed size
+  console.log("Canvas clientWidth:", canvas.clientWidth);
+  console.log("Canvas clientHeight:", canvas.clientHeight);
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
 

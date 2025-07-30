@@ -9,13 +9,16 @@ if (!getUser()) {
   goto("login");
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  initCanvas();
-
-  updateCurrentLocation().catch((err) => {
+window.initCreateNoteMap = async function () {
+  try {
+    await updateCurrentLocation();
+  } catch (err) {
     console.warn("⚠️ Could not get location in create-note:", err);
     alert("לא ניתן לקבל מיקום. לא ניתן לשמור את הפתק.");
-  });
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function () {
 
   const saveBtn = document.getElementById("save-note-btn");
   if (saveBtn) {
@@ -25,7 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const text = textInput ? textInput.value.trim() : "";
       let drawingData = null;
-      if (canvas && !isCanvasEmpty(canvas)) {
+      // Only get drawing data if the brush section is visible
+      if (brushSection.style.display !== 'none' && canvas && !isCanvasEmpty(canvas)) {
         drawingData = canvas.toDataURL();
       }
 
@@ -98,6 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
   toggleBrushBtn.addEventListener('click', () => {
     textSection.style.display = 'none';
     brushSection.style.display = 'block';
+    initCanvas(); // Initialize canvas when brush section is shown
   });
 
 });

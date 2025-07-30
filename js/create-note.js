@@ -57,6 +57,8 @@ async function getPlaceIdFromCoordinates(lat, lon) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  initCanvas();
+
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -76,27 +78,21 @@ document.addEventListener("DOMContentLoaded", function () {
     alert("המכשיר שלך לא תומך במיקום גיאוגרפי.");
   }
 
-  const toBrushBtn = document.getElementById("to-brush-btn");
-  if (toBrushBtn) {
-    toBrushBtn.addEventListener("click", () => {
-      goto("brush-note");
-    });
-  }
-
-  const saveBtn = document.getElementById("save-text-note-btn");
+  const saveBtn = document.getElementById("save-note-btn");
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
       const textInput = document.getElementById("note-text");
       const canvas = document.getElementById("note-canvas");
 
-      if (!textInput || !canvas) {
-        return;
+      const text = textInput ? textInput.value.trim() : "";
+      let drawingData = null;
+      if (canvas && !isCanvasEmpty(canvas)) {
+        drawingData = canvas.toDataURL();
       }
 
-      const text = textInput.value.trim();
-      let drawingData = null;
-      if (!isCanvasEmpty(canvas)) {
-        drawingData = canvas.toDataURL();
+      if (!text && !drawingData) {
+        alert("Please write something or draw something before saving.");
+        return;
       }
 
       await throwNote(
@@ -110,10 +106,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  document.getElementById("clear-canvas-btn1").addEventListener("click", () => {
-    const textInput = document.getElementById("note-text");
-    if (textInput) textInput.value = "";
-  });
+  const cancelBtn = document.getElementById("cancel-note-btn");
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      goto("home");
+    });
+  }
+
+  const clearCanvasBtn = document.getElementById("clear-canvas-btn");
+  if (clearCanvasBtn) {
+    clearCanvasBtn.addEventListener("click", () => {
+      const canvas = document.getElementById("note-canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+  }
 
   const noteText = document.getElementById("note-text");
   const textColorPicker = document.getElementById("text-color");
@@ -123,4 +130,35 @@ document.addEventListener("DOMContentLoaded", function () {
       noteText.style.color = textColorPicker.value;
     });
   }
+
+  const brushColorPicker = document.getElementById("brush-color");
+  const brushSizeSlider = document.getElementById("brush-size");
+
+  if (brushColorPicker) {
+    brushColorPicker.addEventListener("input", () => {
+      document.documentElement.style.setProperty('--brush-color', brushColorPicker.value);
+    });
+  }
+
+  if (brushSizeSlider) {
+    brushSizeSlider.addEventListener("input", () => {
+      document.documentElement.style.setProperty('--brush-size', brushSizeSlider.value + 'px');
+    });
+  }
+
+  const textSection = document.getElementById('text-note-section');
+  const brushSection = document.getElementById('brush-note-section');
+  const toggleTextBtn = document.getElementById('toggle-text-btn');
+  const toggleBrushBtn = document.getElementById('toggle-brush-btn');
+
+  toggleTextBtn.addEventListener('click', () => {
+    textSection.style.display = 'block';
+    brushSection.style.display = 'none';
+  });
+
+  toggleBrushBtn.addEventListener('click', () => {
+    textSection.style.display = 'none';
+    brushSection.style.display = 'block';
+  });
+
 });

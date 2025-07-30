@@ -210,7 +210,7 @@ window.initHomeMap = async function () {
   const newNoteBtn = document.getElementById("new-note-btn");
   if (newNoteBtn) {
     newNoteBtn.addEventListener("click", () => {
-      goto("write-note");
+      goto("create-note");
     });
   }
 

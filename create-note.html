@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PickMi - Create Note</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <!-- ====== CREATE NOTE SCREEN ====== -->
+    <div id="create-note-screen" class="container">
+      <img id="status-bar" src="./images/status-bar.png" />
+
+      <div class="app-bar">
+        <img
+          id="app-icon-create"
+          src="/images/indicator-Day.png"
+          alt="App Icon"
+          class="App-icon"
+        />
+      </div>
+
+      <div class="write-card">
+        <div class="note-large">
+          <!-- Action Buttons -->
+          <div class="button-group">
+            <button id="cancel-note-btn" class="btn-link">Cancel</button>
+            <button id="save-note-btn" class="btn-stamp">✉️</button>
+          </div>
+
+          <!-- Text Note Section -->
+          <div id="text-note-section" class="note-write">
+            <img src="/images/WritePen (1).png" alt="Note for writing" />
+            <textarea id="note-text" placeholder="Write your note here..."></textarea>
+            <div class="text-style-controls">
+              <label for="text-color"></label>
+              <input type="color" id="text-color" value="#000000" />
+            </div>
+          </div>
+
+          <!-- Brush Note Section -->
+          <div id="brush-note-section" class="note-brush" style="display: none;">
+            <img src="/images/WriteBrush.png" alt="Note for drawing" />
+            <canvas id="note-canvas" width="420" height="300"></canvas>
+            <div class="brush-controls">
+              <label for="brush-color"></label>
+              <input type="color" id="brush-color" value="#000000" />
+              <label for="brush-size"></label>
+              <input type="range" id="brush-size" min="1" max="30" value="5" />
+              <button id="clear-canvas-btn" title="Clear Drawing">🗑️</button>
+            </div>
+          </div>
+
+          <div class="toggle-buttons">
+            <button id="toggle-text-btn" class="btn-link">Text</button>
+            <button id="toggle-brush-btn" class="btn-link">Brush</button>
+          </div>
+
+        </div>
+      </div>
+
+      <img id="nav-bar" src="./images/navigation.png" alt="Navigation Bar" />
+    </div>
+    <script type="module" defer src="./js/create-note.js"></script>
+  </body>
+</html>

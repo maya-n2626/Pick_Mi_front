@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // 2. הרכבת URL של Static Map עם מרקרים
         const sizeW = 400,
           sizeH = 300;
-        const key = "AIzaSyCbMIwPY6SqN9WsL7Fvn4E_r_2kpj6CrQY";
+                const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
         const base = "https://maps.googleapis.com/maps/api/staticmap";
         const centerParam =
           `center=${locationData.lat},${locationData.lon}` +

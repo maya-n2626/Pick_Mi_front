@@ -26,6 +26,10 @@ export function initCanvas() {
 
     ctx = canvas.getContext("2d");
 
+    // Set canvas dimensions to match its displayed size
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
 
     if (colorPicker) { // הוספת מאזין רק אם הפקד קיים
         colorPicker.addEventListener("input", (e) => {

@@ -1,5 +1,11 @@
 import { getNearbyNotes, getNoteContent } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
+import { getUser } from "./modules/auth.js";
+
+// Check if user is logged in
+if (!getUser()) {
+  goto("login");
+}
 
 let lastKnownLocation = {
   lat: null,

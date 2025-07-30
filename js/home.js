@@ -1,8 +1,13 @@
 import { getNearbyNotes, getNoteContent, deleteNote } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
-import { isAdmin } from "./modules/auth.js";
+import { isAdmin, getUser } from "./modules/auth.js";
 
 console.log("home.js is running");
+
+// Check if user is logged in
+if (!getUser()) {
+  goto("login");
+}
 
 window.updateAdminButtonVisibility = function () {
   const homeContent = document.getElementById("home-content");

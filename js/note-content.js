@@ -1,5 +1,11 @@
 import { getNoteContent, deleteNote } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
+import { getUser } from "./modules/auth.js";
+
+// Check if user is logged in
+if (!getUser()) {
+  goto("login");
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   const noteId = localStorage.getItem("noteId");

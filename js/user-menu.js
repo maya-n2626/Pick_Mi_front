@@ -1,5 +1,10 @@
-import { deleteAccount } from "./modules/auth.js";
+import { deleteAccount, getUser } from "./modules/auth.js";
 import { goto } from "./modules/ui.js";
+
+// Check if user is logged in
+if (!getUser()) {
+  goto("login");
+}
 
 document.addEventListener("DOMContentLoaded", function () {
   document

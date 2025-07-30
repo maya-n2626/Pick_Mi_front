@@ -1,6 +1,12 @@
 import { throwNote } from "./modules/notes.js";
 import { goto } from "./modules/ui.js";
 import { initCanvas, isCanvasEmpty } from "./modules/canvas.js";
+import { getUser } from "./modules/auth.js";
+
+// Check if user is logged in
+if (!getUser()) {
+  goto("login");
+}
 
 let lastKnownLocation = {
   lat: null,

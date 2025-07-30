@@ -10,7 +10,7 @@ export function show(screenId) {
     .forEach((el) => el.classList.add("hidden"));
   document.getElementById(screenId).classList.remove("hidden");
   if (screenId === "home-content") {
-    document.getElementById("home-bg").classList.remove("hidden");
+    document.getElementById("home-map").classList.remove("hidden");
   }
 }
 

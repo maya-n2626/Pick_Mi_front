@@ -76,6 +76,45 @@ async function getPlaceIdFromCoordinates(lat, lon) {
     }
   });
 }
+
+function renderLockedMapWithNotes(notes, locationData) {
+  const mapContainer = document.getElementById("home-map");
+  mapContainer.innerHTML = ""; // Clear any previous map
+
+  const map = new google.maps.Map(mapContainer, {
+    center: { lat: locationData.lat, lng: locationData.lon },
+    zoom: 15,
+    disableDefaultUI: true,
+    gestureHandling: "none",
+    draggable: false,
+    zoomControl: false,
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+    clickableIcons: false,
+    mapTypeControl: false,
+    streetViewControl: false,
+    fullscreenControl: false,
+    keyboardShortcuts: false,
+    mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID,
+  });
+
+  // Add user marker
+  const userMarkerEl = document.createElement("img");
+  userMarkerEl.src = "../images/Generic avatar.png";
+  userMarkerEl.style.width = "40px";
+  userMarkerEl.style.height = "40px";
+
+  new google.maps.marker.AdvancedMarkerElement({
+    position: { lat: locationData.lat, lng: locationData.lon },
+    map,
+    title: "המיקום שלך",
+    content: userMarkerEl,
+  });
+
+  // Render notes
+  renderNotesOnMap(notes, map);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   updateAdminButtonVisibility();
 
@@ -303,31 +342,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
         renderNotesOnHome(notes);
         // 2. הרכבת URL של Static Map עם מרקרים
-        const sizeW = 400,
-          sizeH = 300;
-        const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-        const base = "https://maps.googleapis.com/maps/api/staticmap";
-        const centerParam =
-          `center=${locationData.lat},${locationData.lon}` +
-          `&zoom=15&size=${sizeW}x${sizeH}&scale=2`;
-        const markerIconUrl =
-          "../images/ClosedNote.png";
-
-        const userMarker = `markers=color:blue|${locationData.lat},${locationData.lon}`;
-        const noteMarkers = notes
-          .map(
-            (n) =>
-              `markers=icon:${encodeURIComponent(markerIconUrl)}|${n.location.lat},${n.location.lon}`,
-          )
-          .join("&");
-        const url = `${base}?${centerParam}&${userMarker}&${noteMarkers}&key=${key}`;
-
+        // const sizeW = 400,
+        //   sizeH = 300;
+        // const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+        // const base = "https://maps.googleapis.com/maps/api/staticmap";
+        // const centerParam =
+        //   `center=${locationData.lat},${locationData.lon}` +
+        //   `&zoom=15&size=${sizeW}x${sizeH}&scale=2`;
+        // const markerIconUrl = "../images/ClosedNote.png";
+        //
+        // const userMarker = `markers=icon:${encodeURIComponent(markerIconUrl)}|${lat},${lon}`;
+        // const noteMarkers = notes
+        //   .map(
+        //     (n) =>
+        //       `markers=icon:${encodeURIComponent(markerIconUrl)}|${n.location.lat},${n.location.lon}`,
+        //   )
+        //   .join("&");
+        // const url = `${base}?${centerParam}&${userMarker}&${noteMarkers}&key=${key}`;
+        //
         // 3. הצגת המפה הסטטית כרקע ה־card
         const container = document.getElementById("home-content");
-        container.style.backgroundImage = `url("${url}")`;
-        container.style.backgroundSize = "cover";
-        container.style.backgroundPosition = "center";
-
+        // container.style.backgroundImage = `url("${url}")`;
+        // container.style.backgroundSize = "cover";
+        // container.style.backgroundPosition = "center";
+        if (container) {
+          renderLockedMapWithNotes(notes, locationData);
+        }
         // 4. הצגת/הסתרת כפתור Admin
         updateAdminButtonVisibility();
       },

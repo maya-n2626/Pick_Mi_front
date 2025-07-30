@@ -1,38 +1,10 @@
-let lastKnownLocation = {
-  lat: null,
-  lon: null,
-  placeId: null,
-};
-
-async function getPlaceIdFromCoordinates(lat, lon) {
-  return new Promise((resolve) => {
-    const service = new google.maps.places.PlacesService(document.createElement('div'));
-    const request = {
-      location: new google.maps.LatLng(lat, lon),
-      radius: '100', // Search within 100 meters
-      type: ['establishment'] // Look for establishments (e.g., businesses, points of interest)
-    };
-
-    service.nearbySearch(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
-        resolve(results[0].place_id);
-      } else {
-        console.warn("⚠️ Could not find nearby place or Places API error:", status);
-        resolve("0"); // Return "0" if no place found or error
-      }
-    });
-  });
-}
-
 import {
   signup,
   signin,
   forgotPassword,
-  resetPassword,
   deleteAccount,
 } from "./modules/auth.js";
 
-import { apiFetch, jwt, API_BASE } from "./modules/utils.js";
 import {
   throwNote,
   getNearbyNotes,
@@ -41,7 +13,7 @@ import {
 } from "./modules/notes.js";
 import { show, gotoLogin } from "./modules/ui.js";
 import { fetchAllUsers, fetchAllNotes } from "./modules/admin.js";
-import { initCanvas } from "./modules/canvas.js";
+import { initCanvas, isCanvasEmpty } from "./modules/canvas.js";
 
 import { isAdmin } from "./modules/auth.js";
 
@@ -51,7 +23,59 @@ function updateAdminButtonVisibility() {
     adminBtn.classList.toggle("hidden", !isAdmin());
   }
 }
+let lastKnownLocation = {
+  lat: null,
+  lon: null,
+  placeId: null,
+};
 
+async function getPlaceIdFromCoordinates(lat, lon) {
+  return new Promise(async (resolve) => {
+    const center = new google.maps.LatLng(lat, lon);
+
+    const request = {
+      fields: ["displayName", "location", "id"],
+      locationRestriction: {
+        center,
+        radius: 100, // Search within 100 meters
+      },
+      includedPrimaryTypes: [
+        "park",
+        "school",
+        "university",
+        "library",
+        "shopping_mall",
+        "restaurant",
+        "cafe",
+        "bar",
+        "gym",
+        "movie_theater",
+        "museum",
+        "church",
+        "mosque",
+        "synagogue",
+        "city_hall",
+        "police",
+        "post_office",
+      ],
+      maxResultCount: 1,
+      rankPreference: google.maps.places.SearchNearbyRankPreference.DISTANCE,
+    };
+
+    try {
+      const { places } = await google.maps.places.Place.searchNearby(request);
+      if (places && places.length > 0) {
+        resolve(places[0].id);
+      } else {
+        console.warn("⚠️ No nearby places found.");
+        resolve("0");
+      }
+    } catch (error) {
+      console.warn("⚠️ Error during Place.searchNearby:", error);
+      resolve("0");
+    }
+  });
+}
 document.addEventListener("DOMContentLoaded", function () {
   updateAdminButtonVisibility();
 
@@ -141,10 +165,13 @@ document.addEventListener("DOMContentLoaded", function () {
       // === בקשת מיקום ===
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
-          (position) => {
+          async (position) => {
             lastKnownLocation.lat = position.coords.latitude;
             lastKnownLocation.lon = position.coords.longitude;
-            lastKnownLocation.placeId = await getPlaceIdFromCoordinates(lastKnownLocation.lat, lastKnownLocation.lon);
+            lastKnownLocation.placeId = await getPlaceIdFromCoordinates(
+              lastKnownLocation.lat,
+              lastKnownLocation.lon,
+            );
             console.log(
               "📍 Location and Place ID set in write-note-screen:",
               lastKnownLocation,
@@ -199,7 +226,10 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const text = textInput.value.trim();
-      const drawingData = canvas.toDataURL();
+      let drawingData = null;
+      if (!isCanvasEmpty(canvas)) {
+        drawingData = canvas.toDataURL();
+      }
 
       console.log("🖊 text to send:", text);
       console.log("🖼 drawingData to send:", drawingData);
@@ -229,7 +259,10 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const text = textInput.value.trim();
-      const drawingData = canvas.toDataURL();
+      let drawingData = null;
+      if (!isCanvasEmpty(canvas)) {
+        drawingData = canvas.toDataURL();
+      }
       console.log("🖊 text to send:", text);
       console.log("🖼 drawingData to send:", drawingData);
 
@@ -254,7 +287,10 @@ document.addEventListener("DOMContentLoaded", function () {
       async (pos) => {
         locationData.lat = pos.coords.latitude;
         locationData.lon = pos.coords.longitude;
-        locationData.placeId = await getPlaceIdFromCoordinates(locationData.lat, locationData.lon);
+        locationData.placeId = await getPlaceIdFromCoordinates(
+          locationData.lat,
+          locationData.lon,
+        );
         console.log("📍 Location and Place ID set in gotoHome:", locationData);
 
         // 1. שליפת פתקים קרובים
@@ -302,8 +338,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   //open notes on screen
   async function openNoteAndShow(noteId) {
-    const PLACEHOLDER_DRAWING =
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQIW2NgAAIAAAUAAR4f7BQAAAAASUVORK5CYII=";
     const note = await getNoteContent(
       noteId,
       lastKnownLocation.lat,
@@ -335,10 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
       p.classList.add("note-text");
       contentDiv.appendChild(p);
     }
-    const hasRealDrawing =
-      note.content.drawingData &&
-      note.content.drawingData !== PLACEHOLDER_DRAWING;
-    if (hasRealDrawing) {
+    if (note.content.drawingData) {
       const img = document.createElement("img");
       img.src = note.content.drawingData;
       img.alt = "ציור";
@@ -540,7 +571,10 @@ document.addEventListener("DOMContentLoaded", function () {
         lastKnownLocation = {
           lat: position.coords.latitude,
           lon: position.coords.longitude,
-          placeId: await getPlaceIdFromCoordinates(position.coords.latitude, position.coords.longitude),
+          placeId: await getPlaceIdFromCoordinates(
+            position.coords.latitude,
+            position.coords.longitude,
+          ),
         };
 
         // יצירת המפה

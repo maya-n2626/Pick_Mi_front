@@ -84,37 +84,6 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("wrong-forgot").onclick = () =>
     show("forgot-password-screen");
 
-  // Reset Password
-  const resetPasswordForm = document.getElementById("reset-password-form");
-  if (resetPasswordForm) {
-    resetPasswordForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const errEl = document.getElementById("reset-error");
-      const successEl = document.getElementById("reset-success");
-      errEl.classList.add("hidden");
-      successEl.classList.add("hidden");
-
-      const password = document.getElementById("reset-password-input").value;
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get("token");
-
-      if (!token) {
-        errEl.textContent = "Reset token not found in URL.";
-        errEl.classList.remove("hidden");
-        return;
-      }
-
-      try {
-        await resetPassword(token, password);
-        successEl.classList.remove("hidden");
-        resetPasswordForm.reset();
-      } catch (err) {
-        errEl.textContent = err;
-        errEl.classList.remove("hidden");
-      }
-    };
-  }
-
   // 5. Forgot Password Flow
   document.getElementById("to-forgot").onclick = () =>
     show("forgot-password-screen");

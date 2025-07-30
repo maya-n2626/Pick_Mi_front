@@ -21,7 +21,10 @@ body {
   box-shadow: 0 6px 20px 0 #0001;
   position: relative;
   z-index: 10;
-  overflow: hidden;
+  background-image: url("../images/Park_BG.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 h1 {
   text-align: center;
@@ -184,14 +187,6 @@ button:hover,
   margin: 40px auto;
   border-radius: 18px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  background: #fff;
-}
-#home-map {
-  position: relative;
-  z-index: -1;
-  width: 427px;
-  height: 903px;
   overflow: hidden;
   background: #fff;
 }
@@ -703,3 +698,4 @@ label[for="reset-password-input"] {
 .hidden {
   display: none;
 }
+

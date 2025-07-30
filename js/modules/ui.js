@@ -1,7 +1,4 @@
 // modules/uis.js
-import { getNearbyNotes } from "./notes.js";
-import { API_BASE, jwt, apiFetch } from "./utils.js";
-
 export function show(screenId) {
   document
     .querySelectorAll(
@@ -10,7 +7,7 @@ export function show(screenId) {
     .forEach((el) => el.classList.add("hidden"));
   document.getElementById(screenId).classList.remove("hidden");
   if (screenId === "home-content") {
-    document.getElementById("home-map").classList.remove("hidden");
+    document.getElementById("home-bg").classList.remove("hidden");
   }
 }
 

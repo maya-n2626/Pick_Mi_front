@@ -190,6 +190,14 @@ button:hover,
   overflow: hidden;
   background: #fff;
 }
+#home-map {
+  position: relative;
+  z-index: -1;
+  width: 427px;
+  height: 903px;
+  overflow: hidden;
+  background: #fff;
+}
 
 #status-bar {
   width: 100%;
@@ -698,4 +706,3 @@ label[for="reset-password-input"] {
 .hidden {
   display: none;
 }
-

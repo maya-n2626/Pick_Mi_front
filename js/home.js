@@ -86,26 +86,33 @@ async function getPlaceIdFromCoordinates(lat, lon) {
 }
 
 async function updateLocationAndRenderHome() {
+  console.log("updateLocationAndRenderHome started.");
   try {
     const position = await new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject);
     });
+    console.log("Geolocation position obtained:", position);
 
     lastKnownLocation.lat = position.coords.latitude;
     lastKnownLocation.lon = position.coords.longitude;
+    console.log("Fetching placeId for lat/lon:", lastKnownLocation.lat, lastKnownLocation.lon);
     lastKnownLocation.placeId = await getPlaceIdFromCoordinates(
       lastKnownLocation.lat,
       lastKnownLocation.lon,
     );
     localStorage.setItem("lastKnownLocation", JSON.stringify(lastKnownLocation));
+    console.log("lastKnownLocation updated and stored:", lastKnownLocation);
 
+    console.log("Fetching nearby notes...");
     const notes = await getNearbyNotes(
       lastKnownLocation.lat,
       lastKnownLocation.lon,
       500,
     );
+    console.log("Nearby notes fetched:", notes);
 
     renderNotesOnHome(notes, lastKnownLocation);
+    console.log("Notes rendered on home.");
 
     const sizeW = 400,
       sizeH = 300;
@@ -126,14 +133,21 @@ async function updateLocationAndRenderHome() {
     const url = `${base}?${centerParam}&${userMarker}&${noteMarkers}&key=${key}`;
 
     const container = document.getElementById("home-content");
-    container.style.backgroundImage = `url("${url}")`;
-    container.style.backgroundSize = "cover";
-    container.style.backgroundPosition = "center";
+    if (container) {
+      container.style.backgroundImage = `url("${url}")`;
+      container.style.backgroundSize = "cover";
+      container.style.backgroundPosition = "center";
+      console.log("Background image set.");
+    } else {
+      console.warn("home-content container not found.");
+    }
 
     window.updateAdminButtonVisibility();
+    console.log("Admin button visibility updated.");
   } catch (err) {
     console.warn("לא ניתן לקבל מיקום:", err);
   }
+  console.log("updateLocationAndRenderHome finished.");
 }
 
 function renderNotesOnHome(notes, locationData) {
@@ -205,47 +219,57 @@ function renderNotesOnHome(notes, locationData) {
 }
 
 window.initHomeMap = async function () {
+  console.log("initHomeMap called.");
   const storedLocation = localStorage.getItem("lastKnownLocation");
   if (storedLocation) {
     lastKnownLocation = JSON.parse(storedLocation);
+    console.log("Loaded lastKnownLocation from localStorage:", lastKnownLocation);
   }
 
-  updateLocationAndRenderHome();
+  await updateLocationAndRenderHome();
+  console.log("updateLocationAndRenderHome completed.");
 
   const newNoteBtn = document.getElementById("new-note-btn");
   if (newNoteBtn) {
     newNoteBtn.addEventListener("click", () => {
+      console.log("New Note button clicked.");
       goto("create-note");
     });
+    console.log("New Note button event listener attached.");
   }
 
-  document.addEventListener("DOMContentLoaded", function() {
-
-    const logoutBtn = document.getElementById("logout-btn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("jwt");
-        goto("login");
-      });
-    }
-
-    ["app-icon1"].forEach((id) => {
-      const btn = document.getElementById(id);
-      if (btn) {
-        btn.addEventListener("click", () => {
-          goto("user-menu");
-        });
-      }
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      console.log("Logout button clicked.");
+      localStorage.removeItem("jwt");
+      goto("login");
     });
+    console.log("Logout button event listener attached.");
+  }
 
-    // The admin button is now dynamically added, so its event listener is attached when it's created.
-    // No need to getElementById here.
-
-    const toMapBtn = document.getElementById("to-map-btn");
-    if (toMapBtn) {
-      toMapBtn.addEventListener("click", async () => {
-        goto("map");
+  ["app-icon1"].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener("click", () => {
+        console.log(`${id} clicked.`);
+        goto("user-menu");
       });
+      console.log(`${id} event listener attached.`);
     }
   });
+
+  const toMapBtn = document.getElementById("to-map-btn");
+  if (toMapBtn) {
+    toMapBtn.addEventListener("click", async () => {
+      console.log("To Map button clicked.");
+      goto("map");
+    });
+    console.log("To Map button event listener attached.");
+  }
+
+  // The admin button is now dynamically added, so its event listener is attached when it's created.
+  // No need to getElementById here.
+
+  console.log("All event listeners attached in initHomeMap.");
 };

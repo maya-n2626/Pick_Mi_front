@@ -127,21 +127,10 @@ const apiFetch = async (path, options = {}) => {
 // API Modules (Auth, Notes, Admin)
 // =================================================================
 const authAPI = {
-  signup: (email, password) =>
-    apiFetch("/api/auth/signup", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    }),
-  forgotPassword: (email) =>
-    apiFetch("/api/auth/forgot-password", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-    }),
-  deleteAccount: (password) =>
-    apiFetch("/api/auth/me", {
-      method: "DELETE",
-      body: JSON.stringify({ password }),
-    }),
+  signup: (email, password) => apiFetch("/api/auth/signup", { method: "POST", body: JSON.stringify({ email, password }) }),
+  forgotPassword: (email) => apiFetch("/api/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
+  resetPassword: (token, newPassword) => apiFetch("/api/auth/reset-password", { method: "POST", body: JSON.stringify({ token, newPassword }) }),
+  deleteAccount: (password) => apiFetch("/api/auth/me", { method: "DELETE", body: JSON.stringify({ password }) }),
 };
 
 const notesAPI = {

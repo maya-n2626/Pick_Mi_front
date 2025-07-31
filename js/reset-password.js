@@ -1,37 +1,41 @@
-import { resetPassword } from './modules/auth.js';
+import { resetPassword } from "./modules/auth.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-  const resetPasswordForm = document.getElementById('reset-password-form');
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("reset-password-form");
+  const errorEl = document.getElementById("reset-error");
+  const successEl = document.getElementById("reset-success");
 
-  if (resetPasswordForm) {
-    resetPasswordForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorEl.style.display = "none";
+    successEl.style.display = "none";
 
-      const password = document.getElementById('reset-password-input').value;
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
+    const password = document.getElementById("reset-password").value;
+    const confirmPassword = document.getElementById("reset-password-confirm").value;
 
-      const errorElement = document.getElementById('reset-error');
-      const successElement = document.getElementById('reset-success');
+    if (password !== confirmPassword) {
+      errorEl.textContent = "Passwords do not match.";
+      errorEl.style.display = "block";
+      return;
+    }
 
-      errorElement.classList.add('hidden');
-      successElement.classList.add('hidden');
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
 
-      if (!token) {
-        errorElement.textContent = 'Invalid reset link.';
-        errorElement.classList.remove('hidden');
-        return;
-      }
+    if (!token) {
+      errorEl.textContent = "Invalid or missing reset token.";
+      errorEl.style.display = "block";
+      return;
+    }
 
-      try {
-        await resetPassword(token, password);
-        successElement.textContent = 'Password reset successfully!';
-        successElement.classList.remove('hidden');
-        resetPasswordForm.reset();
-      } catch (error) {
-        errorElement.textContent = error.message;
-        errorElement.classList.remove('hidden');
-      }
-    });
-  }
+    try {
+      await resetPassword(token, password);
+      successEl.textContent = "Your password has been reset successfully! You can now log in.";
+      successEl.style.display = "block";
+      form.reset();
+    } catch (err) {
+      errorEl.textContent = err.message || "An error occurred. Please try again.";
+      errorEl.style.display = "block";
+    }
+  });
 });

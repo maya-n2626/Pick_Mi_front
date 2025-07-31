@@ -442,6 +442,39 @@ body {
   padding: 20px;
 }
 
+input[type="color"] {
+  width: 30px;
+  height: 30px;
+  min-width: 30px; /* Ensure it doesn't shrink */
+  min-height: 30px; /* Ensure it doesn't shrink */
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  flex-shrink: 0; /* Prevent shrinking in flex containers */
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+input[type="color"]::-moz-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
 .canvas-controls {
   display: flex;
   gap: 15px;

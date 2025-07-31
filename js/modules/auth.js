@@ -3,6 +3,7 @@ import { showScreen } from "./ui.js";
 import { authAPI } from "./api.js";
 import { showToast } from "./toast.js";
 import { showConfirmation } from "./confirmation.js";
+import { homeController } from "./home.js";
 
 export const authController = {
   init() {
@@ -59,6 +60,7 @@ export const authController = {
     localStorage.removeItem("jwt");
     state.currentUser = null;
     showScreen("login-screen");
+    homeController.setupAdminButton(); // Update admin button visibility on logout
   },
 };
 

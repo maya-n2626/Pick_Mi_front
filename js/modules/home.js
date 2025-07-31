@@ -2,7 +2,6 @@ import { state } from "./state.js";
 import { notesAPI } from "./api.js";
 import { locationService } from "./location.js";
 import { authController } from "./auth.js";
-import { noteViewController } from "./note.js";
 import { debounce } from "./utils.js";
 
 const homeController = {
@@ -94,9 +93,10 @@ const homeController = {
           noteEl.style.animationDelay = `${Math.random() * 6}s`;
           noteEl.innerHTML = `<img src="./images/ClosedNote.png" alt="Note">`;
 
-          noteEl.addEventListener("click", (e) => {
+          noteEl.addEventListener("click", async (e) => {
             e.preventDefault();
             state.currentNoteId = note.id;
+            const { noteViewController } = await import("./note.js");
             noteViewController.loadNote(note.id);
           });
           container.appendChild(noteEl);

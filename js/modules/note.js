@@ -4,7 +4,6 @@ import { showScreen } from "./ui.js";
 import { showToast } from "./toast.js";
 import { canvasService } from "./canvas.js";
 import { locationService } from "./location.js";
-import { homeController } from "./home.js";
 
 const noteViewController = {
   async loadNote(noteId) {
@@ -34,7 +33,7 @@ const noteViewController = {
 
   async closeNote() {
     showScreen("home-screen");
-    // Only reload the notes, not the whole map
+    const { homeController } = await import("./home.js");
     await homeController.loadNearbyNotes();
   },
 

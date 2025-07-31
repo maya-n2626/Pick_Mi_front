@@ -45,10 +45,31 @@ const apiFetchPublic = async (path, options = {}) => {
 };
 
 export const authAPI = {
-  signup: (email, password) => apiFetchPublic("/api/auth/signup", { method: "POST", body: JSON.stringify({ email, password }) }),
-  forgotPassword: (email) => apiFetchPublic("/api/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
-  resetPassword: (token, newPassword) => apiFetchPublic("/api/auth/reset-password", { method: "POST", body: JSON.stringify({ token, newPassword }) }),
-  deleteAccount: (password) => apiFetch("/api/auth/me", { method: "DELETE", body: JSON.stringify({ password }) }), // Requires auth
+  signup: (email, password) =>
+    apiFetchPublic("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+  signin: (email, password) =>
+    apiFetchPublic("/api/auth/signin", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+  forgotPassword: (email) =>
+    apiFetchPublic("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+  resetPassword: (token, newPassword) =>
+    apiFetchPublic("/api/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, newPassword }),
+    }),
+  deleteAccount: (password) =>
+    apiFetch("/api/auth/me", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+    }), // Requires auth
 };
 
 export const notesAPI = {

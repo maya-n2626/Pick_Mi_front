@@ -1,11 +1,12 @@
 import { initAuth } from "./modules/auth.js";
 import { initNote } from "./modules/note.js";
-import { initHome } from "./modules/home.js";
 import { initMap } from "./modules/map.js";
 import { initAdmin } from "./modules/admin.js";
 import { showScreen } from "./modules/ui.js";
 import { noteEditorController } from "./modules/note.js";
+import { initResetPassword } from "./modules/resetPassword.js";
 import { authController } from "./modules/auth.js";
+import { initHome } from "./modules/home.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   initAuth();
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   if (window.location.pathname.includes("reset-password") && urlParams.has("token")) {
     showScreen("reset-password-screen");
-    // resetPasswordController.init();
+    initResetPassword();
   } else if (authController.getUser()) {
     showScreen("home-screen");
     initHome();

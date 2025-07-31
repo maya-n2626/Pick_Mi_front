@@ -62,7 +62,7 @@ export const authController = {
   },
 };
 
-export function initAuth() {
+export async function initAuth() {
   authController.init();
 
   document
@@ -74,7 +74,8 @@ export function initAuth() {
       try {
         await authController.signin(email, password);
         showScreen("home-screen");
-        // homeController.init();
+        const { initHome } = await import("./home.js");
+        initHome();
       } catch (error) {
         showToast(error.message, "error");
       }
@@ -143,7 +144,8 @@ export function initAuth() {
         // resetPasswordController.init();
     } else if (authController.getUser()) {
         showScreen("home-screen");
-        // homeController.init();
+        const { initHome } = await import("./home.js");
+        initHome();
     } else {
         showScreen("login-screen");
     }

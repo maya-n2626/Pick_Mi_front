@@ -1,5 +1,6 @@
 import { showToast } from "./modules/toast.js";
 import { showConfirmation } from "./modules/confirmation.js";
+import { debounce } from "./modules/utils.js";
 // =================================================================
 // Global State & Configuration
 // =================================================================
@@ -387,12 +388,18 @@ const canvasService = {
 // UI Controllers
 // =================================================================
 const homeController = {
+  resizeObserver: null,
   async init() {
     try {
       await locationService.getCurrentPosition();
       this.setupAdminButton();
       this.renderMap(); // Render map once
       await this.loadNearbyNotes(); // Then load notes
+
+      const container = document.getElementById("notes-container");
+      this.resizeObserver = new ResizeObserver(debounce(() => this.renderMap(), 250));
+      this.resizeObserver.observe(container);
+
     } catch (error) {
       console.error("Error initializing home:", error);
     }
@@ -421,6 +428,7 @@ const homeController = {
 
     const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&maptype=roadmap&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
     container.style.backgroundImage = `url(${staticMapUrl})`;
+    this.loadNearbyNotes();
   },
   renderNotes(notes) {
     const container = document.getElementById("notes-container");

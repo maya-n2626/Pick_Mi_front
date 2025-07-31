@@ -73,10 +73,14 @@ const authAPI = {
       body: JSON.stringify({ email, password }),
     });
 
-    state.currentUser = {
-      token: response.token,
-      user: response.user,
-    };
+    const token = response.token;
+    if (token) {
+      const userPayload = decodeJwt(token);
+      state.currentUser = {
+        token: token,
+        user: userPayload,
+      };
+    }
 
     return response;
   },

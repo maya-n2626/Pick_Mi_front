@@ -249,26 +249,31 @@
         </div>
       </div>
 
-      <!-- Admin Screen -->
-      <div id="admin-screen" class="screen">
-        <div class="app-header">
-          <button class="nav-button" id="back-from-admin">← Back</button>
-          <div class="logo">Admin Panel</div>
-          <div></div>
+      <!-- ====== ADMIN PANEL ====== -->
+      <div id="admin-screen" class="container screen">
+        <img id="status-bar" src="./images/status-bar.png" />
+
+        <div class="app-bar">
+          <img
+            id="app-icon6"
+            src="/images/indicator-Day.png"
+            alt="App Icon"
+            class="App-icon"
+          />
         </div>
-        <div class="admin-panel">
-          <div class="admin-section">
-            <h3>Users</h3>
-            <div id="admin-users" class="loading">
-              <div class="spinner"></div>
-            </div>
-          </div>
-          <div class="admin-section">
-            <h3>Notes</h3>
-            <div id="admin-notes" class="loading">
-              <div class="spinner"></div>
-            </div>
-          </div>
+
+        <div class="admin-header">
+          <button id="back-from-admin" class="btn-link">← Back</button>
+        </div>
+
+        <h2>All Users</h2>
+        <div class="admin-box">
+          <div id="admin-users"></div>
+        </div>
+
+        <h2>All Notes</h2>
+        <div class="admin-box">
+          <div id="admin-notes"></div>
         </div>
       </div>
     </div>

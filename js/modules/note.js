@@ -4,6 +4,7 @@ import { showScreen } from "./ui.js";
 import { showToast } from "./toast.js";
 import { canvasService } from "./canvas.js";
 import { locationService } from "./location.js";
+import { homeController } from "./home.js";
 
 const noteViewController = {
   async loadNote(noteId, clickX = '50%', clickY = '50%') {
@@ -35,7 +36,6 @@ const noteViewController = {
 
   async closeNote() {
     showScreen("home-screen");
-    const { homeController } = await import("./home.js");
     await homeController.loadNearbyNotes();
   },
 

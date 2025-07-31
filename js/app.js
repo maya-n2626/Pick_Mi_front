@@ -475,7 +475,7 @@ const mapController = {
     });
 
     // Add user location marker
-    new google.maps.AdvancedMarkerElement({
+    new google.maps.marker.AdvancedMarkerElement({
       position: {
         lat: state.currentLocation.lat,
         lng: state.currentLocation.lon,
@@ -483,7 +483,6 @@ const mapController = {
       map: this.map,
       title: "Your Location",
       icon: {
-        path: google.maps.SymbolPath.CIRCLE,
         scale: 8,
         fillColor: "#667eea",
         fillOpacity: 1,

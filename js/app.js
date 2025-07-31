@@ -192,7 +192,7 @@ const locationService = {
       fields: ["displayName", "location", "id"],
       locationRestriction: {
         center: { lat, lng: lon },
-        radius: 500, // Increased from 100m to 500m for better reliability
+        radius: 500,
       },
       includedPrimaryTypes: [
         "park",
@@ -387,18 +387,56 @@ const homeController = {
   },
   renderNotes(notes) {
     const container = document.getElementById("notes-container");
-    container.innerHTML = "";
+    const mapWidth = container.offsetWidth;
+    const mapHeight = container.offsetHeight;
+    const centerLat = state.currentLocation.lat;
+    const centerLon = state.currentLocation.lon;
+    const zoom = 15;
+
+    // 1. Set Static Map Background
+    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+    container.style.backgroundImage = `url(${staticMapUrl})`;
+    container.innerHTML = ""; // Clear previous notes
+
+    // 2. Mercator Projection Functions
+    const project = (lat, lon) => {
+        let siny = Math.sin(lat * Math.PI / 180);
+        siny = Math.min(Math.max(siny, -0.9999), 0.9999);
+        return {
+            x: 256 * (0.5 + lon / 360),
+            y: 256 * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI))
+        };
+    }
+
+    const getPixelCoords = (lat, lon) => {
+        const worldCoords = project(lat, lon);
+        const centerCoords = project(centerLat, centerLon);
+        const scale = Math.pow(2, zoom);
+
+        const x = (worldCoords.x - centerCoords.x) * scale + (mapWidth / 2);
+        const y = (worldCoords.y - centerCoords.y) * scale + (mapHeight / 2);
+        return { x, y };
+    }
+
+    // 3. Position each note
     notes.forEach((note) => {
-      const noteEl = document.createElement("div");
-      noteEl.className = "floating-note";
-      noteEl.style.left = `${Math.random() * 80}%`;
-      noteEl.style.top = `${Math.random() * 80}%`;
-      noteEl.style.animationDelay = `${Math.random() * 6}s`;
-      noteEl.addEventListener("click", () => {
-        state.currentNoteId = note.id;
-        noteViewController.loadNote(note.id);
-      });
-      container.appendChild(noteEl);
+      if (note.location?.latitude && note.location?.longitude) {
+        const { x, y } = getPixelCoords(note.location.latitude, note.location.longitude);
+
+        if (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
+          const noteEl = document.createElement("div");
+          noteEl.className = "floating-note";
+          noteEl.style.left = `${x}px`;
+          noteEl.style.top = `${y}px`;
+          noteEl.style.animation = 'none';
+
+          noteEl.addEventListener("click", () => {
+            state.currentNoteId = note.id;
+            noteViewController.loadNote(note.id);
+          });
+          container.appendChild(noteEl);
+        }
+      }
     });
   },
   setupAdminButton() {

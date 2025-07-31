@@ -188,8 +188,9 @@ body {
   position: relative;
   height: 400px;
   margin: 40px 0;
-  background-image: url("./public/images/Park_BG.png");
   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border-radius: 20px;
   overflow: hidden;
 }

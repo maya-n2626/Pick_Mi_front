@@ -3,6 +3,30 @@ import { showToast } from "./toast.js";
 import { showConfirmation } from "./confirmation.js";
 import { noteViewController } from "./note.js";
 
+function isDrawingEmpty(drawingData) {
+  if (!drawingData) {
+    return true;
+  }
+  // Common empty 1x1 transparent PNG data URL
+  const emptyPng = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+  // Common empty 1x1 transparent GIF data URL
+  const emptyGif = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+  // Check for exact matches of common empty image data URLs
+  if (drawingData === emptyPng || drawingData === emptyGif) {
+    return true;
+  }
+
+  // Heuristic: if the base64 string is very short, it's likely an empty drawing.
+  // A typical non-empty drawing will have a much larger base64 string.
+  // The threshold of 100 characters is arbitrary but should catch most empty cases.
+  if (drawingData.length < 100) {
+    return true;
+  }
+
+  return false;
+}
+
 const adminController = {
   async init() {
     window.adminController = this;
@@ -59,7 +83,7 @@ const adminController = {
             <p><strong>Sender:</strong> ${userEmail}</p>
             <p><strong>Note ID:</strong> ${note.id}</p>
             <p><strong>Content:</strong> ${note.content?.text ? note.content.text.substring(0, 70) + (note.content.text.length > 70 ? "..." : "") : "No text content"}</p>
-            <p><strong>Includes Drawing:</strong> ${note.content?.drawingData ? "Yes" : "No"}</p>
+            <p><strong>Includes Drawing:</strong> ${isDrawingEmpty(note.content?.drawingData) ? "No" : "Yes"}</p>
           </div>
           <button class="btn-danger" onclick="event.stopPropagation(); adminController.deleteNote('${note.id}')">Delete</button>
         </div>
@@ -92,6 +116,7 @@ const adminController = {
 
     if (noteContent.text) {
       const p = document.createElement("p");
+      p.style.fontSize = "16px"; // Set a default font size for display
       p.innerHTML = noteContent.text;
       modalNoteContent.appendChild(p);
     }
@@ -128,7 +153,7 @@ const adminController = {
             <p><strong>Sender:</strong> ${note.userEmail || note.userId}</p>
             <p><strong>Note ID:</strong> ${note.id}</p>
             <p><strong>Content:</strong> ${note.content?.text ? note.content.text.substring(0, 70) + (note.content.text.length > 70 ? "..." : "") : "No text content"}</p>
-            <p><strong>Includes Drawing:</strong> ${note.content?.drawingData ? "Yes" : "No"}</p>
+            <p><strong>Includes Drawing:</strong> ${isDrawingEmpty(note.content?.drawingData) ? "No" : "Yes"}</p>
           </div>
           <button class="btn-danger" onclick="event.stopPropagation(); adminController.deleteNote('${note.id}')">Delete</button>
         </div>`,

@@ -316,23 +316,55 @@ body {
   border-radius: 12px;
 }
 
-.admin-panel {
+.admin-container {
   padding: 20px;
 }
 
 .admin-section {
-  background: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.admin-section h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .admin-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid #eee;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.admin-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+}
+
+.admin-item p {
+  margin: 0;
+  color: #555;
+}
+
+.admin-item small {
+  color: #777;
 }
 
 .btn-danger {
@@ -343,6 +375,8 @@ body {
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  transition: background 0.3s ease;
 }
 
 .btn-danger:hover {

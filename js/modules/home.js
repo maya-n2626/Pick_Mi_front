@@ -43,7 +43,7 @@ const homeController = {
     const centerLon = state.currentLocation.lon;
     const zoom = 15;
 
-    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&maptype=roadmap&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&maptype=roadmap&markers=color:red%7Clabel:P%7C${centerLat},${centerLon}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
     container.style.backgroundImage = `url(${staticMapUrl})`;
     this.loadNearbyNotes();
   },

@@ -32,8 +32,22 @@ document.addEventListener("DOMContentLoaded", () => {
       showScreen(screenId);
       if (btnId === "show-map") await initMap();
       if (btnId === "admin-btn") await initAdmin();
-      if (btnId === "new-note-btn") noteEditorController.init();
+      if (btnId === "new-note-btn") {
+        noteEditorController.init();
+        noteEditorController.showSlide(0); // Show text editor by default
+      }
     });
+  }
+
+  // Note editor slide navigation
+  const prevSlideBtn = document.getElementById("prev-slide");
+  const nextSlideBtn = document.getElementById("next-slide");
+
+  if (prevSlideBtn) {
+    prevSlideBtn.addEventListener("click", () => noteEditorController.showSlide(0));
+  }
+  if (nextSlideBtn) {
+    nextSlideBtn.addEventListener("click", () => noteEditorController.showSlide(1));
   }
 
   const urlParams = new URLSearchParams(window.location.search);

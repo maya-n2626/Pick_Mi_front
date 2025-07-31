@@ -61,7 +61,7 @@ body {
 
 /* Home Screen - Simple fade */
 .screen#home-screen {
-  transform: translateX(0); /* Always at base position */
+  transform: translateX(0);
   opacity: 0;
 }
 
@@ -73,30 +73,35 @@ body {
 .screen#login-screen,
 .screen#signup-screen,
 .screen#forgot-screen {
-  transform: translateY(100%); /* Start off-screen bottom */
+  transform: translateY(100%);
   opacity: 0;
 }
 
 .screen#login-screen.active,
 .screen#signup-screen.active,
 .screen#forgot-screen.active {
-  transform: translateY(0); /* Slide up */
+  transform: translateY(0);
   opacity: 1;
 }
 
 /* Map Screen - Slide in from right */
 .screen#map-screen {
-  transform: translateX(100%); /* Start off-screen right */
+  transform: translateX(100%);
 }
 
 /* Note Editor Screen - Slide in from bottom */
 .screen#note-editor-screen {
-  transform: translateY(100%); /* Start off-screen bottom */
+  transform: translateY(100%);
 }
 
 /* Admin Screen - Slide in from top */
 .screen#admin-screen {
-  transform: translateY(-100%); /* Start off-screen top */
+  transform: translateY(-100%);
+}
+
+/* Profile Screen - Slide in from top */
+.screen#profile-screen {
+  transform: translateY(-100%);
 }
 
 /* Note Content Zoom (handled by JS for dynamic origin) */
@@ -112,7 +117,7 @@ body {
 }
 
 .screen#note-view-screen.exit-transition {
-  transform: scale(0) translateY(-100%); /* Fly out to top */
+  transform: scale(0) translateY(-100%);
   opacity: 0;
 }
 
@@ -124,7 +129,7 @@ body {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  z-index: 10; /* Ensure header is on top */
+  z-index: 10;
 }
 
 .nav-buttons {
@@ -340,6 +345,28 @@ body {
   padding: 30px;
   margin: 20px;
 }
+
+.swiper-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.swiper-wrapper {
+  display: flex;
+  transition: transform 0.4s ease-out;
+}
+
+.swiper-slide {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.note-editor-nav {
+  display: flex;
+  gap: 8px;
+}
+
+
 
 .note-input {
   width: 100%;

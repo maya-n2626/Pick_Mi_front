@@ -63,32 +63,36 @@ const noteViewController = {
 };
 
 const noteEditorController = {
+  currentSlide: 0,
   init() {
     canvasService.init();
-    this.setupModeToggle();
+    this.showSlide(this.currentSlide); // Initialize to the current slide
   },
-  setupModeToggle() {
-    const textMode = document.getElementById("text-mode");
-    const drawMode = document.getElementById("draw-mode");
-    const textEditor = document.getElementById("text-editor");
-    const drawEditor = document.getElementById("draw-editor");
-    textMode.addEventListener("click", () => {
-      textEditor.style.display = "block";
-      drawEditor.style.display = "none";
-      textMode.style.background = "#667eea";
-      textMode.style.color = "white";
-      drawMode.style.background = "none";
-      drawMode.style.color = "#667eea";
-    });
-    drawMode.addEventListener("click", () => {
-      textEditor.style.display = "none";
-      drawEditor.style.display = "block";
-      drawMode.style.background = "#667eea";
-      drawMode.style.color = "white";
-      textMode.style.background = "none";
-      textMode.style.color = "#667eea";
-      canvasService.init();
-    });
+  showSlide(index) {
+    this.currentSlide = index;
+    const swiperWrapper = document.querySelector(".swiper-wrapper");
+    const slides = document.querySelectorAll(".swiper-slide");
+    const prevSlideBtn = document.getElementById("prev-slide");
+    const nextSlideBtn = document.getElementById("next-slide");
+
+    if (swiperWrapper && slides.length > 0) {
+      const slideWidth = slides[0].offsetWidth;
+      swiperWrapper.style.transform = `translateX(-${index * slideWidth}px)`;
+
+      // Update button styles
+      if (index === 0) {
+        prevSlideBtn.style.background = "#667eea";
+        prevSlideBtn.style.color = "white";
+        nextSlideBtn.style.background = "none";
+        nextSlideBtn.style.color = "#667eea";
+      } else {
+        prevSlideBtn.style.background = "none";
+        prevSlideBtn.style.color = "#667eea";
+        nextSlideBtn.style.background = "#667eea";
+        nextSlideBtn.style.color = "white";
+        canvasService.init(); // Re-initialize canvas when switching to draw mode
+      }
+    }
   },
   async saveNote() {
     try {

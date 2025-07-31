@@ -1,3 +1,4 @@
+import { showToast } from "./modules/toast.js";
 // =================================================================
 // Global State & Configuration
 // =================================================================
@@ -89,12 +90,7 @@ const showScreen = (screenId) => {
 };
 
 const showError = (elementId, message) => {
-  const element = document.getElementById(elementId);
-  element.textContent = message;
-  element.style.display = "block";
-  setTimeout(() => {
-    element.style.display = "none";
-  }, 5000);
+  showToast(message, 'error');
 };
 
 // =================================================================
@@ -495,7 +491,7 @@ const noteViewController = {
         .catch((err) => console.error("Failed to delete note:", err));
     } catch (error) {
       console.error("Error loading note:", error);
-      alert(`Error loading note: ${error.message}`);
+      showToast(`Error loading note: ${error.message}`, "error");
       // If loading fails, go back and refresh to remove the potentially broken note.
       this.closeNote();
     }
@@ -566,7 +562,7 @@ const noteEditorController = {
       const drawingData = !canvasService.isCanvasEmpty() ? canvasService.getDataURL() : null;
 
       if (!textInput.trim() && !drawingData) {
-        alert("Please add some content to your note");
+        showToast("Please add some content to your note", "error");
         return;
       }
 
@@ -580,7 +576,7 @@ const noteEditorController = {
       await homeController.loadNearbyNotes();
     } catch (error) {
       console.error("Error saving note:", error);
-      alert(`Error saving note: ${error.message}`);
+      showToast(`Error saving note: ${error.message}`, "error");
     }
   },
 };
@@ -594,7 +590,7 @@ const mapController = {
       await this.loadNotesOnMap();
     } catch (error) {
       console.error("Error initializing map:", error);
-      alert(`Error loading map: ${error.message}`);
+      showToast(`Error loading map: ${error.message}`, "error");
     }
   },
   initializeMap() {
@@ -706,7 +702,7 @@ const adminController = {
       await this.loadUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert(`Error deleting user: ${error.message}`);
+      showToast(`Error deleting user: ${error.message}`, "error");
     }
   },
   async deleteNote(noteId) {
@@ -716,7 +712,7 @@ const adminController = {
       await this.loadNotes();
     } catch (error) {
       console.error("Error deleting note:", error);
-      alert(`Error deleting note: ${error.message}`);
+      showToast(`Error deleting note: ${error.message}`, "error");
     }
   },
 };
@@ -758,7 +754,7 @@ const resetPasswordController = {
       successEl.style.display = "block";
       e.target.reset();
     } catch (err) {
-      showError("reset-error", err.message || "An error occurred. Please try again.");
+      showError(err.message || "An error occurred. Please try again.");
     }
   },
 };
@@ -795,7 +791,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = document.getElementById("signup-password").value;
       try {
         await authAPI.signup(email, password);
-        alert("Account created successfully! Please sign in.");
+        showToast("Account created successfully! Please sign in.");
         showScreen("login-screen");
       } catch (error) {
         showError("signup-error", error.message);
@@ -809,7 +805,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const email = document.getElementById("forgot-email").value.trim();
       try {
         await authAPI.forgotPassword(email);
-        alert(
+        showToast(
           "If an account with that email exists, a password reset link has been sent.",
         );
         showScreen("login-screen");
@@ -873,11 +869,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       try {
         await authAPI.deleteAccount(password);
-        alert("Account deleted successfully.");
+        showToast("Account deleted successfully.");
         authController.logout();
       } catch (error) {
         console.error("Error deleting account:", error);
-        alert(`Error deleting account: ${error.message}`);
+        showToast(`Error deleting account: ${error.message}`, "error");
       }
     });
 

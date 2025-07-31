@@ -8,6 +8,10 @@ export const canvasService = {
     state.canvas = canvas;
     state.ctx = canvas.getContext("2d");
 
+    // Set canvas dimensions to match its displayed size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
     let painting = false;
 
     const startPaint = (e) => {
@@ -44,6 +48,14 @@ export const canvasService = {
     canvas.addEventListener("mouseup", stopPaint);
     canvas.addEventListener("mouseout", stopPaint);
     canvas.addEventListener("mousemove", this.draw);
+
+    // Handle canvas resizing
+    window.addEventListener("resize", () => {
+      const img = state.ctx.getImageData(0, 0, state.canvas.width, state.canvas.height);
+      state.canvas.width = state.canvas.offsetWidth;
+      state.canvas.height = state.canvas.offsetHeight;
+      state.ctx.putImageData(img, 0, 0);
+    });
 
     // Touch events for mobile
     canvas.addEventListener("touchstart", (e) => {

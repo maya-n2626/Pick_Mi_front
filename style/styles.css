@@ -443,7 +443,7 @@ body {
   cursor: crosshair;
   background: white;
   width: 100%;
-  padding: 20px;
+  height: 240px; /* Fixed height to match note-input */
 }
 
 input[type="color"] {

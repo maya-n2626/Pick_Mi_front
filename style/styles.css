@@ -32,6 +32,8 @@ body {
   color: #fff;
   font-size: 14px;
   font-weight: 500;
+  position: relative; /* Ensure z-index works */
+  z-index: 100; /* Always on top */
 }
 
 /* Screen Transitions */
@@ -46,21 +48,32 @@ body {
   background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-  transform: translateX(100%); /* Default off-screen to the right */
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out; /* Adjusted transition */
+  z-index: 1; /* Default z-index */
 }
 
 .screen.active {
   opacity: 1;
   pointer-events: all;
-  transform: translateX(0%);
+  transform: translateX(0%) !important; /* Override specific transforms */
+  z-index: 2; /* Active screen on top */
 }
 
-/* Specific Screen Animations */
+/* Home Screen - Simple fade */
+.screen#home-screen {
+  transform: translateX(0); /* Always at base position */
+  opacity: 0;
+}
+
+.screen#home-screen.active {
+  opacity: 1;
+}
+
+/* Auth Screens (Login, Signup, Forgot) - Slide up from bottom */
 .screen#login-screen,
 .screen#signup-screen,
 .screen#forgot-screen {
-  transform: translateY(20px); /* Start slightly below */
+  transform: translateY(100%); /* Start off-screen bottom */
   opacity: 0;
 }
 
@@ -71,28 +84,19 @@ body {
   opacity: 1;
 }
 
+/* Map Screen - Slide in from right */
 .screen#map-screen {
-  transform: translateX(100%);
+  transform: translateX(100%); /* Start off-screen right */
 }
 
-.screen#map-screen.active {
-  transform: translateX(0);
-}
-
+/* Note Editor Screen - Slide in from bottom */
 .screen#note-editor-screen {
-  transform: translateY(100%);
+  transform: translateY(100%); /* Start off-screen bottom */
 }
 
-.screen#note-editor-screen.active {
-  transform: translateY(0);
-}
-
+/* Admin Screen - Slide in from top */
 .screen#admin-screen {
-  transform: translateY(-100%);
-}
-
-.screen#admin-screen.active {
-  transform: translateY(0);
+  transform: translateY(-100%); /* Start off-screen top */
 }
 
 /* Note Content Zoom (handled by JS for dynamic origin) */

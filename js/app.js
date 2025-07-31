@@ -30,8 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
   for (const [btnId, screenId] of Object.entries(navButtons)) {
     document.getElementById(btnId).addEventListener("click", async () => {
       showScreen(screenId);
-      if (btnId === "show-map") await initMap();
-      if (btnId === "admin-btn") await initAdmin();
+      if (btnId === "show-map") initMap();
+      if (btnId === "admin-btn") initAdmin();
       if (btnId === "new-note-btn") {
         noteEditorController.init();
         noteEditorController.showSlide(0); // Show text editor by default
@@ -44,14 +44,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextSlideBtn = document.getElementById("next-slide");
 
   if (prevSlideBtn) {
-    prevSlideBtn.addEventListener("click", () => noteEditorController.showSlide(0));
+    prevSlideBtn.addEventListener("click", () =>
+      noteEditorController.showSlide(0),
+    );
   }
   if (nextSlideBtn) {
-    nextSlideBtn.addEventListener("click", () => noteEditorController.showSlide(1));
+    nextSlideBtn.addEventListener("click", () =>
+      noteEditorController.showSlide(1),
+    );
   }
 
   const urlParams = new URLSearchParams(window.location.search);
-  if (window.location.pathname.includes("reset-password") && urlParams.has("token")) {
+  if (
+    window.location.pathname.includes("reset-password") &&
+    urlParams.has("token")
+  ) {
     showScreen("reset-password-screen");
     initResetPassword();
   } else if (authController.getUser()) {

@@ -1,12 +1,14 @@
 import { adminAPI } from "./api.js";
 import { showToast } from "./toast.js";
 import { showConfirmation } from "./confirmation.js";
+import { noteViewController } from "./note.js";
 
 const adminController = {
   async init() {
     window.adminController = this;
     await this.loadUsers();
     await this.loadNotes();
+    this.setupModalCloseButtons();
   },
   async loadUsers() {
     try {
@@ -15,20 +17,98 @@ const adminController = {
       container.innerHTML = users
         .map(
           (user) => `
-        <div class="admin-item">
+        <div class="admin-item" data-user-id="${user.id}" data-user-email="${user.email}">
           <div>
             <strong>${user.email}</strong>
+            <span style="color: #666; margin-left: 10px;">ID: ${user.id}</span>
             <span style="color: #666; margin-left: 10px;">(${user.role})</span>
           </div>
           <button class="btn-danger" onclick="adminController.deleteUser('${user.id}')">Delete</button>
         </div>`,
         )
         .join("");
+
+      // Add event listeners for viewing user notes
+      container.querySelectorAll(".admin-item").forEach(item => {
+        item.addEventListener("click", (e) => {
+          // Prevent opening modal if delete button was clicked
+          if (e.target.classList.contains("btn-danger")) return;
+          const userId = item.dataset.userId;
+          const userEmail = item.dataset.userEmail;
+          this.showUserNotesModal(userId, userEmail);
+        });
+      });
+
     } catch (error) {
       console.error("Error loading users:", error);
       document.getElementById("admin-users").innerHTML =
         "<p>Error loading users</p>";
     }
+  },
+  async showUserNotesModal(userId, userEmail) {
+    try {
+      const notes = await adminAPI.getNotesByUserId(userId);
+      const modalNotesList = document.getElementById("modal-notes-list");
+      document.getElementById("modal-username").textContent = userEmail;
+      modalNotesList.innerHTML = notes.length > 0 ? notes.map(note => `
+        <div class="admin-item" data-note-id="${note.id}">
+          <div>
+            <p><strong>Sender:</strong> ${userEmail}</p>
+            <p><strong>Note ID:</strong> ${note.id}</p>
+            <p><strong>Content:</strong> ${note.content?.text ? note.content.text.substring(0, 70) + (note.content.text.length > 70 ? "..." : "") : "No text content"}</p>
+            <p><strong>Includes Drawing:</strong> ${note.content?.drawingData ? 'Yes' : 'No'}</p>
+          </div>
+          <button class="btn-danger" onclick="adminController.deleteNote('${note.id}')">Delete</button>
+        </div>
+      `).join("") : "<p>No notes found for this user.</p>";
+
+      modalNotesList.querySelectorAll(".admin-item").forEach(item => {
+        item.addEventListener("click", async (e) => {
+          if (e.target.classList.contains("btn-danger")) return;
+          const noteId = item.dataset.noteId;
+          // Fetch full note content to display in detail modal
+          const fullNote = notes.find(n => n.id === noteId);
+          if (fullNote) {
+            this.showNoteDetailModal(fullNote.content);
+          }
+        });
+      });
+
+      document.getElementById("user-notes-modal").style.display = "block";
+    } catch (error) {
+      console.error("Error loading user notes:", error);
+      showToast(`Error loading user notes: ${error.message}`, "error");
+    }
+  },
+  showNoteDetailModal(noteContent) {
+    const modalNoteContent = document.getElementById("modal-note-content");
+    modalNoteContent.innerHTML = "";
+
+    if (noteContent.text) {
+      const p = document.createElement("p");
+      p.innerHTML = noteContent.text;
+      modalNoteContent.appendChild(p);
+    }
+    if (noteContent.drawingData) {
+      const img = document.createElement("img");
+      img.src = noteContent.drawingData;
+      img.style.maxWidth = "100%";
+      modalNoteContent.appendChild(img);
+    }
+
+    document.getElementById("note-detail-modal").style.display = "block";
+  },
+  setupModalCloseButtons() {
+    document.querySelectorAll(".modal .close-button").forEach(button => {
+      button.addEventListener("click", (e) => {
+        e.target.closest(".modal").style.display = "none";
+      });
+    });
+    window.addEventListener("click", (event) => {
+      if (event.target.classList.contains("modal")) {
+        event.target.style.display = "none";
+      }
+    });
   },
   async loadNotes() {
     try {
@@ -37,15 +117,29 @@ const adminController = {
       container.innerHTML = notes
         .map(
           (note) => `
-        <div class="admin-item">
+        <div class="admin-item" data-note-id="${note.id}">
           <div>
-            <p>${note.content?.text ? note.content.text.substring(0, 50) + "..." : "Drawing note"}</p>
-            <small style="color: #666;">by ${note.userId}</small>
+            <p><strong>Sender:</strong> ${note.userEmail || note.userId}</p>
+            <p><strong>Note ID:</strong> ${note.id}</p>
+            <p><strong>Content:</strong> ${note.content?.text ? note.content.text.substring(0, 70) + (note.content.text.length > 70 ? "..." : "") : "No text content"}</p>
+            <p><strong>Includes Drawing:</strong> ${note.content?.drawingData ? 'Yes' : 'No'}</p>
           </div>
           <button class="btn-danger" onclick="adminController.deleteNote('${note.id}')">Delete</button>
         </div>`,
         )
         .join("");
+
+      container.querySelectorAll(".admin-item").forEach(item => {
+        item.addEventListener("click", async (e) => {
+          if (e.target.classList.contains("btn-danger")) return;
+          const noteId = item.dataset.noteId;
+          const fullNote = notes.find(n => n.id === noteId);
+          if (fullNote) {
+            this.showNoteDetailModal(fullNote.content);
+          }
+        });
+      });
+
     } catch (error) {
       console.error("Error loading notes:", error);
       document.getElementById("admin-notes").innerHTML =

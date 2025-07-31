@@ -101,6 +101,7 @@ export const notesAPI = {
 export const adminAPI = {
   getAllUsers: () => apiFetch("/api/admin/users"),
   getAllNotes: () => apiFetch("/api/admin/notes"),
+  getNotesByUserId: (userId) => apiFetch(`/api/admin/users/${userId}/notes`),
   deleteUser: (userId) =>
     apiFetch(`/api/admin/users/${userId}`, { method: "DELETE" }),
   deleteNoteAsAdmin: (noteId) =>

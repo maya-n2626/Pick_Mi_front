@@ -387,48 +387,49 @@ const homeController = {
   },
   renderNotes(notes) {
     const container = document.getElementById("notes-container");
+    if (!container) return;
+
     const mapWidth = container.offsetWidth;
     const mapHeight = container.offsetHeight;
     const centerLat = state.currentLocation.lat;
     const centerLon = state.currentLocation.lon;
     const zoom = 15;
 
-    // 1. Set Static Map Background
     const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
     container.style.backgroundImage = `url(${staticMapUrl})`;
-    container.innerHTML = ""; // Clear previous notes
+    container.innerHTML = "";
 
-    // 2. Mercator Projection Functions
     const project = (lat, lon) => {
-        let siny = Math.sin(lat * Math.PI / 180);
-        siny = Math.min(Math.max(siny, -0.9999), 0.9999);
-        return {
-            x: 256 * (0.5 + lon / 360),
-            y: 256 * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI))
-        };
-    }
+      let siny = Math.sin((lat * Math.PI) / 180);
+      siny = Math.min(Math.max(siny, -0.9999), 0.9999);
+      return {
+        x: 256 * (0.5 + lon / 360),
+        y: 256 * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI)),
+      };
+    };
 
     const getPixelCoords = (lat, lon) => {
-        const worldCoords = project(lat, lon);
-        const centerCoords = project(centerLat, centerLon);
-        const scale = Math.pow(2, zoom);
+      const worldCoords = project(lat, lon);
+      const centerCoords = project(centerLat, centerLon);
+      const scale = Math.pow(2, zoom);
+      const x = (worldCoords.x - centerCoords.x) * scale + mapWidth / 2;
+      const y = (worldCoords.y - centerCoords.y) * scale + mapHeight / 2;
+      return { x, y };
+    };
 
-        const x = (worldCoords.x - centerCoords.x) * scale + (mapWidth / 2);
-        const y = (worldCoords.y - centerCoords.y) * scale + (mapHeight / 2);
-        return { x, y };
-    }
-
-    // 3. Position each note
     notes.forEach((note) => {
       if (note.location?.latitude && note.location?.longitude) {
-        const { x, y } = getPixelCoords(note.location.latitude, note.location.longitude);
+        const { x, y } = getPixelCoords(
+          note.location.latitude,
+          note.location.longitude,
+        );
 
         if (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
           const noteEl = document.createElement("div");
           noteEl.className = "floating-note";
           noteEl.style.left = `${x}px`;
           noteEl.style.top = `${y}px`;
-          noteEl.style.animation = 'none';
+          noteEl.style.animationDelay = `${Math.random() * 6}s`;
 
           noteEl.addEventListener("click", () => {
             state.currentNoteId = note.id;
@@ -573,6 +574,7 @@ const mapController = {
       },
       zoom: 15,
       mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID,
+      disableDefaultUI: true,
     });
     new google.maps.marker.AdvancedMarkerElement({
       position: {

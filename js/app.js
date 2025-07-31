@@ -863,7 +863,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "new-note-btn": "note-editor-screen",
     "back-from-map": "home-screen",
     "back-from-editor": "home-screen",
-    "back-from-note": null, // Handled by its own controller
     "back-from-profile": "home-screen",
     "back-from-admin": "home-screen",
   };

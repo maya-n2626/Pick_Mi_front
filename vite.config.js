@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "pickmi-spa.html"),
+        main: resolve(__dirname, "index.html"),
         // login: resolve(__dirname, "login.html"),
         // signup: resolve(__dirname, "signup.html"),
         // "wrong-password": resolve(__dirname, "wrong-password.html"),

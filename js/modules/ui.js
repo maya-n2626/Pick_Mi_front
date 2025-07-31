@@ -1,23 +1,26 @@
-// modules/uis.js
-import { getNearbyNotes } from './notes.js'; 
-import { API_BASE, jwt, apiFetch } from './auth.js'; 
+export const showScreen = (screenId) => {
+  const currentActiveScreen = document.querySelector(".screen.active");
+  const newScreen = document.getElementById(screenId);
 
-export function show(screenId) {
-  document.querySelectorAll(
-    ".container, #home-bg, #home-content, #map-screen, #settings-screen"
-  ).forEach(el => el.classList.add("hidden"));
-  document.getElementById(screenId).classList.remove("hidden");
-  if (screenId === "home-content") {
-    document.getElementById("home-bg").classList.remove("hidden");
-  }
-}
-
-export function gotoLogin() {
-      console.log("🔵 gotoLogin called");
-
-    document.getElementById("login-error").classList.add("hidden");
-    show("login-screen");
+  if (currentActiveScreen) {
+    // Handle specific exit animation for note-view-screen
+    if (currentActiveScreen.id === "note-view-screen") {
+      currentActiveScreen.classList.add("exit-transition");
+      // Wait for the exit transition to complete before removing 'active'
+      currentActiveScreen.addEventListener('transitionend', function handler() {
+        currentActiveScreen.classList.remove("active", "exit-transition");
+        currentActiveScreen.removeEventListener('transitionend', handler);
+      }, { once: true });
+    } else {
+      currentActiveScreen.classList.remove("active");
+    }
   }
 
-
-
+  if (newScreen) {
+    // Ensure no exit-transition class is present when activating
+    newScreen.classList.remove("exit-transition");
+    newScreen.classList.add("active");
+  } else {
+    console.error(`Screen with ID "${screenId}" not found.`);
+  }
+};

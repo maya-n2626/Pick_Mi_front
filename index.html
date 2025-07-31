@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PickMi - Anonymous Note Throwing</title>
+    <link rel="stylesheet" href="./style/styles.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span id="time">9:41</span>
+        <span>PickMi</span>
+        <span>🔋 100%</span>
+      </div>
+
+      <!-- Login Screen -->
+      <div id="login-screen" class="screen active">
+        <div class="auth-container">
+          <div class="auth-card">
+            <h1 class="auth-title">Welcome to PickMi</h1>
+            <form id="login-form">
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-input"
+                  id="login-email"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-input"
+                  id="login-password"
+                  required
+                />
+              </div>
+              <div id="login-error" class="error-message"></div>
+              <button type="submit" class="btn-primary">Sign In</button>
+              <div style="text-align: center">
+                <button type="button" class="btn-secondary" id="show-signup">
+                  Sign Up
+                </button>
+                <button type="button" class="btn-secondary" id="show-forgot">
+                  Forgot Password?
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signup Screen -->
+      <div id="signup-screen" class="screen">
+        <div class="auth-container">
+          <div class="auth-card">
+            <h1 class="auth-title">Create Account</h1>
+            <form id="signup-form">
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-input"
+                  id="signup-email"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-input"
+                  id="signup-password"
+                  required
+                />
+              </div>
+              <div id="signup-error" class="error-message"></div>
+              <button type="submit" class="btn-primary">Create Account</button>
+              <div style="text-align: center">
+                <button type="button" class="btn-secondary" id="back-to-login">
+                  Back to Login
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forgot Password Screen -->
+      <div id="forgot-screen" class="screen">
+        <div class="auth-container">
+          <div class="auth-card">
+            <h1 class="auth-title">Reset Password</h1>
+            <form id="forgot-form">
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-input"
+                  id="forgot-email"
+                  required
+                />
+              </div>
+              <div id="forgot-error" class="error-message"></div>
+              <button type="submit" class="btn-primary">Send Reset Link</button>
+              <div style="text-align: center">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="back-to-login-2"
+                >
+                  Back to Login
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="home-screen" class="screen">
+        <div class="app-header">
+          <div class="logo">PickMi</div>
+          <div class="nav-buttons">
+            <button class="nav-button" id="show-map">Map</button>
+            <button class="nav-button" id="show-profile">Profile</button>
+            <button class="nav-button" id="admin-btn" style="display: none;">Admin</button>
+          </div>
+        </div>
+        <div class="home-content">
+          <div id="notes-container" class="floating-notes"></div>
+          <div class="action-buttons">
+            <button class="fab" id="new-note-btn" title="Create Note">📝</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Screen -->
+      <div id="map-screen" class="screen">
+        <div class="app-header">
+          <button class="nav-button" id="back-from-map">← Back</button>
+          <div class="logo">Map</div>
+          <div></div>
+        </div>
+        <div style="padding: 20px">
+          <div class="map-container">
+            <div id="map" style="width: 100%; height: 100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Note Editor Screen -->
+      <div id="note-editor-screen" class="screen">
+        <div class="app-header">
+          <button class="nav-button" id="back-from-editor">← Back</button>
+          <div class="logo">New Note</div>
+          <div class="note-editor-nav">
+            <button class="nav-button" id="prev-slide">Text</button>
+            <button class="nav-button" id="next-slide">Draw</button>
+          </div>
+          <button class="nav-button" id="save-note">Save</button>
+        </div>
+        <div class="note-editor">
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              <div id="text-editor" class="swiper-slide text-editor">
+                <div
+                  id="note-text"
+                  class="note-input"
+                  contenteditable="true"
+                  placeholder="Write your note here..."
+                ></div>
+                <div class="text-controls">
+                  <label>Text Color:</label>
+                  <input type="color" id="text-color" value="#000000" />
+                  <label>Font Size:</label>
+                  <input
+                    type="range"
+                    id="font-size"
+                    min="12"
+                    max="36"
+                    value="16"
+                  />
+                </div>
+              </div>
+
+              <div id="draw-editor" class="swiper-slide draw-editor">
+                <div class="canvas-container">
+                  <canvas
+                    id="drawing-canvas"
+                    class="drawing-canvas"
+                    width="320"
+                    height="240"
+                  ></canvas>
+                  <div class="canvas-controls">
+                    <label>Color:</label>
+                    <input type="color" id="brush-color" value="#000000" />
+                    <label>Size:</label>
+                    <input
+                      type="range"
+                      id="brush-size"
+                      min="1"
+                      max="20"
+                      value="5"
+                    />
+                    <button type="button" class="btn-secondary" id="clear-canvas">
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Note View Screen -->
+      <div id="note-view-screen" class="screen">
+        <div class="app-header">
+          <button class="nav-button" id="back-from-note">← Back</button>
+          <div class="logo">Note</div>
+        </div>
+        <div class="note-content" id="note-content">
+          <!-- Note content will be loaded here -->
+        </div>
+      </div>
+
+      <!-- Profile Screen -->
+      <div id="profile-screen" class="screen">
+        <div class="app-header">
+          <button class="nav-button" id="back-from-profile">← Back</button>
+          <div class="logo">Profile</div>
+          <button class="nav-button" id="logout-btn">Logout</button>
+        </div>
+        <div style="padding: 40px">
+          <div class="auth-card">
+            <h2 style="text-align: center; margin-bottom: 30px">
+              Account Settings
+            </h2>
+            <button
+              class="btn-danger"
+              id="delete-account-btn"
+              style="width: 100%"
+            >
+              🗑️ Delete Account
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Screen -->
+      <div id="admin-screen" class="screen">
+        <div class="app-header">
+          <button class="nav-button" id="back-from-admin">← Back</button>
+          <div class="logo">Admin Panel</div>
+          <div></div>
+        </div>
+        <div class="admin-container">
+          <div class="admin-section">
+            <h2>Users <img src="/public/images/refresh.svg" id="refresh-users" class="refresh-icon" /></h2>
+            <div id="admin-users" class="admin-list"></div>
+          </div>
+          <div class="admin-section">
+            <h2>Notes <img src="/public/images/refresh.svg" id="refresh-notes" class="refresh-icon" /></h2>
+            <div id="admin-notes" class="admin-list"></div>
+          </div>
+        </div>
+
+        <!-- User Notes Modal -->
+        <div id="user-notes-modal" class="modal">
+          <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Notes by <span id="modal-username"></span></h3>
+            <div id="modal-notes-list" class="admin-list"></div>
+          </div>
+        </div>
+
+        <!-- Note Detail Modal -->
+        <div id="note-detail-modal" class="modal">
+          <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Note Details</h3>
+            <div id="modal-note-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reset Password Screen -->
+      <div id="reset-password-screen" class="screen">
+        <div class="auth-container">
+          <div class="auth-card">
+            <h1 class="auth-title">Choose a New Password</h1>
+            <form id="reset-password-form">
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-input" id="reset-password" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" class="form-input" id="reset-password-confirm" required />
+              </div>
+              <div id="reset-error" class="error-message"></div>
+              <div id="reset-success" class="success-message" style="display: none;"></div>
+              <button type="submit" class="btn-primary">Reset Password</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=%VITE_GOOGLE_MAPS_API_KEY%&libraries=marker,places&loading=async"
+      async
+      defer
+    ></script>
+    
+    <script type="module" src="./js/app.js" defer></script>
+  </body>
+</html>

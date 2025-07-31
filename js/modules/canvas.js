@@ -1,76 +1,106 @@
-// js/modules/canvas.js
+import { state } from "./state.js";
 
-let canvas; // משתנים שיימצאו על ידי initCanvas
-let ctx;
-let colorPicker;
-let sizePicker;
+export const canvasService = {
+  init() {
+    const canvas = document.getElementById("drawing-canvas");
+    if (!canvas) return;
 
-let painting = false; // משתנים ששומרים את מצב הציור
-let brushColor = "#000000";
-let brushSize = 5;
+    state.canvas = canvas;
+    state.ctx = canvas.getContext("2d");
 
+    // Set canvas dimensions to match its displayed size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 
-export function initCanvas() {
-    canvas = document.getElementById("note-canvas");
-    colorPicker = document.getElementById("brush-color");
-    sizePicker = document.getElementById("brush-size");
+    let painting = false;
 
-    if (!canvas) {
-        console.warn("❗ אלמנט note-canvas לא נמצא. לא ניתן לאתחל את הקנבס.");
-        return;
-    }
+    const startPaint = (e) => {
+      painting = true;
+      this.draw(e);
+    };
 
-    if (!colorPicker) console.warn("❗ פקד צבע מברשת (brush-color) לא נמצא.");
-    if (!sizePicker) console.warn("❗ פקד גודל מברשת (brush-size) לא נמצא.");
+    const stopPaint = () => {
+      painting = false;
+      state.ctx.beginPath();
+    };
 
+    this.draw = (e) => {
+      if (!painting) return;
 
-    ctx = canvas.getContext("2d");
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
+      const brushColor = document.getElementById("brush-color").value;
+      const brushSize = document.getElementById("brush-size").value;
 
-    if (colorPicker) { // הוספת מאזין רק אם הפקד קיים
-        colorPicker.addEventListener("input", (e) => {
-            brushColor = e.target.value;
-        });
-    }
+      state.ctx.lineWidth = brushSize;
+      state.ctx.lineCap = "round";
+      state.ctx.strokeStyle = brushColor;
 
-    if (sizePicker) { // הוספת מאזין רק אם הפקד קיים
-        sizePicker.addEventListener("input", (e) => {
-            brushSize = e.target.value;
-        });
-    }
+      state.ctx.lineTo(x, y);
+      state.ctx.stroke();
+      state.ctx.beginPath();
+      state.ctx.moveTo(x, y);
+    };
 
-    // הוספת מאזיני אירועים לקנבס עצמו
     canvas.addEventListener("mousedown", startPaint);
     canvas.addEventListener("mouseup", stopPaint);
     canvas.addEventListener("mouseout", stopPaint);
-    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mousemove", this.draw);
 
-    console.log("✅ Canvas initialized and listeners added.");
-}
+    // Handle canvas resizing
+    window.addEventListener("resize", () => {
+      const img = state.ctx.getImageData(0, 0, state.canvas.width, state.canvas.height);
+      state.canvas.width = state.canvas.offsetWidth;
+      state.canvas.height = state.canvas.offsetHeight;
+      state.ctx.putImageData(img, 0, 0);
+    });
 
-function startPaint(e) {
-    painting = true;
-    draw(e);
-}
+    // Touch events for mobile
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent("mousedown", {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      canvas.dispatchEvent(mouseEvent);
+    });
 
-function stopPaint() {
-    painting = false;
-    ctx.beginPath();
-}
+    canvas.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent("mousemove", {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      canvas.dispatchEvent(mouseEvent);
+    });
 
-function draw(e) {
-    if (!painting || !ctx || !canvas) return;
+    canvas.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      const mouseEvent = new MouseEvent("mouseup", {});
+      canvas.dispatchEvent(mouseEvent);
+    });
+  },
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  clear() {
+    if (state.canvas && state.ctx) {
+      state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
+    }
+  },
 
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = brushColor;
-
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-}
+  getDataURL() {
+    return state.canvas ? state.canvas.toDataURL() : null;
+  },
+  isCanvasEmpty() {
+    const pixels = state.ctx.getImageData(
+      0,
+      0,
+      state.canvas.width,
+      state.canvas.height,
+    ).data;
+    return !pixels.some((channel) => channel !== 0);
+  },
+};

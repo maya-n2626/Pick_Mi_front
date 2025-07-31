@@ -97,7 +97,10 @@ const homeController = {
             e.preventDefault();
             state.currentNoteId = note.id;
             const { noteViewController } = await import("./note.js");
-            noteViewController.loadNote(note.id);
+            const rect = noteEl.getBoundingClientRect();
+            const clickX = e.clientX - rect.left + (rect.width / 2);
+            const clickY = e.clientY - rect.top + (rect.height / 2);
+            noteViewController.loadNote(note.id, `${clickX}px`, `${clickY}px`);
           });
           container.appendChild(noteEl);
         }

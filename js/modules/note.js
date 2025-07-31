@@ -6,7 +6,7 @@ import { canvasService } from "./canvas.js";
 import { locationService } from "./location.js";
 
 const noteViewController = {
-  async loadNote(noteId) {
+  async loadNote(noteId, clickX = '50%', clickY = '50%') {
     try {
       const note = await notesAPI.getNoteContent(
         noteId,
@@ -14,6 +14,8 @@ const noteViewController = {
         state.currentLocation.lon,
       );
       this.renderNote(note);
+      const noteViewScreen = document.getElementById("note-view-screen");
+      noteViewScreen.style.transformOrigin = `${clickX} ${clickY}`;
       showScreen("note-view-screen");
       // Delete the note in the background after showing it.
       notesAPI

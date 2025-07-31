@@ -34,16 +34,83 @@ body {
   font-weight: 500;
 }
 
+/* Screen Transitions */
 .screen {
-  display: none;
+  display: flex;
+  flex-direction: column;
   min-height: calc(90vh - 44px);
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  transform: translateX(100%); /* Default off-screen to the right */
 }
 
 .screen.active {
-  display: flex;
-  flex-direction: column;
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0%);
+}
+
+/* Specific Screen Animations */
+.screen#login-screen,
+.screen#signup-screen,
+.screen#forgot-screen {
+  transform: translateY(20px); /* Start slightly below */
+  opacity: 0;
+}
+
+.screen#login-screen.active,
+.screen#signup-screen.active,
+.screen#forgot-screen.active {
+  transform: translateY(0); /* Slide up */
+  opacity: 1;
+}
+
+.screen#map-screen {
+  transform: translateX(100%);
+}
+
+.screen#map-screen.active {
+  transform: translateX(0);
+}
+
+.screen#note-editor-screen {
+  transform: translateY(100%);
+}
+
+.screen#note-editor-screen.active {
+  transform: translateY(0);
+}
+
+.screen#admin-screen {
+  transform: translateY(-100%);
+}
+
+.screen#admin-screen.active {
+  transform: translateY(0);
+}
+
+/* Note Content Zoom (handled by JS for dynamic origin) */
+.screen#note-view-screen {
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.screen#note-view-screen.active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.screen#note-view-screen.exit-transition {
+  transform: scale(0) translateY(-100%); /* Fly out to top */
+  opacity: 0;
 }
 
 .app-header {
@@ -239,8 +306,8 @@ body {
   height: 60px;
   border-radius: 50%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
   color: white;
+  border: none;
   font-size: 24px;
   cursor: pointer;
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);

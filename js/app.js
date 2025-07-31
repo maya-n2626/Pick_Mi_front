@@ -31,8 +31,8 @@ const authController = {
 
   decodeJwt(token) {
     try {
-      const parts = token.split('.');
-      if (parts.length !== 3) throw new Error('Invalid JWT');
+      const parts = token.split(".");
+      if (parts.length !== 3) throw new Error("Invalid JWT");
       return JSON.parse(atob(parts[1]));
     } catch (e) {
       console.error("Failed to decode JWT:", e);
@@ -49,7 +49,7 @@ const authController = {
   },
 
   isAdmin() {
-    return this.getUser()?.role === 'admin';
+    return this.getUser()?.role === "admin";
   },
 
   async signin(email, password) {
@@ -127,23 +127,56 @@ const apiFetch = async (path, options = {}) => {
 // API Modules (Auth, Notes, Admin)
 // =================================================================
 const authAPI = {
-  signup: (email, password) => apiFetch("/api/auth/signup", { method: "POST", body: JSON.stringify({ email, password }) }),
-  forgotPassword: (email) => apiFetch("/api/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
-  deleteAccount: (password) => apiFetch("/api/auth/me", { method: "DELETE", body: JSON.stringify({ password }) }),
+  signup: (email, password) =>
+    apiFetch("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+  forgotPassword: (email) =>
+    apiFetch("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+  deleteAccount: (password) =>
+    apiFetch("/api/auth/me", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+    }),
 };
 
 const notesAPI = {
-  createNote: (text, drawingData, lat, lon, placeId) => apiFetch("/api/notes", { method: "POST", body: JSON.stringify({ content: { text, drawingData }, location: { latitude: lat, longitude: lon, placeId } }) }),
-  getNearbyNotes: (lat, lon, radius = 1000) => apiFetch(`/api/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`),
-  getNoteContent: (id, lat, lon) => apiFetch(`/api/notes/${id}?lat=${lat}&lon=${lon}`),
-  deleteNote: (id, lat, lon) => apiFetch(`/api/notes/${id}`, { method: "DELETE", body: JSON.stringify({ latitude: Number(lat), longitude: Number(lon) }) }),
+  createNote: (text, drawingData, lat, lon, placeId) => {
+    const content = { text };
+    if (drawingData) {
+      content.drawingData = drawingData;
+    }
+
+    return apiFetch("/api/notes", {
+      method: "POST",
+      body: JSON.stringify({
+        content,
+        location: { latitude: lat, longitude: lon, placeId },
+      }),
+    });
+  },
+  getNearbyNotes: (lat, lon, radius = 1000) =>
+    apiFetch(`/api/notes/nearby?lat=${lat}&lon=${lon}&radius=${radius}`),
+  getNoteContent: (id, lat, lon) =>
+    apiFetch(`/api/notes/${id}?lat=${lat}&lon=${lon}`),
+  deleteNote: (id, lat, lon) =>
+    apiFetch(`/api/notes/${id}`, {
+      method: "DELETE",
+      body: JSON.stringify({ latitude: Number(lat), longitude: Number(lon) }),
+    }),
 };
 
 const adminAPI = {
   getAllUsers: () => apiFetch("/api/admin/users"),
   getAllNotes: () => apiFetch("/api/admin/notes"),
-  deleteUser: (userId) => apiFetch(`/api/admin/users/${userId}`, { method: "DELETE" }),
-  deleteNoteAsAdmin: (noteId) => apiFetch(`/api/admin/notes/${noteId}`, { method: "DELETE" }),
+  deleteUser: (userId) =>
+    apiFetch(`/api/admin/users/${userId}`, { method: "DELETE" }),
+  deleteNoteAsAdmin: (noteId) =>
+    apiFetch(`/api/admin/notes/${noteId}`, { method: "DELETE" }),
 };
 
 // =================================================================
@@ -159,9 +192,27 @@ const locationService = {
       fields: ["displayName", "location", "id"],
       locationRestriction: {
         center: { lat, lng: lon },
-        radius: 100, // Search within 100 meters
+        radius: 500, // Increased from 100m to 500m for better reliability
       },
-      includedPrimaryTypes: ["park", "school", "university", "library", "shopping_mall", "restaurant", "cafe", "bar", "gym", "movie_theater", "museum", "church", "mosque", "synagogue", "city_hall", "police", "post_office"],
+      includedPrimaryTypes: [
+        "park",
+        "school",
+        "university",
+        "library",
+        "shopping_mall",
+        "restaurant",
+        "cafe",
+        "bar",
+        "gym",
+        "movie_theater",
+        "museum",
+        "church",
+        "mosque",
+        "synagogue",
+        "city_hall",
+        "police",
+        "post_office",
+      ],
       maxResultCount: 1,
       rankPreference: google.maps.places.SearchNearbyRankPreference.DISTANCE,
     };
@@ -182,12 +233,12 @@ const locationService = {
   async getCurrentPosition() {
     const cachedLocation = localStorage.getItem("lastKnownLocation");
     if (cachedLocation) {
-        const parsed = JSON.parse(cachedLocation);
-        // If cache is recent (e.g., 5 minutes), return it.
-        if (Date.now() - (parsed.timestamp || 0) < 300000) {
-            state.currentLocation = parsed;
-            return parsed;
-        }
+      const parsed = JSON.parse(cachedLocation);
+      // If cache is recent (e.g., 5 minutes), return it.
+      if (Date.now() - (parsed.timestamp || 0) < 300000) {
+        state.currentLocation = parsed;
+        return parsed;
+      }
     }
 
     return new Promise((resolve, reject) => {
@@ -200,7 +251,7 @@ const locationService = {
           const lon = position.coords.longitude;
           const placeId = await this.getPlaceIdFromCoordinates(lat, lon);
           const location = { lat, lon, placeId, timestamp: Date.now() };
-          
+
           state.currentLocation = location;
           localStorage.setItem("lastKnownLocation", JSON.stringify(location));
           resolve(location);
@@ -209,14 +260,14 @@ const locationService = {
           console.warn("Could not get location:", err);
           reject(err);
         },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
       );
     });
   },
 };
 
 const canvasService = {
-    init() {
+  init() {
     const canvas = document.getElementById("drawing-canvas");
     if (!canvas) return;
 
@@ -306,7 +357,7 @@ const canvasService = {
     ).data;
     return !pixels.some((channel) => channel !== 0);
   },
-}
+};
 
 // =================================================================
 // UI Controllers
@@ -324,7 +375,11 @@ const homeController = {
   async loadNearbyNotes() {
     if (!state.currentLocation.lat || !state.currentLocation.lon) return;
     try {
-      const notes = await notesAPI.getNearbyNotes(state.currentLocation.lat, state.currentLocation.lon, 1000);
+      const notes = await notesAPI.getNearbyNotes(
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+        1000,
+      );
       this.renderNotes(notes);
     } catch (error) {
       console.error("Error loading notes:", error);
@@ -359,10 +414,18 @@ const homeController = {
 const noteViewController = {
   async loadNote(noteId) {
     try {
-      const note = await notesAPI.getNoteContent(noteId, state.currentLocation.lat, state.currentLocation.lon);
+      const note = await notesAPI.getNoteContent(
+        noteId,
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+      );
       this.renderNote(note);
       showScreen("note-view-screen");
-      await notesAPI.deleteNote(noteId, state.currentLocation.lat, state.currentLocation.lon);
+      await notesAPI.deleteNote(
+        noteId,
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+      );
     } catch (error) {
       console.error("Error loading note:", error);
       alert(`Error loading note: ${error.message}`);
@@ -374,10 +437,15 @@ const noteViewController = {
     if (note.content.text) {
       const p = document.createElement("p");
       p.textContent = note.content.text;
-      p.style.cssText = "font-size: 18px; line-height: 1.6; margin-bottom: 20px;";
+      p.style.cssText =
+        "font-size: 18px; line-height: 1.6; margin-bottom: 20px;";
       container.appendChild(p);
     }
-    if (note.content.drawingData && note.content.drawingData !== "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==") {
+    if (
+      note.content.drawingData &&
+      note.content.drawingData !==
+        "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg=="
+    ) {
       const img = document.createElement("img");
       img.src = note.content.drawingData;
       img.style.cssText = "max-width: 100%; border-radius: 12px;";
@@ -418,12 +486,20 @@ const noteEditorController = {
     try {
       await locationService.getCurrentPosition();
       const text = document.getElementById("note-text").value.trim();
-      const drawingData = !canvasService.isCanvasEmpty() ? canvasService.getDataURL() : null;
+      const drawingData = !canvasService.isCanvasEmpty()
+        ? canvasService.getDataURL()
+        : null;
       if (!text && !drawingData) {
         alert("Please add some content to your note");
         return;
       }
-      await notesAPI.createNote(text, drawingData, state.currentLocation.lat, state.currentLocation.lon, state.currentLocation.placeId);
+      await notesAPI.createNote(
+        text,
+        drawingData,
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+        state.currentLocation.placeId,
+      );
       document.getElementById("note-text").value = "";
       canvasService.clear();
       showScreen("home-screen");
@@ -453,26 +529,39 @@ const mapController = {
       return;
     }
     this.map = new google.maps.Map(document.getElementById("map"), {
-      center: { lat: state.currentLocation.lat, lng: state.currentLocation.lon },
+      center: {
+        lat: state.currentLocation.lat,
+        lng: state.currentLocation.lon,
+      },
       zoom: 15,
       mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID,
     });
     new google.maps.marker.AdvancedMarkerElement({
-      position: { lat: state.currentLocation.lat, lng: state.currentLocation.lon },
+      position: {
+        lat: state.currentLocation.lat,
+        lng: state.currentLocation.lon,
+      },
       map: this.map,
       title: "Your Location",
     });
   },
   async loadNotesOnMap() {
     try {
-      const notes = await notesAPI.getNearbyNotes(state.currentLocation.lat, state.currentLocation.lon, 5000);
+      const notes = await notesAPI.getNearbyNotes(
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+        5000,
+      );
       notes.forEach((note) => {
         if (note.location?.latitude && note.location?.longitude) {
           const img = document.createElement("img");
           img.src = "./images/ClosedNote.png";
           img.style.width = "40px";
           new google.maps.marker.AdvancedMarkerElement({
-            position: { lat: Number(note.location.latitude), lng: Number(note.location.longitude) },
+            position: {
+              lat: Number(note.location.latitude),
+              lng: Number(note.location.longitude),
+            },
             map: this.map,
             title: note.content?.text || "Note",
             content: img,
@@ -495,34 +584,44 @@ const adminController = {
     try {
       const users = await adminAPI.getAllUsers();
       const container = document.getElementById("admin-users");
-      container.innerHTML = users.map(user => `
+      container.innerHTML = users
+        .map(
+          (user) => `
         <div class="admin-item">
           <div>
             <strong>${user.email}</strong>
             <span style="color: #666; margin-left: 10px;">(${user.role})</span>
           </div>
           <button class="btn-danger" onclick="adminController.deleteUser('${user.id}')">Delete</button>
-        </div>`).join("");
+        </div>`,
+        )
+        .join("");
     } catch (error) {
       console.error("Error loading users:", error);
-      document.getElementById("admin-users").innerHTML = "<p>Error loading users</p>";
+      document.getElementById("admin-users").innerHTML =
+        "<p>Error loading users</p>";
     }
   },
   async loadNotes() {
     try {
       const notes = await adminAPI.getAllNotes();
       const container = document.getElementById("admin-notes");
-      container.innerHTML = notes.map(note => `
+      container.innerHTML = notes
+        .map(
+          (note) => `
         <div class="admin-item">
           <div>
             <p>${note.content?.text ? note.content.text.substring(0, 50) + "..." : "Drawing note"}</p>
             <small style="color: #666;">by ${note.userId}</small>
           </div>
           <button class="btn-danger" onclick="adminController.deleteNote('${note.id}')">Delete</button>
-        </div>`).join("");
+        </div>`,
+        )
+        .join("");
     } catch (error) {
       console.error("Error loading notes:", error);
-      document.getElementById("admin-notes").innerHTML = "<p>Error loading notes</p>";
+      document.getElementById("admin-notes").innerHTML =
+        "<p>Error loading notes</p>";
     }
   },
   async deleteUser(userId) {
@@ -556,43 +655,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Setup event listeners
   // Auth forms
-  document.getElementById("login-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value;
-    try {
-      await authController.signin(email, password);
-      showScreen("home-screen");
-      await homeController.init();
-    } catch (error) {
-      showError("login-error", error.message);
-    }
-  });
+  document
+    .getElementById("login-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      try {
+        await authController.signin(email, password);
+        showScreen("home-screen");
+        await homeController.init();
+      } catch (error) {
+        showError("login-error", error.message);
+      }
+    });
 
-  document.getElementById("signup-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("signup-email").value.trim();
-    const password = document.getElementById("signup-password").value;
-    try {
-      await authAPI.signup(email, password);
-      alert("Account created successfully! Please sign in.");
-      showScreen("login-screen");
-    } catch (error) {
-      showError("signup-error", error.message);
-    }
-  });
+  document
+    .getElementById("signup-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signup-email").value.trim();
+      const password = document.getElementById("signup-password").value;
+      try {
+        await authAPI.signup(email, password);
+        alert("Account created successfully! Please sign in.");
+        showScreen("login-screen");
+      } catch (error) {
+        showError("signup-error", error.message);
+      }
+    });
 
-  document.getElementById("forgot-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("forgot-email").value.trim();
-    try {
-      await authAPI.forgotPassword(email);
-      alert("If an account with that email exists, a password reset link has been sent.");
-      showScreen("login-screen");
-    } catch (error) {
-      showError("forgot-error", error.message);
-    }
-  });
+  document
+    .getElementById("forgot-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("forgot-email").value.trim();
+      try {
+        await authAPI.forgotPassword(email);
+        alert(
+          "If an account with that email exists, a password reset link has been sent.",
+        );
+        showScreen("login-screen");
+      } catch (error) {
+        showError("forgot-error", error.message);
+      }
+    });
 
   // Navigation buttons
   const navButtons = {
@@ -614,30 +721,45 @@ document.addEventListener("DOMContentLoaded", () => {
   for (const [btnId, screenId] of Object.entries(navButtons)) {
     document.getElementById(btnId).addEventListener("click", async () => {
       showScreen(screenId);
-      if (btnId === 'show-map') await mapController.init();
-      if (btnId === 'admin-btn') await adminController.init();
-      if (btnId === 'new-note-btn') noteEditorController.init();
+      if (btnId === "show-map") await mapController.init();
+      if (btnId === "admin-btn") await adminController.init();
+      if (btnId === "new-note-btn") noteEditorController.init();
     });
   }
 
   // Other actions
-  document.getElementById("save-note").addEventListener("click", () => noteEditorController.saveNote());
-  document.getElementById("clear-canvas").addEventListener("click", () => canvasService.clear());
-  document.getElementById("logout-btn").addEventListener("click", () => authController.logout());
-  
-  document.getElementById("delete-account-btn").addEventListener("click", async () => {
-    const password = prompt("Enter your current password to confirm account deletion:");
-    if (!password) return;
-    if (!confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
-    try {
-      await authAPI.deleteAccount(password);
-      alert("Account deleted successfully.");
-      authController.logout();
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      alert(`Error deleting account: ${error.message}`);
-    }
-  });
+  document
+    .getElementById("save-note")
+    .addEventListener("click", () => noteEditorController.saveNote());
+  document
+    .getElementById("clear-canvas")
+    .addEventListener("click", () => canvasService.clear());
+  document
+    .getElementById("logout-btn")
+    .addEventListener("click", () => authController.logout());
+
+  document
+    .getElementById("delete-account-btn")
+    .addEventListener("click", async () => {
+      const password = prompt(
+        "Enter your current password to confirm account deletion:",
+      );
+      if (!password) return;
+      if (
+        !confirm(
+          "Are you sure you want to delete your account? This cannot be undone.",
+        )
+      )
+        return;
+      try {
+        await authAPI.deleteAccount(password);
+        alert("Account deleted successfully.");
+        authController.logout();
+      } catch (error) {
+        console.error("Error deleting account:", error);
+        alert(`Error deleting account: ${error.message}`);
+      }
+    });
 
   // Set initial screen based on auth state
   if (authController.getUser()) {
@@ -646,6 +768,6 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     showScreen("login-screen");
   }
-  
+
   console.log("PickMi SPA initialized");
 });

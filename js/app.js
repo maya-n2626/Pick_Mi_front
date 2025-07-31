@@ -31,8 +31,8 @@ const authController = {
 
   decodeJwt(token) {
     try {
-      const parts = token.split(".");
-      if (parts.length !== 3) throw new Error("Invalid JWT");
+      const parts = token.split('.');
+      if (parts.length !== 3) throw new Error('Invalid JWT');
       return JSON.parse(atob(parts[1]));
     } catch (e) {
       console.error("Failed to decode JWT:", e);
@@ -49,7 +49,7 @@ const authController = {
   },
 
   isAdmin() {
-    return this.getUser()?.role === "admin";
+    return this.getUser()?.role === 'admin';
   },
 
   async signin(email, password) {
@@ -146,7 +146,7 @@ const authAPI = {
 
 const notesAPI = {
   createNote: (text, drawingData, lat, lon, placeId) => {
-    const content = { text };
+    const content = { text: text || "" }; // Ensure text is always a string
     if (drawingData) {
       content.drawingData = drawingData;
     }
@@ -366,8 +366,9 @@ const homeController = {
   async init() {
     try {
       await locationService.getCurrentPosition();
-      await this.loadNearbyNotes();
       this.setupAdminButton();
+      this.renderMap(); // Render map once
+      await this.loadNearbyNotes(); // Then load notes
     } catch (error) {
       console.error("Error initializing home:", error);
     }
@@ -385,6 +386,18 @@ const homeController = {
       console.error("Error loading notes:", error);
     }
   },
+  renderMap() {
+    const container = document.getElementById("notes-container");
+    if (!container || !state.currentLocation.lat) return;
+    const mapWidth = container.offsetWidth;
+    const mapHeight = container.offsetHeight;
+    const centerLat = state.currentLocation.lat;
+    const centerLon = state.currentLocation.lon;
+    const zoom = 15;
+
+    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&maptype=roadmap&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+    container.style.backgroundImage = `url(${staticMapUrl})`;
+  },
   renderNotes(notes) {
     const container = document.getElementById("notes-container");
     if (!container || !state.currentLocation.lat) return;
@@ -395,16 +408,15 @@ const homeController = {
     const centerLon = state.currentLocation.lon;
     const zoom = 15;
 
-    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&maptype=roadmap&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
-    container.style.backgroundImage = `url(${staticMapUrl})`;
+    // Clear only the notes, not the map background
     container.innerHTML = "";
 
     const project = (lat, lon) => {
-      let siny = Math.sin(lat * Math.PI / 180);
+      let siny = Math.sin((lat * Math.PI) / 180);
       siny = Math.min(Math.max(siny, -0.9999), 0.9999);
       return {
         x: 256 * (0.5 + lon / 360),
-        y: 256 * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI))
+        y: 256 * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI)),
       };
     };
 
@@ -412,14 +424,17 @@ const homeController = {
       const worldCoords = project(lat, lon);
       const centerCoords = project(centerLat, centerLon);
       const scale = Math.pow(2, zoom);
-      const x = (worldCoords.x - centerCoords.x) * scale + (mapWidth / 2);
-      const y = (worldCoords.y - centerCoords.y) * scale + (mapHeight / 2);
+      const x = (worldCoords.x - centerCoords.x) * scale + mapWidth / 2;
+      const y = (worldCoords.y - centerCoords.y) * scale + mapHeight / 2;
       return { x, y };
     };
 
     notes.forEach((note) => {
       if (note.location?.latitude && note.location?.longitude) {
-        const { x, y } = getPixelCoords(note.location.latitude, note.location.longitude);
+        const { x, y } = getPixelCoords(
+          note.location.latitude,
+          note.location.longitude,
+        );
 
         if (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
           const noteEl = document.createElement("a");
@@ -452,11 +467,21 @@ const homeController = {
 const noteViewController = {
   async loadNote(noteId) {
     try {
-      const note = await notesAPI.getNoteContent(noteId, state.currentLocation.lat, state.currentLocation.lon);
+      const note = await notesAPI.getNoteContent(
+        noteId,
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+      );
       this.renderNote(note);
       showScreen("note-view-screen");
       // Delete the note in the background after showing it.
-      notesAPI.deleteNote(noteId, state.currentLocation.lat, state.currentLocation.lon).catch(err => console.error("Failed to delete note:", err));
+      notesAPI
+        .deleteNote(
+          noteId,
+          state.currentLocation.lat,
+          state.currentLocation.lon,
+        )
+        .catch((err) => console.error("Failed to delete note:", err));
     } catch (error) {
       console.error("Error loading note:", error);
       alert(`Error loading note: ${error.message}`);
@@ -467,7 +492,8 @@ const noteViewController = {
 
   async closeNote() {
     showScreen("home-screen");
-    await homeController.init(); // Force a full refresh of the home screen
+    // Only reload the notes, not the whole map
+    await homeController.loadNearbyNotes();
   },
 
   renderNote(note) {
@@ -524,9 +550,11 @@ const noteEditorController = {
   async saveNote() {
     try {
       await locationService.getCurrentPosition();
-      
+
       const textInput = document.getElementById("note-text").value;
-      const drawingData = !canvasService.isCanvasEmpty() ? canvasService.getDataURL() : null;
+      const drawingData = !canvasService.isCanvasEmpty()
+        ? canvasService.getDataURL()
+        : null;
 
       if (!textInput.trim() && !drawingData) {
         alert("Please add some content to your note");
@@ -536,8 +564,14 @@ const noteEditorController = {
       // Ensure text is an empty string if only a drawing is provided.
       const text = textInput.trim();
 
-      await notesAPI.createNote(text, drawingData, state.currentLocation.lat, state.currentLocation.lon, state.currentLocation.placeId);
-      
+      await notesAPI.createNote(
+        text,
+        drawingData,
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+        state.currentLocation.placeId,
+      );
+
       document.getElementById("note-text").value = "";
       canvasService.clear();
       showScreen("home-screen");
@@ -752,7 +786,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "new-note-btn": "note-editor-screen",
     "back-from-map": "home-screen",
     "back-from-editor": "home-screen",
-    "back-from-note": "home-screen",
+    "back-from-note": null, // Handled by its own controller
     "back-from-profile": "home-screen",
     "back-from-admin": "home-screen",
   };
@@ -760,14 +794,16 @@ document.addEventListener("DOMContentLoaded", () => {
   for (const [btnId, screenId] of Object.entries(navButtons)) {
     document.getElementById(btnId).addEventListener("click", async () => {
       showScreen(screenId);
-      if (btnId === 'show-map') await mapController.init();
-      if (btnId === 'admin-btn') await adminController.init();
-      if (btnId === 'new-note-btn') noteEditorController.init();
-      if (btnId === 'back-from-note') await homeController.loadNearbyNotes();
+      if (btnId === "show-map") await mapController.init();
+      if (btnId === "admin-btn") await adminController.init();
+      if (btnId === "new-note-btn") noteEditorController.init();
     });
   }
 
   // Other actions
+  document
+    .getElementById("back-from-note")
+    .addEventListener("click", () => noteViewController.closeNote());
   document
     .getElementById("save-note")
     .addEventListener("click", () => noteEditorController.saveNote());

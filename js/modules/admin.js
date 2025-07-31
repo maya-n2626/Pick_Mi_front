@@ -201,18 +201,22 @@ const adminController = {
     });
   },
   setupRefreshButtons() {
-    document.getElementById('refresh-users').addEventListener('click', (e) => {
-      e.target.classList.add('spinning');
-      this.loadUsers().finally(() => {
-        e.target.classList.remove('spinning');
-      });
+    document.getElementById('refresh-users').addEventListener('click', async (e) => {
+      const icon = e.currentTarget;
+      icon.classList.add('spinning');
+      const loadPromise = this.loadUsers();
+      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 500));
+      await Promise.all([loadPromise, timeoutPromise]);
+      icon.classList.remove('spinning');
     });
 
-    document.getElementById('refresh-notes').addEventListener('click', (e) => {
-      e.target.classList.add('spinning');
-      this.loadNotes().finally(() => {
-        e.target.classList.remove('spinning');
-      });
+    document.getElementById('refresh-notes').addEventListener('click', async (e) => {
+      const icon = e.currentTarget;
+      icon.classList.add('spinning');
+      const loadPromise = this.loadNotes();
+      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 500));
+      await Promise.all([loadPromise, timeoutPromise]);
+      icon.classList.remove('spinning');
     });
   },
 };

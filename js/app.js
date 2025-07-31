@@ -123,6 +123,25 @@ const apiFetch = async (path, options = {}) => {
   }
 };
 
+const apiFetchPublic = async (path, options = {}) => {
+  const headers = { ...(options.headers || {}) };
+  if (options.body && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  try {
+    const response = await fetch(API_BASE + path, { ...options, headers });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || response.statusText);
+    }
+    return response.status !== 204 ? response.json() : {};
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
+};
+
 // =================================================================
 // API Modules (Auth, Notes, Admin)
 // =================================================================
@@ -542,28 +561,19 @@ const noteEditorController = {
   async saveNote() {
     try {
       await locationService.getCurrentPosition();
-
+      
       const textInput = document.getElementById("note-text").value;
-      const drawingData = !canvasService.isCanvasEmpty()
-        ? canvasService.getDataURL()
-        : null;
+      const drawingData = !canvasService.isCanvasEmpty() ? canvasService.getDataURL() : null;
 
       if (!textInput.trim() && !drawingData) {
         alert("Please add some content to your note");
         return;
       }
 
-      // Ensure text is an empty string if only a drawing is provided.
-      const text = textInput.trim();
+      const text = textInput.trim(); // Send empty string if only drawing is present
 
-      await notesAPI.createNote(
-        text,
-        drawingData,
-        state.currentLocation.lat,
-        state.currentLocation.lon,
-        state.currentLocation.placeId,
-      );
-
+      await notesAPI.createNote(text, drawingData, state.currentLocation.lat, state.currentLocation.lon, state.currentLocation.placeId);
+      
       document.getElementById("note-text").value = "";
       canvasService.clear();
       showScreen("home-screen");
@@ -707,6 +717,48 @@ const adminController = {
     } catch (error) {
       console.error("Error deleting note:", error);
       alert(`Error deleting note: ${error.message}`);
+    }
+  },
+};
+
+// =================================================================
+// Main App Initialization
+// =================================================================
+const resetPasswordController = {
+  init() {
+    const form = document.getElementById("reset-password-form");
+    form.addEventListener("submit", this.handleSubmit.bind(this));
+  },
+  async handleSubmit(e) {
+    e.preventDefault();
+    const errorEl = document.getElementById("reset-error");
+    const successEl = document.getElementById("reset-success");
+    errorEl.style.display = "none";
+    successEl.style.display = "none";
+
+    const newPassword = document.getElementById("reset-password").value;
+    const confirmPassword = document.getElementById("reset-password-confirm").value;
+
+    if (newPassword !== confirmPassword) {
+      showError("reset-error", "Passwords do not match.");
+      return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+      showError("reset-error", "Invalid or missing reset token.");
+      return;
+    }
+
+    try {
+      await authAPI.resetPassword(token, newPassword);
+      successEl.textContent = "Your password has been reset successfully! You can now log in.";
+      successEl.style.display = "block";
+      e.target.reset();
+    } catch (err) {
+      showError("reset-error", err.message || "An error occurred. Please try again.");
     }
   },
 };

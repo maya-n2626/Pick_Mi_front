@@ -387,7 +387,7 @@ const homeController = {
   },
   renderNotes(notes) {
     const container = document.getElementById("notes-container");
-    if (!container) return;
+    if (!container || !state.currentLocation.lat) return;
 
     const mapWidth = container.offsetWidth;
     const mapHeight = container.offsetHeight;
@@ -395,16 +395,16 @@ const homeController = {
     const centerLon = state.currentLocation.lon;
     const zoom = 15;
 
-    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+    const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${centerLat},${centerLon}&zoom=${zoom}&size=${mapWidth}x${mapHeight}&maptype=roadmap&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
     container.style.backgroundImage = `url(${staticMapUrl})`;
     container.innerHTML = "";
 
     const project = (lat, lon) => {
-      let siny = Math.sin((lat * Math.PI) / 180);
+      let siny = Math.sin(lat * Math.PI / 180);
       siny = Math.min(Math.max(siny, -0.9999), 0.9999);
       return {
         x: 256 * (0.5 + lon / 360),
-        y: 256 * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI)),
+        y: 256 * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI))
       };
     };
 
@@ -412,26 +412,25 @@ const homeController = {
       const worldCoords = project(lat, lon);
       const centerCoords = project(centerLat, centerLon);
       const scale = Math.pow(2, zoom);
-      const x = (worldCoords.x - centerCoords.x) * scale + mapWidth / 2;
-      const y = (worldCoords.y - centerCoords.y) * scale + mapHeight / 2;
+      const x = (worldCoords.x - centerCoords.x) * scale + (mapWidth / 2);
+      const y = (worldCoords.y - centerCoords.y) * scale + (mapHeight / 2);
       return { x, y };
     };
 
     notes.forEach((note) => {
       if (note.location?.latitude && note.location?.longitude) {
-        const { x, y } = getPixelCoords(
-          note.location.latitude,
-          note.location.longitude,
-        );
+        const { x, y } = getPixelCoords(note.location.latitude, note.location.longitude);
 
         if (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
-          const noteEl = document.createElement("div");
+          const noteEl = document.createElement("a");
           noteEl.className = "floating-note";
           noteEl.style.left = `${x}px`;
           noteEl.style.top = `${y}px`;
           noteEl.style.animationDelay = `${Math.random() * 6}s`;
+          noteEl.innerHTML = `<img src="./images/ClosedNote.png" alt="Note">`;
 
-          noteEl.addEventListener("click", () => {
+          noteEl.addEventListener("click", (e) => {
+            e.preventDefault();
             state.currentNoteId = note.id;
             noteViewController.loadNote(note.id);
           });
@@ -524,21 +523,20 @@ const noteEditorController = {
   async saveNote() {
     try {
       await locationService.getCurrentPosition();
-      const text = document.getElementById("note-text").value.trim();
-      const drawingData = !canvasService.isCanvasEmpty()
-        ? canvasService.getDataURL()
-        : null;
-      if (!text && !drawingData) {
+      
+      const textInput = document.getElementById("note-text").value;
+      const drawingData = !canvasService.isCanvasEmpty() ? canvasService.getDataURL() : null;
+
+      if (!textInput.trim() && !drawingData) {
         alert("Please add some content to your note");
         return;
       }
-      await notesAPI.createNote(
-        text,
-        drawingData,
-        state.currentLocation.lat,
-        state.currentLocation.lon,
-        state.currentLocation.placeId,
-      );
+
+      // Ensure text is an empty string if only a drawing is provided.
+      const text = textInput.trim();
+
+      await notesAPI.createNote(text, drawingData, state.currentLocation.lat, state.currentLocation.lon, state.currentLocation.placeId);
+      
       document.getElementById("note-text").value = "";
       canvasService.clear();
       showScreen("home-screen");

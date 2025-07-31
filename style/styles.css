@@ -187,56 +187,43 @@ body {
 }
 
 .home-content {
-  position: relative; /* For positioning children */
-  flex-grow: 1; /* Fill available vertical space */
-  display: flex;
-  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
 }
 
 .floating-notes {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background-size: cover;
   background-position: center;
-  overflow: hidden;
 }
 
 .floating-note {
   position: absolute;
   width: 50px;
   height: 50px;
-  background-image: url("./public/images/ClosedNote.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  transform: translate(-50%, -50%); /* Center the note on its coordinates */
+  transform: translate(-50%, -50%);
   animation: float 6s ease-in-out infinite;
 }
 
-.floating-note:hover {
-  transform: translate(-50%, -50%) scale(1.2);
-  z-index: 10;
+.floating-note img {
+  width: 100%;
+  transition: transform 0.3s ease;
+}
+
+.floating-note:hover img {
+  transform: scale(1.2);
 }
 
 @keyframes float {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) translateY(0px) rotate(0deg);
-  }
-  25% {
-    transform: translate(-50%, -50%) translateY(-10px) rotate(5deg);
-  }
-  50% {
-    transform: translate(-50%, -50%) translateY(0px) rotate(-5deg);
-  }
-  75% {
-    transform: translate(-50%, -50%) translateY(-5px) rotate(3deg);
-  }
+  0%, 100% { transform: translate(-50%, -50%) translateY(0px) rotate(0deg); }
+  25% { transform: translate(-50%, -50%) translateY(-10px) rotate(5deg); }
+  50% { transform: translate(-50%, -50%) translateY(0px) rotate(-5deg); }
+  75% { transform: translate(-50%, -50%) translateY(-5px) rotate(3deg); }
 }
 
 .action-buttons {

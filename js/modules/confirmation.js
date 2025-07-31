@@ -1,5 +1,5 @@
-import Toastify from 'toastify-js';
-import { showToast } from './toast.js';
+import Toastify from "toastify-js";
+import { showToast } from "./toast.js";
 
 export function showConfirmation(message, onConfirm) {
   const toast = Toastify({
@@ -14,20 +14,22 @@ export function showConfirmation(message, onConfirm) {
     `,
     duration: -1, // Indefinite
     close: true,
-    gravity: 'top',
-    position: 'center',
-    backgroundColor: '#333',
+    gravity: "top",
+    position: "center",
+    style: {
+      background: "#333",
+    },
     escapeMarkup: false,
-    onClick: function() {},
-    onClose: function() {},
+    onClick: function () {},
+    onClose: function () {},
   }).showToast();
 
-  document.getElementById('confirm-yes').addEventListener('click', () => {
+  document.getElementById("confirm-yes").addEventListener("click", () => {
     onConfirm();
     toast.hideToast();
   });
 
-  document.getElementById('confirm-no').addEventListener('click', () => {
+  document.getElementById("confirm-no").addEventListener("click", () => {
     toast.hideToast();
   });
 }

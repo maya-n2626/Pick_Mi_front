@@ -33,8 +33,8 @@ const authController = {
 
   decodeJwt(token) {
     try {
-      const parts = token.split('.');
-      if (parts.length !== 3) throw new Error('Invalid JWT');
+      const parts = token.split(".");
+      if (parts.length !== 3) throw new Error("Invalid JWT");
       return JSON.parse(atob(parts[1]));
     } catch (e) {
       console.error("Failed to decode JWT:", e);
@@ -51,7 +51,7 @@ const authController = {
   },
 
   isAdmin() {
-    return this.getUser()?.role === 'admin';
+    return this.getUser()?.role === "admin";
   },
 
   async signin(email, password) {
@@ -91,7 +91,7 @@ const showScreen = (screenId) => {
 };
 
 const showError = (elementId, message) => {
-  showToast(message, 'error');
+  showToast(message, "error");
 };
 
 // =================================================================
@@ -146,10 +146,26 @@ const apiFetchPublic = async (path, options = {}) => {
 // API Modules (Auth, Notes, Admin)
 // =================================================================
 const authAPI = {
-  signup: (email, password) => apiFetchPublic("/api/auth/signup", { method: "POST", body: JSON.stringify({ email, password }) }),
-  forgotPassword: (email) => apiFetchPublic("/api/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
-  resetPassword: (token, newPassword) => apiFetchPublic("/api/auth/reset-password", { method: "POST", body: JSON.stringify({ token, newPassword }) }),
-  deleteAccount: (password) => apiFetch("/api/auth/me", { method: "DELETE", body: JSON.stringify({ password }) }), // Requires auth
+  signup: (email, password) =>
+    apiFetchPublic("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+  forgotPassword: (email) =>
+    apiFetchPublic("/api/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+  resetPassword: (token, newPassword) =>
+    apiFetchPublic("/api/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, newPassword }),
+    }),
+  deleteAccount: (password) =>
+    apiFetch("/api/auth/me", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+    }), // Requires auth
 };
 
 const notesAPI = {
@@ -558,9 +574,11 @@ const noteEditorController = {
   async saveNote() {
     try {
       await locationService.getCurrentPosition();
-      
+
       const textInput = document.getElementById("note-text").value;
-      const drawingData = !canvasService.isCanvasEmpty() ? canvasService.getDataURL() : null;
+      const drawingData = !canvasService.isCanvasEmpty()
+        ? canvasService.getDataURL()
+        : null;
 
       if (!textInput.trim()) {
         showToast("Please add some text to your note", "error");
@@ -574,8 +592,14 @@ const noteEditorController = {
 
       const text = textInput.trim(); // Send empty string if only drawing is present
 
-      await notesAPI.createNote(text, drawingData, state.currentLocation.lat, state.currentLocation.lon, state.currentLocation.placeId);
-      
+      await notesAPI.createNote(
+        text,
+        drawingData,
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+        state.currentLocation.placeId,
+      );
+
       document.getElementById("note-text").value = "";
       canvasService.clear();
       showScreen("home-screen");
@@ -743,7 +767,9 @@ const resetPasswordController = {
     successEl.style.display = "none";
 
     const newPassword = document.getElementById("reset-password").value;
-    const confirmPassword = document.getElementById("reset-password-confirm").value;
+    const confirmPassword = document.getElementById(
+      "reset-password-confirm",
+    ).value;
 
     if (newPassword !== confirmPassword) {
       showError("reset-error", "Passwords do not match.");
@@ -751,7 +777,7 @@ const resetPasswordController = {
     }
 
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+    const token = urlParams.get("token");
 
     if (!token) {
       showError("reset-error", "Invalid or missing reset token.");
@@ -760,7 +786,8 @@ const resetPasswordController = {
 
     try {
       await authAPI.resetPassword(token, newPassword);
-      successEl.textContent = "Your password has been reset successfully! You can now log in.";
+      successEl.textContent =
+        "Your password has been reset successfully! You can now log in.";
       successEl.style.display = "block";
       e.target.reset();
     } catch (err) {
@@ -888,7 +915,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Set initial screen based on auth state
   const urlParams = new URLSearchParams(window.location.search);
-  if (window.location.pathname.includes("reset-password") && urlParams.has("token")) {
+  if (
+    window.location.pathname.includes("reset-password") &&
+    urlParams.has("token")
+  ) {
     showScreen("reset-password-screen");
     resetPasswordController.init();
   } else if (authController.getUser()) {
@@ -897,6 +927,7 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     showScreen("login-screen");
   }
-  
+
   console.log("PickMi SPA initialized");
 });
+

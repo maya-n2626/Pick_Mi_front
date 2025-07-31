@@ -4,7 +4,7 @@ import { authAPI } from "./api.js";
 import { showToast } from "./toast.js";
 import { showConfirmation } from "./confirmation.js";
 
-const authController = {
+export const authController = {
   init() {
     const token = localStorage.getItem("jwt");
     if (token) {
@@ -148,5 +148,3 @@ export function initAuth() {
         showScreen("login-screen");
     }
 }
-
-export { authController };

@@ -1,4 +1,5 @@
 import { showToast } from "./modules/toast.js";
+import { showConfirmation } from "./modules/confirmation.js";
 // =================================================================
 // Global State & Configuration
 // =================================================================
@@ -561,6 +562,11 @@ const noteEditorController = {
       const textInput = document.getElementById("note-text").value;
       const drawingData = !canvasService.isCanvasEmpty() ? canvasService.getDataURL() : null;
 
+      if (!textInput.trim()) {
+        showToast("Please add some text to your note", "error");
+        return;
+      }
+
       if (!textInput.trim() && !drawingData) {
         showToast("Please add some content to your note", "error");
         return;
@@ -696,24 +702,28 @@ const adminController = {
     }
   },
   async deleteUser(userId) {
-    if (!confirm("Are you sure you want to delete this user?")) return;
-    try {
-      await adminAPI.deleteUser(userId);
-      await this.loadUsers();
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      showToast(`Error deleting user: ${error.message}`, "error");
-    }
+    showConfirmation("Are you sure you want to delete this user?", async () => {
+      try {
+        await adminAPI.deleteUser(userId);
+        await this.loadUsers();
+        showToast("User deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        showToast(`Error deleting user: ${error.message}`, "error");
+      }
+    });
   },
   async deleteNote(noteId) {
-    if (!confirm("Are you sure you want to delete this note?")) return;
-    try {
-      await adminAPI.deleteNoteAsAdmin(noteId);
-      await this.loadNotes();
-    } catch (error) {
-      console.error("Error deleting note:", error);
-      showToast(`Error deleting note: ${error.message}`, "error");
-    }
+    showConfirmation("Are you sure you want to delete this note?", async () => {
+      try {
+        await adminAPI.deleteNoteAsAdmin(noteId);
+        await this.loadNotes();
+        showToast("Note deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting note:", error);
+        showToast(`Error deleting note: ${error.message}`, "error");
+      }
+    });
   },
 };
 
@@ -857,24 +867,23 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("delete-account-btn")
     .addEventListener("click", async () => {
-      const password = prompt(
-        "Enter your current password to confirm account deletion:",
+      showConfirmation(
+        "Are you sure you want to delete your account? This cannot be undone.",
+        async () => {
+          const password = prompt(
+            "Enter your current password to confirm account deletion:",
+          );
+          if (!password) return;
+          try {
+            await authAPI.deleteAccount(password);
+            showToast("Account deleted successfully.");
+            authController.logout();
+          } catch (error) {
+            console.error("Error deleting account:", error);
+            showToast(`Error deleting account: ${error.message}`, "error");
+          }
+        },
       );
-      if (!password) return;
-      if (
-        !confirm(
-          "Are you sure you want to delete your account? This cannot be undone.",
-        )
-      )
-        return;
-      try {
-        await authAPI.deleteAccount(password);
-        showToast("Account deleted successfully.");
-        authController.logout();
-      } catch (error) {
-        console.error("Error deleting account:", error);
-        showToast(`Error deleting account: ${error.message}`, "error");
-      }
     });
 
   // Set initial screen based on auth state

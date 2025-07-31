@@ -167,11 +167,24 @@
           <div class="swiper-container">
             <div class="swiper-wrapper">
               <div id="text-editor" class="swiper-slide text-editor">
-                <textarea
+                <div
                   id="note-text"
                   class="note-input"
+                  contenteditable="true"
                   placeholder="Write your note here..."
-                ></textarea>
+                ></div>
+                <div class="text-controls">
+                  <label>Text Color:</label>
+                  <input type="color" id="text-color" value="#000000" />
+                  <label>Font Size:</label>
+                  <input
+                    type="range"
+                    id="font-size"
+                    min="12"
+                    max="36"
+                    value="16"
+                  />
+                </div>
               </div>
 
               <div id="draw-editor" class="swiper-slide draw-editor">

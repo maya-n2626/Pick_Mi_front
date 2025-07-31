@@ -827,12 +827,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   // Set initial screen based on auth state
-  if (authController.getUser()) {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (window.location.pathname.includes("reset-password") && urlParams.has("token")) {
+    showScreen("reset-password-screen");
+    resetPasswordController.init();
+  } else if (authController.getUser()) {
     showScreen("home-screen");
     homeController.init();
   } else {
     showScreen("login-screen");
   }
-
+  
   console.log("PickMi SPA initialized");
 });

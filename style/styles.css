@@ -562,6 +562,20 @@ input[type="color"]::-moz-color-swatch {
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.refresh-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.5s ease-in-out;
+}
+
+.refresh-icon.spinning {
+  transform: rotate(360deg);
 }
 
 .admin-list {

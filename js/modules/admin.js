@@ -33,6 +33,7 @@ const adminController = {
     await this.loadUsers();
     await this.loadNotes();
     this.setupModalCloseButtons();
+    this.setupRefreshButtons();
   },
   async loadUsers() {
     try {
@@ -197,6 +198,21 @@ const adminController = {
         console.error("Error deleting note:", error);
         showToast(`Error deleting note: ${error.message}`, "error");
       }
+    });
+  },
+  setupRefreshButtons() {
+    document.getElementById('refresh-users').addEventListener('click', (e) => {
+      e.target.classList.add('spinning');
+      this.loadUsers().finally(() => {
+        e.target.classList.remove('spinning');
+      });
+    });
+
+    document.getElementById('refresh-notes').addEventListener('click', (e) => {
+      e.target.classList.add('spinning');
+      this.loadNotes().finally(() => {
+        e.target.classList.remove('spinning');
+      });
     });
   },
 };

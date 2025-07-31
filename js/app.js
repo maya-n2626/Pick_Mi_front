@@ -254,6 +254,15 @@ const canvasService = {
   getDataURL() {
     return state.canvas ? state.canvas.toDataURL() : null;
   },
+  isCanvasEmpty() {
+    const pixels = state.ctx.getImageData(
+      0,
+      0,
+      state.canvas.width,
+      state.canvas.height,
+    ).data;
+    return !pixels.some((channel) => channel !== 0);
+  },
 };
 
 // UI Controllers
@@ -290,7 +299,6 @@ const homeController = {
     notes.forEach((note, index) => {
       const noteEl = document.createElement("div");
       noteEl.className = "floating-note";
-      noteEl.textContent = "📝";
       noteEl.style.left = Math.random() * 80 + "%";
       noteEl.style.top = Math.random() * 80 + "%";
       noteEl.style.animationDelay = Math.random() * 6 + "s";
@@ -325,6 +333,11 @@ const noteViewController = {
       );
       this.renderNote(note);
       showScreen("note-view-screen");
+      await notesAPI.deleteNote(
+        noteId,
+        state.currentLocation.lat,
+        state.currentLocation.lon,
+      );
     } catch (error) {
       console.error("Error loading note:", error);
       alert("Error loading note: " + error.message);
@@ -395,7 +408,9 @@ const noteEditorController = {
       await locationService.getCurrentPosition();
 
       const text = document.getElementById("note-text").value.trim();
-      const drawingData = canvasService.getDataURL();
+      const drawingData = !canvasService.isCanvasEmpty(canvas)
+        ? canvasService.getDataURL()
+        : null;
 
       if (!text && !drawingData) {
         alert("Please add some content to your note");
@@ -460,7 +475,7 @@ const mapController = {
     });
 
     // Add user location marker
-    new google.maps.Marker({
+    new google.maps.AdvancedMarkerElement({
       position: {
         lat: state.currentLocation.lat,
         lng: state.currentLocation.lon,
@@ -492,30 +507,19 @@ const mapController = {
           note.location.latitude &&
           note.location.longitude
         ) {
-          const marker = new google.maps.Marker({
+          const img = document.createElement("img");
+          img.src = "./images/ClosedNote.png";
+          img.style.width = "40px";
+          img.style.height = "40px";
+
+          const marker = new google.maps.marker.AdvancedMarkerElement({
             position: {
               lat: Number(note.location.latitude),
               lng: Number(note.location.longitude),
             },
             map: this.map,
             title: note.content?.text || "Note",
-            icon: {
-              url:
-                "data:image/svg+xml;charset=UTF-8," +
-                encodeURIComponent(`
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
-                                            <circle cx="15" cy="15" r="12" fill="#ffd54f" stroke="#fff" stroke-width="2"/>
-                                            <text x="15" y="20" font-family="Arial" font-size="14" text-anchor="middle" fill="#333">📝</text>
-                                        </svg>
-                                    `),
-              scaledSize: new google.maps.Size(30, 30),
-              anchor: new google.maps.Point(15, 15),
-            },
-          });
-
-          marker.addListener("click", () => {
-            state.currentNoteId = note.id;
-            noteViewController.loadNote(note.id);
+            content: img,
           });
         }
       });
@@ -738,24 +742,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("clear-canvas").addEventListener("click", () => {
     canvasService.clear();
-  });
-
-  // Note actions
-  document.getElementById("delete-note").addEventListener("click", async () => {
-    if (!confirm("Are you sure you want to delete this note?")) return;
-
-    try {
-      await notesAPI.deleteNote(
-        state.currentNoteId,
-        state.currentLocation.lat,
-        state.currentLocation.lon,
-      );
-      showScreen("home-screen");
-      await homeController.loadNearbyNotes();
-    } catch (error) {
-      console.error("Error deleting note:", error);
-      alert("Error deleting note: " + error.message);
-    }
   });
 
   // Profile actions

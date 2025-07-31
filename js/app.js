@@ -452,23 +452,24 @@ const homeController = {
 const noteViewController = {
   async loadNote(noteId) {
     try {
-      const note = await notesAPI.getNoteContent(
-        noteId,
-        state.currentLocation.lat,
-        state.currentLocation.lon,
-      );
+      const note = await notesAPI.getNoteContent(noteId, state.currentLocation.lat, state.currentLocation.lon);
       this.renderNote(note);
       showScreen("note-view-screen");
-      await notesAPI.deleteNote(
-        noteId,
-        state.currentLocation.lat,
-        state.currentLocation.lon,
-      );
+      // Delete the note in the background after showing it.
+      notesAPI.deleteNote(noteId, state.currentLocation.lat, state.currentLocation.lon).catch(err => console.error("Failed to delete note:", err));
     } catch (error) {
       console.error("Error loading note:", error);
       alert(`Error loading note: ${error.message}`);
+      // If loading fails, go back and refresh to remove the potentially broken note.
+      this.closeNote();
     }
   },
+
+  async closeNote() {
+    showScreen("home-screen");
+    await homeController.init(); // Force a full refresh of the home screen
+  },
+
   renderNote(note) {
     const container = document.getElementById("note-content");
     container.innerHTML = "";
@@ -759,9 +760,10 @@ document.addEventListener("DOMContentLoaded", () => {
   for (const [btnId, screenId] of Object.entries(navButtons)) {
     document.getElementById(btnId).addEventListener("click", async () => {
       showScreen(screenId);
-      if (btnId === "show-map") await mapController.init();
-      if (btnId === "admin-btn") await adminController.init();
-      if (btnId === "new-note-btn") noteEditorController.init();
+      if (btnId === 'show-map') await mapController.init();
+      if (btnId === 'admin-btn') await adminController.init();
+      if (btnId === 'new-note-btn') noteEditorController.init();
+      if (btnId === 'back-from-note') await homeController.loadNearbyNotes();
     });
   }
 

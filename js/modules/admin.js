@@ -82,7 +82,7 @@ const adminController = {
           <div>
             <p><strong>Sender:</strong> ${userEmail}</p>
             <p><strong>Note ID:</strong> ${note.id}</p>
-            <p><strong>Content:</strong> ${note.content?.text ? note.content.text.substring(0, 70) + (note.content.text.length > 70 ? "..." : "") : "No text content"}</p>
+            <p><strong>Content:</strong> ${note.content?.text ? new DOMParser().parseFromString(note.content.text, 'text/html').body.textContent.substring(0, 70) + (note.content.text.length > 70 ? "..." : "") : "No text content"}</p>
             <p><strong>Includes Drawing:</strong> ${isDrawingEmpty(note.content?.drawingData) ? "No" : "Yes"}</p>
           </div>
           <button class="btn-danger" onclick="event.stopPropagation(); adminController.deleteNote('${note.id}')">Delete</button>
@@ -116,7 +116,6 @@ const adminController = {
 
     if (noteContent.text) {
       const p = document.createElement("p");
-      p.style.fontSize = "16px"; // Set a default font size for display
       p.innerHTML = noteContent.text;
       modalNoteContent.appendChild(p);
     }
@@ -152,7 +151,7 @@ const adminController = {
           <div>
             <p><strong>Sender:</strong> ${note.userEmail || note.userId}</p>
             <p><strong>Note ID:</strong> ${note.id}</p>
-            <p><strong>Content:</strong> ${note.content?.text ? note.content.text.substring(0, 70) + (note.content.text.length > 70 ? "..." : "") : "No text content"}</p>
+            <p><strong>Content:</strong> ${note.content?.text ? new DOMParser().parseFromString(note.content.text, 'text/html').body.textContent.substring(0, 70) + (note.content.text.length > 70 ? "..." : "") : "No text content"}</p>
             <p><strong>Includes Drawing:</strong> ${isDrawingEmpty(note.content?.drawingData) ? "No" : "Yes"}</p>
           </div>
           <button class="btn-danger" onclick="event.stopPropagation(); adminController.deleteNote('${note.id}')">Delete</button>

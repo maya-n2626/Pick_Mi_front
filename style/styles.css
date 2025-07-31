@@ -653,6 +653,10 @@ input[type="color"]::-moz-color-swatch {
   margin: 10px 0;
 }
 
+#modal-note-content p {
+  font-size: 16px !important;
+}
+
 .bottom-nav {
   position: fixed;
   bottom: 0;
